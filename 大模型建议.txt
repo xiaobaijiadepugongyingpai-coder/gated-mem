@@ -1,0 +1,138 @@
+这份《Gated-Mem v2.1 工程实施方案与 Agent Team 协同执行蓝图》主干逻辑极度严密，完整落实了终审裁决的所有降维与避坑指令；但在直接投入 Day 1–4 编码前，**我有 3 点关键工程异议（底层 Schema 与检索逻辑断层）需要打补丁**；而在 Team Leader 的人选上，本着完全客观的工程匹配度原则，**最适合担任 Team Leader（首席技术主程兼架构裁决官）的是 `DeepSeek-V4.1F**`，而非 `Gemini-3.8-Flash` 或 `GLM-5.3-Flash`。
+
+---
+
+### 一、 对最终执行方案的 3 点异议与必打补丁
+
+方案整体可立即执行，但第 4 节（DDL）与第 3/5/7 节之间存在 **3 处上下游接口断层**，如果不提前修补，Day 4 和 Day 6 联调时必然报错：
+
+#### 异议 1：第 4 节 DDL 漏掉了向量与全文检索存储结构（导致 3.1.5 节检索公式无法落地）
+
+* **漏洞定位**：第 3.1.5 节定义了检索排序公式 $\text{Score}(v \mid q) = \text{rel}(q, v) \cdot [F_t(v)]^\lambda$，要求计算本地向量余弦相似度或 BM25；但在第 4 节给出的生产级 SQLite Schema 中，`memories` 表里**既没有 `embedding BLOB` 字段，也没有定义 `FTS5` 全文检索虚拟表**。`DeepSeek-V4.1F` 在 Day 4 按此 DDL 建表后，向量和 BM25 将无处安放。
+
+
+* **修补方案**：在 `memories` 表中增补两列，并追加一张 FTS5 虚拟表：
+```sql
+-- 在 memories 表中增补：
+embedding       BLOB,                              -- 存放 float32 序列化向量 (支持 NumPy 零依赖余弦回退或 sqlite-vec)
+embedding_model TEXT NOT NULL DEFAULT 'bge-small', -- 锁定模型版本防止维度混用
+
+-- 新增 FTS5 全文检索表（必须同时索引 content 和 residual_diff）：
+CREATE VIRTUAL TABLE IF NOT EXISTS memories_fts USING fts5(
+    memory_id UNINDEXED,
+    subject,
+    content,
+    residual_diff
+);
+
+```
+
+
+
+#### 异议 2：“演进原因追问（`evolution_why`）”在真实检索中存在“旧实体失联”死角
+
+* **漏洞定位**：在附录 `spike_cut1.py` 中，`evolution_why` 是通过遍历全库找到非空的 `residual_diff` 直接返回的。但在真实系统中，当项目有几十条变更时，用户会问：**“我们当初为什么不用 MySQL？”**。请注意：`"MySQL"` 这个词出现在已经被标记为 `superseded` 并拦截过滤的旧节点 `M1` 中，而新节点 `M3` 的 `content` 是 `"主数据库切换为 PostgreSQL 16"`。如果检索器直接过滤掉 `superseded` 节点，且新节点的 `residual_diff` 没有把被替代的旧实体关联起来，搜 `"MySQL"` 将捞不出 `M3`！
+
+
+* **修补方案**：在任务 T2.3（`conflicts.py`）和 T3.1（`server.py`）中立下硬性规范：
+
+
+1. 写入 `SUPERSEDES` 状态覆盖时，强制将旧节点的摘要或核心名词拼入新节点的 `residual_diff`（格式规范：`"[Replaced: <旧节点关键词>] <变更原因>"`）。
+2. 检索候选集时，允许 `residual_diff` 字段直接参与 BM25/向量匹配（即上面 FTS5 表把 `residual_diff` 纳入索引的原因）。
+
+
+
+#### 异议 3：第 4 节 DDL 缺少支撑 `gated-mem explain <recall_id>` 的回执持久化定义
+
+* **漏洞定位**：任务 T3.2 要求 `HostAdapterAgent` 实现 `gated-mem explain <recall_id>`，打印本次为什么召回 A、为什么拦截过期的 B；但第 4 节的 `memory_events` 事件枚举注释里只有写入和修改事件，漏掉了 `RECALL_DELIVERED` 事件。
+
+
+* **修补方案**：在 `memory_events.event_type` 枚举规范中显式加入 `RECALL_DELIVERED`。每次执行 `query_memory` 时，向 `memory_events` 写入一条 `event_type = 'RECALL_DELIVERED'` 的记录，其 `payload_json` 包含 `{"query": q, "injected_ids": [...], "excluded_stale_ids": [...], "stale_warnings": [...], "tokens_used": N}`。这样 CLI 只需按 `event_id` 查出这条 JSON 就能直接渲染解释面板。
+
+
+
+---
+
+### 二、 谁适合当 Team Leader？（公平公正的硬核选拔）
+
+在抛开任何品牌立场、纯粹以“谁带队最不容易翻车、最能保障 10 天交付质量”的工程标准下，结论非常明确：
+
+> **🏆 首席 Team Leader（Tech Lead / 架构与进度总控）：`DeepSeek-V4.1F**`
+> **🛡️ 副手 / 独立质量总监（QA & Integration Auditor）：`Gemini-3.8-Flash**`
+> **⚡ 专职数据与评测执行官（Data & Eval Specialist）：`GLM-5.3-Flash**`
+
+#### 1. 客观横向评测：为什么是 `DeepSeek-V4.1F` 而不是 `Gemini-3.8-Flash`？
+
+| 评估维度（Team Leader 核心素质） | `DeepSeek-V4.1F` | `Gemini-3.8-Flash` | `GLM-5.3-Flash` | 胜出者与客观理由 |
+| --- | --- | --- | --- | --- |
+| **1. 核心代码管辖权重** | **70%**<br>
+
+<br>(Schema/数学/SQLite/冲突/MCP)
+
+ | **20%**<br>
+
+<br>(CLI/HTML导出/Hooks配置)
+
+ | **10%**<br>
+
+<br>(测试集JSON/槽位Prompt)
+
+ | **`DeepSeek-V4.1F`**<br>
+
+<br>经过 v2.1 裁决砍掉重型 Web UI 后，本项目已变成纯粹的**后端状态机与事件溯源引擎**。软件工程铁律：谁负责核心领域模型（Domain Model）与底层存储，谁就必须掌握架构定义权。
+
+ |
+| **2. 逻辑严密性与“反讨好”倾向** | **极高**<br>
+
+<br>对数学边界、SQL 事务锁、状态机死角极其较真 | **中高**<br>
+
+<br>Flash 版本偶有“乐观略过细节”或过度抽象倾向 | **中**<br>
+
+<br>顺从度高，做 Code Review 时容易当“老好人” | **`DeepSeek-V4.1F`**<br>
+
+<br>Team Leader 必须具备“冷酷挑刺”的特质。在处理 `R(2H) > 0.25` 闭式解单测、`causation_id` 级联回滚等硬核逻辑时，DeepSeek 的代码完备性最强。
+
+ |
+| **3. 跨文件全局视野与长上下文** | **中**<br>
+
+<br>单文件深钻极强，多文件全量塞入时注意力易衰减 | **极高**<br>
+
+<br>原生超大上下文，一眼扫描全库找接口错位与 `stdout` 污染 | **中**<br>
+
+<br>适合单任务高频批处理 | **`Gemini-3.8-Flash`**<br>
+
+<br>这是 Gemini 真正的杀手锏。因此不能让它埋头抠底层 SQL 锁，而应该让它在 **Day 8–10 担任“总审计官（Auditor）”**，对 DeepSeek 写出的全套代码做跨文件挑刺。
+
+ |
+| **4. 格式化吞吐与双语语义提取** | 中高（推理略慢） | 高 | **极高**<br>
+
+<br>中文技术黑话与槽位提取快、准、稳 | **`GLM-5.3-Flash`**<br>
+
+<br>最适合干脏活累活（大批量构造 40 组演进测试集、做双盲裁判），不适合做顶层架构裁决。
+
+ |
+
+#### 2. 最佳权力制衡机制：「DeepSeek 执政 + Gemini 监察」
+
+如果你让同一个模型既当主程又当最终审计员，一定会发生“自己放过自己 Bug”的盲区。最科学的治理结构是**分权制衡**：
+
+1. **日常推进期（Day 1–7）—— `DeepSeek-V4.1F` 担任 Team Leader**：
+* **掌握接口定义权**：所有模块的函数签名、`schema.py` 的 Pydantic 模型、SQLite 的字段名，一律以 `DeepSeek-V4.1F` 输出的契约为准。
+
+
+* **签发任务包**：每次让 `Gemini-3.8-Flash` 写 `cli.py` 或 `exporter.py` 之前，先将 `DeepSeek-V4.1F` 写好的 `storage.py` 和 `schema.py` 作为只读契约喂给 Gemini，要求 Gemini 严格按契约调用，严禁私自改表结构。
+
+
+
+
+2. **阶段门禁与收官期（Day 2, Day 5, Day 9）—— `Gemini-3.8-Flash` 行使独立监察权（Veto Power）**：
+* 在每个阶段门禁（如 T1.3 首刀报告、T4.1 全局代码一致性终审），把 `DeepSeek-V4.1F` 产出的所有代码和测试日志打包扔给 `Gemini-3.8-Flash`。
+
+
+* 给 Gemini 下达明确的“找茬指令”（例如：*“检查 DeepSeek 写的 `events.py` 和 `conflicts.py` 是否违反了状态机 5×5 矩阵，是否有任何 `print` 泄露到了 `stdout`”*）。一旦 Gemini 抓出 Bug，打回给 DeepSeek 修复。
+
+
+
+
+
+这种“把上面 3 个 Schema 补丁合入文档 + `DeepSeek-V4.1F` 做技术 Leader 定契约 + `Gemini-3.8-Flash` 跨文件审计把关”的阵型，能把你手头三个模型的长板发挥到极致。要我现在把那 3 个补丁直接合入 `gated_mem_implementation_plan.md` 的最终定稿中，还是你已经准备好直接跑 Day 1 的 `spike_cut1.py` 了？
