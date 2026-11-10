@@ -1,0 +1,4577 @@
+{
+  "dataset_version": "1.0.0",
+  "case_count": 40,
+  "cases": [
+    {
+      "scenario_id": "S01",
+      "domain": "db",
+      "description": "用户服务的主数据库从 MySQL 8.0 演进到 PostgreSQL 16 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(MySQL 8.0) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(PostgreSQL 16, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 MySQL 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=MySQL 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "用户服务主数据库决策：采用 MySQL 8.0，其他方案暂不考虑。",
+          "subject": "用户服务",
+          "predicate": "主数据库",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "用户服务主数据库变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "用户服务",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好用户服务的主数据库变更走灰度发布，避免一次性全量切换。",
+          "subject": "用户服务",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "用户服务改用 PostgreSQL 16 作为 主数据库。",
+          "subject": "用户服务",
+          "predicate": "主数据库",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 MySQL 在许可证模式与云托管成本方面逐渐成为瓶颈，团队切换到 PostgreSQL 16。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：用户服务的主数据库凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "用户服务",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：PostgreSQL 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "用户服务",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "用户服务现在的主数据库是什么？还在用 MySQL 吗，还是已经换成了 PostgreSQL？",
+          "must_include": [
+            "PostgreSQL"
+          ],
+          "must_exclude": [
+            "MySQL"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "用户服务的主数据库变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么用户服务的主数据库从 MySQL 切换到了 PostgreSQL？",
+          "must_include": [
+            "许可证模式与云托管成本"
+          ],
+          "must_exclude": [],
+          "old_keyword": "MySQL"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S02",
+      "domain": "auth",
+      "description": "登录模块的会话存储从 Memcached 1.6 演进到 Redis 7 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Memcached 1.6) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Redis 7, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Memcached 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Memcached 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "登录模块会话存储决策：采用 Memcached 1.6，其他方案暂不考虑。",
+          "subject": "登录模块",
+          "predicate": "会话存储",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "登录模块会话存储变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "登录模块",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好登录模块的会话存储变更走灰度发布，避免一次性全量切换。",
+          "subject": "登录模块",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "登录模块改用 Redis 7 作为 会话存储。",
+          "subject": "登录模块",
+          "predicate": "会话存储",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Memcached 在数据结构丰富度与持久化能力方面逐渐成为瓶颈，团队切换到 Redis 7。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：登录模块的会话存储凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "登录模块",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Redis 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "登录模块",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "登录模块现在的会话存储是什么？还在用 Memcached 吗，还是已经换成了 Redis？",
+          "must_include": [
+            "Redis"
+          ],
+          "must_exclude": [
+            "Memcached"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "登录模块的会话存储变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么登录模块的会话存储从 Memcached 切换到了 Redis？",
+          "must_include": [
+            "数据结构丰富度与持久化能力"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Memcached"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S03",
+      "domain": "frontend",
+      "description": "管理后台的构建工具从 webpack 4 演进到 Vite 5 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(webpack 4) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Vite 5, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 webpack 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=webpack 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "管理后台构建工具决策：采用 webpack 4，其他方案暂不考虑。",
+          "subject": "管理后台",
+          "predicate": "构建工具",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "管理后台构建工具变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "管理后台",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好管理后台的构建工具变更走灰度发布，避免一次性全量切换。",
+          "subject": "管理后台",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "管理后台改用 Vite 5 作为 构建工具。",
+          "subject": "管理后台",
+          "predicate": "构建工具",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 webpack 在冷启动与热更新速度方面逐渐成为瓶颈，团队切换到 Vite 5。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：管理后台的构建工具凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "管理后台",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Vite 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "管理后台",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "管理后台现在的构建工具是什么？还在用 webpack 吗，还是已经换成了 Vite？",
+          "must_include": [
+            "Vite"
+          ],
+          "must_exclude": [
+            "webpack"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "管理后台的构建工具变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么管理后台的构建工具从 webpack 切换到了 Vite？",
+          "must_include": [
+            "冷启动与热更新速度"
+          ],
+          "must_exclude": [],
+          "old_keyword": "webpack"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S04",
+      "domain": "testing",
+      "description": "回归测试的E2E 框架从 Selenium 3 演进到 Playwright 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Selenium 3) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Playwright, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Selenium 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Selenium 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "回归测试E2E 框架决策：采用 Selenium 3，其他方案暂不考虑。",
+          "subject": "回归测试",
+          "predicate": "E2E 框架",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "回归测试E2E 框架变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "回归测试",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好回归测试的E2E 框架变更走灰度发布，避免一次性全量切换。",
+          "subject": "回归测试",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "回归测试改用 Playwright 作为 E2E 框架。",
+          "subject": "回归测试",
+          "predicate": "E2E 框架",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Selenium 在执行稳定性与自动等待能力方面逐渐成为瓶颈，团队切换到 Playwright。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：回归测试的E2E 框架凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "回归测试",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Playwright 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "回归测试",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "回归测试现在的E2E 框架是什么？还在用 Selenium 吗，还是已经换成了 Playwright？",
+          "must_include": [
+            "Playwright"
+          ],
+          "must_exclude": [
+            "Selenium"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "回归测试的E2E 框架变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么回归测试的E2E 框架从 Selenium 切换到了 Playwright？",
+          "must_include": [
+            "执行稳定性与自动等待能力"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Selenium"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S05",
+      "domain": "deploy",
+      "description": "订单服务的容器编排平台从 Docker Swarm 演进到 Kubernetes 1.29，且含同时挂两个父节点的多亲事件。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Docker Swarm) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Kubernetes 1.29, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Swarm 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Swarm 只能从 residual_diff 解释通道获得。 另含 M7 同时挂 M2/M4 两个父节点的多亲事件。",
+      "tags": [
+        "evolution",
+        "multi_parent"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "订单服务容器编排平台决策：采用 Docker Swarm，其他方案暂不考虑。",
+          "subject": "订单服务",
+          "predicate": "容器编排平台",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "订单服务容器编排平台变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "订单服务",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好订单服务的容器编排平台变更走灰度发布，避免一次性全量切换。",
+          "subject": "订单服务",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "订单服务改用 Kubernetes 1.29 作为 容器编排平台。",
+          "subject": "订单服务",
+          "predicate": "容器编排平台",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Swarm 在生态成熟度与调度能力方面逐渐成为瓶颈，团队切换到 Kubernetes 1.29。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：订单服务的容器编排平台凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "订单服务",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Kubernetes 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "订单服务",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        },
+        {
+          "id": "M7",
+          "content": "临时记录：同步跟踪 Kubernetes 迁移进度与容器编排平台规范落地情况。",
+          "subject": "订单服务",
+          "predicate": "迁移跟踪",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.2,
+          "parent_ids": [
+            "M2",
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "订单服务现在的容器编排平台是什么？还在用 Swarm 吗，还是已经换成了 Kubernetes？",
+          "must_include": [
+            "Kubernetes"
+          ],
+          "must_exclude": [
+            "Swarm"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "订单服务的容器编排平台变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么订单服务的容器编排平台从 Swarm 切换到了 Kubernetes？",
+          "must_include": [
+            "生态成熟度与调度能力"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Swarm"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S06",
+      "domain": "observability",
+      "description": "网关服务的指标采集通道从 StatsD 演进到 OpenTelemetry，并含同 (subject, predicate) 跨 scope 的隔离节点对（branch:feat-gw-tail）。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(StatsD) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(OpenTelemetry, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 StatsD 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=StatsD 只能从 residual_diff 解释通道获得。 另含 M3/M4 同 (subject, predicate) 不同 scope（global vs branch:feat-gw-tail）的隔离对，current_state 探针同时断言两侧共存、互不覆盖。",
+      "tags": [
+        "evolution",
+        "scope_isolation"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "网关服务指标采集通道决策：采用 StatsD，其他方案暂不考虑。",
+          "subject": "网关服务",
+          "predicate": "指标采集通道",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "网关服务指标采集通道变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "网关服务",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "网关服务的采样策略（全局）：采用全量采样。",
+          "subject": "网关服务",
+          "predicate": "采样策略",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.7
+        },
+        {
+          "id": "M4",
+          "content": "网关服务在分支 feat-gw-tail 上的采样策略：改为尾部采样，仅该分支生效。",
+          "subject": "网关服务",
+          "predicate": "采样策略",
+          "scope": "branch:feat-gw-tail",
+          "memory_type": "DECISION",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M3"
+          ]
+        },
+        {
+          "id": "M5",
+          "content": "网关服务改用 OpenTelemetry 作为 指标采集通道。",
+          "subject": "网关服务",
+          "predicate": "指标采集通道",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 StatsD 在协议标准化与生态兼容性方面逐渐成为瓶颈，团队切换到 OpenTelemetry。"
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：OpenTelemetry 上线后一周内跟踪错误率变化。",
+          "subject": "网关服务",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M5"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "网关服务全局的采样策略是什么？分支 feat-gw-tail 上又改成了什么？指标采集通道还在用 StatsD 吗，还是已经换成了 OpenTelemetry？",
+          "must_include": [
+            "全量采样",
+            "尾部采样",
+            "OpenTelemetry"
+          ],
+          "must_exclude": [
+            "StatsD"
+          ],
+          "expect_nodes": [
+            "M3",
+            "M4",
+            "M5"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "网关服务的指标采集通道变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么网关服务的指标采集通道从 StatsD 切换到了 OpenTelemetry？",
+          "must_include": [
+            "协议标准化与生态兼容性"
+          ],
+          "must_exclude": [],
+          "old_keyword": "StatsD"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S07",
+      "domain": "api",
+      "description": "开放平台的接口协议从 SOAP 演进到 gRPC，并含同实体不同属性的假冲突对（文档格式偏好）。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(SOAP) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(gRPC, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 SOAP 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=SOAP 只能从 residual_diff 解释通道获得。 另含 M1/M3 同 subject 不同 predicate（文档格式偏好）的假冲突对，槽位三元组不同，不得发生覆盖。",
+      "tags": [
+        "evolution",
+        "fake_conflict"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "开放平台接口协议决策：采用 SOAP，其他方案暂不考虑。",
+          "subject": "开放平台",
+          "predicate": "接口协议",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "开放平台接口协议变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "开放平台",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "开放平台的文档格式偏好：统一使用 OpenAPI 3.0。",
+          "subject": "开放平台",
+          "predicate": "文档格式偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "开放平台改用 gRPC 作为 接口协议。",
+          "subject": "开放平台",
+          "predicate": "接口协议",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 SOAP 在强类型契约与传输效率方面逐渐成为瓶颈，团队切换到 gRPC。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：开放平台的接口协议凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "开放平台",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：gRPC 上线后一周内跟踪 P99 延迟变化。",
+          "subject": "开放平台",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "开放平台现在的接口协议是什么？已经从 SOAP 换成 gRPC 了吗？文档格式偏好有变化吗？",
+          "must_include": [
+            "gRPC",
+            "OpenAPI 3.0"
+          ],
+          "must_exclude": [
+            "SOAP"
+          ],
+          "expect_nodes": [
+            "M3",
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "开放平台的接口协议变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么开放平台的接口协议从 SOAP 切换到了 gRPC？",
+          "must_include": [
+            "强类型契约与传输效率"
+          ],
+          "must_exclude": [],
+          "old_keyword": "SOAP"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S08",
+      "domain": "security",
+      "description": "控制组：审计模块的默认日志格式从 logfmt 迁移到 JSON Logs，覆盖不涉及 anti_trap 靶子。",
+      "is_control": true,
+      "construction_note": "控制组：覆盖仅发生在偏好槽位（默认日志格式），anti_trap 靶子 M2 为根节点、不在被覆盖节点 M1 的子孙链上，因此分支 B 的连坐不会误杀靶子；current_state 的 must_exclude 留空，用于证明分支 A 并非必然失败。",
+      "tags": [
+        "control"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "团队偏好：审计模块统一采用 logfmt 作为默认日志格式。",
+          "subject": "审计模块",
+          "predicate": "默认日志格式",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M2",
+          "content": "审计模块运维规范：所有告警必须附带 trace_id，禁止静默失败。",
+          "subject": "审计模块",
+          "predicate": "运维规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7
+        },
+        {
+          "id": "M3",
+          "content": "审计模块改用 JSON Logs 作为默认日志格式。",
+          "subject": "审计模块",
+          "predicate": "默认日志格式",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6,
+          "residual_diff": "因为 logfmt 的表达能力和工具链支持逐渐不足，团队迁移到 JSON Logs。"
+        },
+        {
+          "id": "M4",
+          "content": "审计模块的变更记录统一归档到运维知识库，附变更单号。",
+          "subject": "审计模块",
+          "predicate": "变更归档",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M5",
+          "content": "临时观察：trace_id 覆盖率是否达到 100%。",
+          "subject": "审计模块",
+          "predicate": "规范观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M2"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "团队偏好周五下午发布，避开周一流量高峰。",
+          "subject": "审计模块",
+          "predicate": "发布窗口偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.4,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "团队现在审计模块的默认日志格式是什么？已经用上 JSON 了吗？",
+          "must_include": [
+            "JSON"
+          ],
+          "must_exclude": [],
+          "expect_nodes": [
+            "M3"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "审计模块的运维规范对告警和 trace_id 有什么要求？",
+          "must_include": [
+            "trace_id"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么审计模块的默认日志格式从 logfmt 改成了 JSON？",
+          "must_include": [
+            "表达能力和工具链支持"
+          ],
+          "must_exclude": [],
+          "old_keyword": "logfmt"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S09",
+      "domain": "cache",
+      "description": "商品详情页的本地缓存从 Guava Cache 演进到 Caffeine 3 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Guava Cache) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Caffeine 3, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Guava 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Guava 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "商品详情页本地缓存决策：采用 Guava Cache，其他方案暂不考虑。",
+          "subject": "商品详情页",
+          "predicate": "本地缓存",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "商品详情页本地缓存变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "商品详情页",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好商品详情页的本地缓存变更走灰度发布，避免一次性全量切换。",
+          "subject": "商品详情页",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "商品详情页改用 Caffeine 3 作为 本地缓存。",
+          "subject": "商品详情页",
+          "predicate": "本地缓存",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Guava 在淘汰算法效率与维护状态方面逐渐成为瓶颈，团队切换到 Caffeine 3。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：商品详情页的本地缓存凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "商品详情页",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Caffeine 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "商品详情页",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "商品详情页现在的本地缓存是什么？还在用 Guava 吗，还是已经换成了 Caffeine？",
+          "must_include": [
+            "Caffeine"
+          ],
+          "must_exclude": [
+            "Guava"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "商品详情页的本地缓存变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么商品详情页的本地缓存从 Guava 切换到了 Caffeine？",
+          "must_include": [
+            "淘汰算法效率与维护状态"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Guava"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S10",
+      "domain": "build",
+      "description": "发布流水线的CI 引擎从 Jenkins 2 演进到 GitHub Actions 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Jenkins 2) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(GitHub Actions, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Jenkins 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Jenkins 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "发布流水线CI 引擎决策：采用 Jenkins 2，其他方案暂不考虑。",
+          "subject": "发布流水线",
+          "predicate": "CI 引擎",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "发布流水线CI 引擎变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "发布流水线",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好发布流水线的CI 引擎变更走灰度发布，避免一次性全量切换。",
+          "subject": "发布流水线",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "发布流水线改用 GitHub Actions 作为 CI 引擎。",
+          "subject": "发布流水线",
+          "predicate": "CI 引擎",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Jenkins 在插件生态与维护成本方面逐渐成为瓶颈，团队切换到 GitHub Actions。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：发布流水线的CI 引擎凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "发布流水线",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：GitHub Actions 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "发布流水线",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "发布流水线现在的CI 引擎是什么？还在用 Jenkins 吗，还是已经换成了 GitHub Actions？",
+          "must_include": [
+            "GitHub Actions"
+          ],
+          "must_exclude": [
+            "Jenkins"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "发布流水线的CI 引擎变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么发布流水线的CI 引擎从 Jenkins 切换到了 GitHub Actions？",
+          "must_include": [
+            "插件生态与维护成本"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Jenkins"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S11",
+      "domain": "db",
+      "description": "用户服务的主数据库从 MySQL 8.0 演进到 PostgreSQL 16 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(MySQL 8.0) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(PostgreSQL 16, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 MySQL 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=MySQL 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "用户服务主数据库决策：采用 MySQL 8.0，其他方案暂不考虑。",
+          "subject": "用户服务",
+          "predicate": "主数据库",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "用户服务主数据库变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "用户服务",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好用户服务的主数据库变更走灰度发布，避免一次性全量切换。",
+          "subject": "用户服务",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "用户服务改用 PostgreSQL 16 作为 主数据库。",
+          "subject": "用户服务",
+          "predicate": "主数据库",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 MySQL 在许可证模式与云托管成本方面逐渐成为瓶颈，团队切换到 PostgreSQL 16。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：用户服务的主数据库凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "用户服务",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：PostgreSQL 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "用户服务",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "用户服务现在的主数据库是什么？还在用 MySQL 吗，还是已经换成了 PostgreSQL？",
+          "must_include": [
+            "PostgreSQL"
+          ],
+          "must_exclude": [
+            "MySQL"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "用户服务的主数据库变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么用户服务的主数据库从 MySQL 切换到了 PostgreSQL？",
+          "must_include": [
+            "许可证模式与云托管成本"
+          ],
+          "must_exclude": [],
+          "old_keyword": "MySQL"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S12",
+      "domain": "auth",
+      "description": "登录模块的会话存储从 Memcached 1.6 演进到 Redis 7 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Memcached 1.6) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Redis 7, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Memcached 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Memcached 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "登录模块会话存储决策：采用 Memcached 1.6，其他方案暂不考虑。",
+          "subject": "登录模块",
+          "predicate": "会话存储",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "登录模块会话存储变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "登录模块",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好登录模块的会话存储变更走灰度发布，避免一次性全量切换。",
+          "subject": "登录模块",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "登录模块改用 Redis 7 作为 会话存储。",
+          "subject": "登录模块",
+          "predicate": "会话存储",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Memcached 在数据结构丰富度与持久化能力方面逐渐成为瓶颈，团队切换到 Redis 7。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：登录模块的会话存储凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "登录模块",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Redis 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "登录模块",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "登录模块现在的会话存储是什么？还在用 Memcached 吗，还是已经换成了 Redis？",
+          "must_include": [
+            "Redis"
+          ],
+          "must_exclude": [
+            "Memcached"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "登录模块的会话存储变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么登录模块的会话存储从 Memcached 切换到了 Redis？",
+          "must_include": [
+            "数据结构丰富度与持久化能力"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Memcached"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S13",
+      "domain": "frontend",
+      "description": "控制组：埋点模块的默认日志采集器从 Fluentd 迁移到 Vector，覆盖不涉及 anti_trap 靶子。",
+      "is_control": true,
+      "construction_note": "控制组：覆盖仅发生在偏好槽位（默认日志采集器），anti_trap 靶子 M2 为根节点、不在被覆盖节点 M1 的子孙链上，因此分支 B 的连坐不会误杀靶子；current_state 的 must_exclude 留空，用于证明分支 A 并非必然失败。",
+      "tags": [
+        "control"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "团队偏好：埋点模块统一采用 Fluentd 作为默认日志采集器。",
+          "subject": "埋点模块",
+          "predicate": "默认日志采集器",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M2",
+          "content": "埋点模块运维规范：所有告警必须附带 trace_id，禁止静默失败。",
+          "subject": "埋点模块",
+          "predicate": "运维规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7
+        },
+        {
+          "id": "M3",
+          "content": "埋点模块改用 Vector 作为默认日志采集器。",
+          "subject": "埋点模块",
+          "predicate": "默认日志采集器",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6,
+          "residual_diff": "因为 Fluentd 的表达能力和工具链支持逐渐不足，团队迁移到 Vector。"
+        },
+        {
+          "id": "M4",
+          "content": "埋点模块的变更记录统一归档到运维知识库，附变更单号。",
+          "subject": "埋点模块",
+          "predicate": "变更归档",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M5",
+          "content": "临时观察：trace_id 覆盖率是否达到 100%。",
+          "subject": "埋点模块",
+          "predicate": "规范观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M2"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "团队偏好周五下午发布，避开周一流量高峰。",
+          "subject": "埋点模块",
+          "predicate": "发布窗口偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.4,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "团队现在埋点模块的默认日志采集器是什么？已经用上 Vector 了吗？",
+          "must_include": [
+            "Vector"
+          ],
+          "must_exclude": [],
+          "expect_nodes": [
+            "M3"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "埋点模块的运维规范对告警和 trace_id 有什么要求？",
+          "must_include": [
+            "trace_id"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么埋点模块的默认日志采集器从 Fluentd 改成了 Vector？",
+          "must_include": [
+            "表达能力和工具链支持"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Fluentd"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S14",
+      "domain": "testing",
+      "description": "回归测试的E2E 框架从 Selenium 3 演进到 Playwright 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Selenium 3) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Playwright, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Selenium 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Selenium 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "回归测试E2E 框架决策：采用 Selenium 3，其他方案暂不考虑。",
+          "subject": "回归测试",
+          "predicate": "E2E 框架",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "回归测试E2E 框架变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "回归测试",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好回归测试的E2E 框架变更走灰度发布，避免一次性全量切换。",
+          "subject": "回归测试",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "回归测试改用 Playwright 作为 E2E 框架。",
+          "subject": "回归测试",
+          "predicate": "E2E 框架",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Selenium 在执行稳定性与自动等待能力方面逐渐成为瓶颈，团队切换到 Playwright。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：回归测试的E2E 框架凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "回归测试",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Playwright 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "回归测试",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "回归测试现在的E2E 框架是什么？还在用 Selenium 吗，还是已经换成了 Playwright？",
+          "must_include": [
+            "Playwright"
+          ],
+          "must_exclude": [
+            "Selenium"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "回归测试的E2E 框架变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么回归测试的E2E 框架从 Selenium 切换到了 Playwright？",
+          "must_include": [
+            "执行稳定性与自动等待能力"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Selenium"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S15",
+      "domain": "deploy",
+      "description": "订单服务的容器编排平台从 Docker Swarm 演进到 Kubernetes 1.29，且含同时挂两个父节点的多亲事件。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Docker Swarm) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Kubernetes 1.29, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Swarm 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Swarm 只能从 residual_diff 解释通道获得。 另含 M7 同时挂 M2/M4 两个父节点的多亲事件。",
+      "tags": [
+        "evolution",
+        "multi_parent"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "订单服务容器编排平台决策：采用 Docker Swarm，其他方案暂不考虑。",
+          "subject": "订单服务",
+          "predicate": "容器编排平台",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "订单服务容器编排平台变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "订单服务",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好订单服务的容器编排平台变更走灰度发布，避免一次性全量切换。",
+          "subject": "订单服务",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "订单服务改用 Kubernetes 1.29 作为 容器编排平台。",
+          "subject": "订单服务",
+          "predicate": "容器编排平台",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Swarm 在生态成熟度与调度能力方面逐渐成为瓶颈，团队切换到 Kubernetes 1.29。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：订单服务的容器编排平台凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "订单服务",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Kubernetes 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "订单服务",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        },
+        {
+          "id": "M7",
+          "content": "临时记录：同步跟踪 Kubernetes 迁移进度与容器编排平台规范落地情况。",
+          "subject": "订单服务",
+          "predicate": "迁移跟踪",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.2,
+          "parent_ids": [
+            "M2",
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "订单服务现在的容器编排平台是什么？还在用 Swarm 吗，还是已经换成了 Kubernetes？",
+          "must_include": [
+            "Kubernetes"
+          ],
+          "must_exclude": [
+            "Swarm"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "订单服务的容器编排平台变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么订单服务的容器编排平台从 Swarm 切换到了 Kubernetes？",
+          "must_include": [
+            "生态成熟度与调度能力"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Swarm"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S16",
+      "domain": "observability",
+      "description": "网关服务的指标采集通道从 StatsD 演进到 OpenTelemetry，并含同 (subject, predicate) 跨 scope 的隔离节点对（branch:feat-alert-dyn）。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(StatsD) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(OpenTelemetry, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 StatsD 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=StatsD 只能从 residual_diff 解释通道获得。 另含 M3/M4 同 (subject, predicate) 不同 scope（global vs branch:feat-alert-dyn）的隔离对，current_state 探针同时断言两侧共存、互不覆盖。",
+      "tags": [
+        "evolution",
+        "scope_isolation"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "网关服务指标采集通道决策：采用 StatsD，其他方案暂不考虑。",
+          "subject": "网关服务",
+          "predicate": "指标采集通道",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "网关服务指标采集通道变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "网关服务",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "网关服务的告警降噪策略（全局）：采用静态阈值。",
+          "subject": "网关服务",
+          "predicate": "告警降噪策略",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.7
+        },
+        {
+          "id": "M4",
+          "content": "网关服务在分支 feat-alert-dyn 上的告警降噪策略：改为动态基线，仅该分支生效。",
+          "subject": "网关服务",
+          "predicate": "告警降噪策略",
+          "scope": "branch:feat-alert-dyn",
+          "memory_type": "DECISION",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M3"
+          ]
+        },
+        {
+          "id": "M5",
+          "content": "网关服务改用 OpenTelemetry 作为 指标采集通道。",
+          "subject": "网关服务",
+          "predicate": "指标采集通道",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 StatsD 在协议标准化与生态兼容性方面逐渐成为瓶颈，团队切换到 OpenTelemetry。"
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：OpenTelemetry 上线后一周内跟踪错误率变化。",
+          "subject": "网关服务",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M5"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "网关服务全局的告警降噪策略是什么？分支 feat-alert-dyn 上又改成了什么？指标采集通道还在用 StatsD 吗，还是已经换成了 OpenTelemetry？",
+          "must_include": [
+            "静态阈值",
+            "动态基线",
+            "OpenTelemetry"
+          ],
+          "must_exclude": [
+            "StatsD"
+          ],
+          "expect_nodes": [
+            "M3",
+            "M4",
+            "M5"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "网关服务的指标采集通道变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么网关服务的指标采集通道从 StatsD 切换到了 OpenTelemetry？",
+          "must_include": [
+            "协议标准化与生态兼容性"
+          ],
+          "must_exclude": [],
+          "old_keyword": "StatsD"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S17",
+      "domain": "api",
+      "description": "控制组：对账模块的报表导出格式从 CSV 迁移到 Parquet，覆盖不涉及 anti_trap 靶子。",
+      "is_control": true,
+      "construction_note": "控制组：覆盖仅发生在偏好槽位（报表导出格式），anti_trap 靶子 M2 为根节点、不在被覆盖节点 M1 的子孙链上，因此分支 B 的连坐不会误杀靶子；current_state 的 must_exclude 留空，用于证明分支 A 并非必然失败。",
+      "tags": [
+        "control"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "团队偏好：对账模块统一采用 CSV 作为报表导出格式。",
+          "subject": "对账模块",
+          "predicate": "报表导出格式",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M2",
+          "content": "对账模块运维规范：所有告警必须附带 trace_id，禁止静默失败。",
+          "subject": "对账模块",
+          "predicate": "运维规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7
+        },
+        {
+          "id": "M3",
+          "content": "对账模块改用 Parquet 作为报表导出格式。",
+          "subject": "对账模块",
+          "predicate": "报表导出格式",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6,
+          "residual_diff": "因为 CSV 的表达能力和工具链支持逐渐不足，团队迁移到 Parquet。"
+        },
+        {
+          "id": "M4",
+          "content": "对账模块的变更记录统一归档到运维知识库，附变更单号。",
+          "subject": "对账模块",
+          "predicate": "变更归档",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M5",
+          "content": "临时观察：trace_id 覆盖率是否达到 100%。",
+          "subject": "对账模块",
+          "predicate": "规范观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M2"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "团队偏好周五下午发布，避开周一流量高峰。",
+          "subject": "对账模块",
+          "predicate": "发布窗口偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.4,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "团队现在对账模块的报表导出格式是什么？已经用上 Parquet 了吗？",
+          "must_include": [
+            "Parquet"
+          ],
+          "must_exclude": [],
+          "expect_nodes": [
+            "M3"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "对账模块的运维规范对告警和 trace_id 有什么要求？",
+          "must_include": [
+            "trace_id"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么对账模块的报表导出格式从 CSV 改成了 Parquet？",
+          "must_include": [
+            "表达能力和工具链支持"
+          ],
+          "must_exclude": [],
+          "old_keyword": "CSV"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S18",
+      "domain": "security",
+      "description": "风控接口的WAF 引擎从 ModSecurity 2.9 演进到 Coraza 3 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(ModSecurity 2.9) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Coraza 3, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 ModSecurity 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=ModSecurity 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "风控接口WAF 引擎决策：采用 ModSecurity 2.9，其他方案暂不考虑。",
+          "subject": "风控接口",
+          "predicate": "WAF 引擎",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "风控接口WAF 引擎变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "风控接口",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好风控接口的WAF 引擎变更走灰度发布，避免一次性全量切换。",
+          "subject": "风控接口",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "风控接口改用 Coraza 3 作为 WAF 引擎。",
+          "subject": "风控接口",
+          "predicate": "WAF 引擎",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 ModSecurity 在规则语法现代性与社区维护方面逐渐成为瓶颈，团队切换到 Coraza 3。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：风控接口的WAF 引擎凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "风控接口",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Coraza 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "风控接口",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "风控接口现在的WAF 引擎是什么？还在用 ModSecurity 吗，还是已经换成了 Coraza？",
+          "must_include": [
+            "Coraza"
+          ],
+          "must_exclude": [
+            "ModSecurity"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "风控接口的WAF 引擎变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么风控接口的WAF 引擎从 ModSecurity 切换到了 Coraza？",
+          "must_include": [
+            "规则语法现代性与社区维护"
+          ],
+          "must_exclude": [],
+          "old_keyword": "ModSecurity"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S19",
+      "domain": "cache",
+      "description": "商品详情页的本地缓存从 Guava Cache 演进到 Caffeine 3，并含同实体不同属性的假冲突对（序列化格式偏好）。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Guava Cache) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Caffeine 3, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Guava 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Guava 只能从 residual_diff 解释通道获得。 另含 M1/M3 同 subject 不同 predicate（序列化格式偏好）的假冲突对，槽位三元组不同，不得发生覆盖。",
+      "tags": [
+        "evolution",
+        "fake_conflict"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "商品详情页本地缓存决策：采用 Guava Cache，其他方案暂不考虑。",
+          "subject": "商品详情页",
+          "predicate": "本地缓存",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "商品详情页本地缓存变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "商品详情页",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "商品详情页的序列化格式偏好：统一使用 MessagePack。",
+          "subject": "商品详情页",
+          "predicate": "序列化格式偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "商品详情页改用 Caffeine 3 作为 本地缓存。",
+          "subject": "商品详情页",
+          "predicate": "本地缓存",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Guava 在淘汰算法效率与维护状态方面逐渐成为瓶颈，团队切换到 Caffeine 3。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：商品详情页的本地缓存凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "商品详情页",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Caffeine 上线后一周内跟踪 P99 延迟变化。",
+          "subject": "商品详情页",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "商品详情页现在的本地缓存是什么？已经从 Guava 换成 Caffeine 了吗？序列化格式偏好有变化吗？",
+          "must_include": [
+            "Caffeine",
+            "MessagePack"
+          ],
+          "must_exclude": [
+            "Guava"
+          ],
+          "expect_nodes": [
+            "M3",
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "商品详情页的本地缓存变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么商品详情页的本地缓存从 Guava 切换到了 Caffeine？",
+          "must_include": [
+            "淘汰算法效率与维护状态"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Guava"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S20",
+      "domain": "build",
+      "description": "发布流水线的CI 引擎从 Jenkins 2 演进到 GitHub Actions 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Jenkins 2) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(GitHub Actions, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Jenkins 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Jenkins 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "发布流水线CI 引擎决策：采用 Jenkins 2，其他方案暂不考虑。",
+          "subject": "发布流水线",
+          "predicate": "CI 引擎",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "发布流水线CI 引擎变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "发布流水线",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好发布流水线的CI 引擎变更走灰度发布，避免一次性全量切换。",
+          "subject": "发布流水线",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "发布流水线改用 GitHub Actions 作为 CI 引擎。",
+          "subject": "发布流水线",
+          "predicate": "CI 引擎",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Jenkins 在插件生态与维护成本方面逐渐成为瓶颈，团队切换到 GitHub Actions。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：发布流水线的CI 引擎凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "发布流水线",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：GitHub Actions 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "发布流水线",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "发布流水线现在的CI 引擎是什么？还在用 Jenkins 吗，还是已经换成了 GitHub Actions？",
+          "must_include": [
+            "GitHub Actions"
+          ],
+          "must_exclude": [
+            "Jenkins"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "发布流水线的CI 引擎变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么发布流水线的CI 引擎从 Jenkins 切换到了 GitHub Actions？",
+          "must_include": [
+            "插件生态与维护成本"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Jenkins"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S21",
+      "domain": "db",
+      "description": "控制组：运维脚本的备份压缩格式从 gzip 迁移到 zstd，覆盖不涉及 anti_trap 靶子。",
+      "is_control": true,
+      "construction_note": "控制组：覆盖仅发生在偏好槽位（备份压缩格式），anti_trap 靶子 M2 为根节点、不在被覆盖节点 M1 的子孙链上，因此分支 B 的连坐不会误杀靶子；current_state 的 must_exclude 留空，用于证明分支 A 并非必然失败。",
+      "tags": [
+        "control"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "团队偏好：运维脚本统一采用 gzip 作为备份压缩格式。",
+          "subject": "运维脚本",
+          "predicate": "备份压缩格式",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M2",
+          "content": "运维脚本运维规范：所有告警必须附带 trace_id，禁止静默失败。",
+          "subject": "运维脚本",
+          "predicate": "运维规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7
+        },
+        {
+          "id": "M3",
+          "content": "运维脚本改用 zstd 作为备份压缩格式。",
+          "subject": "运维脚本",
+          "predicate": "备份压缩格式",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6,
+          "residual_diff": "因为 gzip 的表达能力和工具链支持逐渐不足，团队迁移到 zstd。"
+        },
+        {
+          "id": "M4",
+          "content": "运维脚本的变更记录统一归档到运维知识库，附变更单号。",
+          "subject": "运维脚本",
+          "predicate": "变更归档",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M5",
+          "content": "临时观察：trace_id 覆盖率是否达到 100%。",
+          "subject": "运维脚本",
+          "predicate": "规范观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M2"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "团队偏好周五下午发布，避开周一流量高峰。",
+          "subject": "运维脚本",
+          "predicate": "发布窗口偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.4,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "团队现在运维脚本的备份压缩格式是什么？已经用上 zstd 了吗？",
+          "must_include": [
+            "zstd"
+          ],
+          "must_exclude": [],
+          "expect_nodes": [
+            "M3"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "运维脚本的运维规范对告警和 trace_id 有什么要求？",
+          "must_include": [
+            "trace_id"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么运维脚本的备份压缩格式从 gzip 改成了 zstd？",
+          "must_include": [
+            "表达能力和工具链支持"
+          ],
+          "must_exclude": [],
+          "old_keyword": "gzip"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S22",
+      "domain": "auth",
+      "description": "登录模块的会话存储从 Memcached 1.6 演进到 Redis 7 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Memcached 1.6) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Redis 7, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Memcached 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Memcached 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "登录模块会话存储决策：采用 Memcached 1.6，其他方案暂不考虑。",
+          "subject": "登录模块",
+          "predicate": "会话存储",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "登录模块会话存储变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "登录模块",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好登录模块的会话存储变更走灰度发布，避免一次性全量切换。",
+          "subject": "登录模块",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "登录模块改用 Redis 7 作为 会话存储。",
+          "subject": "登录模块",
+          "predicate": "会话存储",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Memcached 在数据结构丰富度与持久化能力方面逐渐成为瓶颈，团队切换到 Redis 7。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：登录模块的会话存储凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "登录模块",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Redis 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "登录模块",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "登录模块现在的会话存储是什么？还在用 Memcached 吗，还是已经换成了 Redis？",
+          "must_include": [
+            "Redis"
+          ],
+          "must_exclude": [
+            "Memcached"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "登录模块的会话存储变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么登录模块的会话存储从 Memcached 切换到了 Redis？",
+          "must_include": [
+            "数据结构丰富度与持久化能力"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Memcached"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S23",
+      "domain": "frontend",
+      "description": "管理后台的构建工具从 webpack 4 演进到 Vite 5 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(webpack 4) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Vite 5, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 webpack 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=webpack 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "管理后台构建工具决策：采用 webpack 4，其他方案暂不考虑。",
+          "subject": "管理后台",
+          "predicate": "构建工具",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "管理后台构建工具变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "管理后台",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好管理后台的构建工具变更走灰度发布，避免一次性全量切换。",
+          "subject": "管理后台",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "管理后台改用 Vite 5 作为 构建工具。",
+          "subject": "管理后台",
+          "predicate": "构建工具",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 webpack 在冷启动与热更新速度方面逐渐成为瓶颈，团队切换到 Vite 5。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：管理后台的构建工具凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "管理后台",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Vite 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "管理后台",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "管理后台现在的构建工具是什么？还在用 webpack 吗，还是已经换成了 Vite？",
+          "must_include": [
+            "Vite"
+          ],
+          "must_exclude": [
+            "webpack"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "管理后台的构建工具变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么管理后台的构建工具从 webpack 切换到了 Vite？",
+          "must_include": [
+            "冷启动与热更新速度"
+          ],
+          "must_exclude": [],
+          "old_keyword": "webpack"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S24",
+      "domain": "testing",
+      "description": "控制组：冒烟测试的默认报告格式从 JUnit XML 迁移到 Allure，覆盖不涉及 anti_trap 靶子。",
+      "is_control": true,
+      "construction_note": "控制组：覆盖仅发生在偏好槽位（默认报告格式），anti_trap 靶子 M2 为根节点、不在被覆盖节点 M1 的子孙链上，因此分支 B 的连坐不会误杀靶子；current_state 的 must_exclude 留空，用于证明分支 A 并非必然失败。",
+      "tags": [
+        "control"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "团队偏好：冒烟测试统一采用 JUnit XML 作为默认报告格式。",
+          "subject": "冒烟测试",
+          "predicate": "默认报告格式",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M2",
+          "content": "冒烟测试运维规范：所有告警必须附带 trace_id，禁止静默失败。",
+          "subject": "冒烟测试",
+          "predicate": "运维规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7
+        },
+        {
+          "id": "M3",
+          "content": "冒烟测试改用 Allure 作为默认报告格式。",
+          "subject": "冒烟测试",
+          "predicate": "默认报告格式",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6,
+          "residual_diff": "因为 JUnit 的表达能力和工具链支持逐渐不足，团队迁移到 Allure。"
+        },
+        {
+          "id": "M4",
+          "content": "冒烟测试的变更记录统一归档到运维知识库，附变更单号。",
+          "subject": "冒烟测试",
+          "predicate": "变更归档",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M5",
+          "content": "临时观察：trace_id 覆盖率是否达到 100%。",
+          "subject": "冒烟测试",
+          "predicate": "规范观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M2"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "团队偏好周五下午发布，避开周一流量高峰。",
+          "subject": "冒烟测试",
+          "predicate": "发布窗口偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.4,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "团队现在冒烟测试的默认报告格式是什么？已经用上 Allure 了吗？",
+          "must_include": [
+            "Allure"
+          ],
+          "must_exclude": [],
+          "expect_nodes": [
+            "M3"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "冒烟测试的运维规范对告警和 trace_id 有什么要求？",
+          "must_include": [
+            "trace_id"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么冒烟测试的默认报告格式从 JUnit 改成了 Allure？",
+          "must_include": [
+            "表达能力和工具链支持"
+          ],
+          "must_exclude": [],
+          "old_keyword": "JUnit"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S25",
+      "domain": "deploy",
+      "description": "订单服务的容器编排平台从 Docker Swarm 演进到 Kubernetes 1.29 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Docker Swarm) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Kubernetes 1.29, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Swarm 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Swarm 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "订单服务容器编排平台决策：采用 Docker Swarm，其他方案暂不考虑。",
+          "subject": "订单服务",
+          "predicate": "容器编排平台",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "订单服务容器编排平台变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "订单服务",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好订单服务的容器编排平台变更走灰度发布，避免一次性全量切换。",
+          "subject": "订单服务",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "订单服务改用 Kubernetes 1.29 作为 容器编排平台。",
+          "subject": "订单服务",
+          "predicate": "容器编排平台",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Swarm 在生态成熟度与调度能力方面逐渐成为瓶颈，团队切换到 Kubernetes 1.29。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：订单服务的容器编排平台凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "订单服务",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Kubernetes 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "订单服务",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "订单服务现在的容器编排平台是什么？还在用 Swarm 吗，还是已经换成了 Kubernetes？",
+          "must_include": [
+            "Kubernetes"
+          ],
+          "must_exclude": [
+            "Swarm"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "订单服务的容器编排平台变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么订单服务的容器编排平台从 Swarm 切换到了 Kubernetes？",
+          "must_include": [
+            "生态成熟度与调度能力"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Swarm"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S26",
+      "domain": "observability",
+      "description": "网关服务的指标采集通道从 StatsD 演进到 OpenTelemetry，并含同 (subject, predicate) 跨 scope 的隔离节点对（branch:feat-remote-store）。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(StatsD) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(OpenTelemetry, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 StatsD 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=StatsD 只能从 residual_diff 解释通道获得。 另含 M3/M4 同 (subject, predicate) 不同 scope（global vs branch:feat-remote-store）的隔离对，current_state 探针同时断言两侧共存、互不覆盖。",
+      "tags": [
+        "evolution",
+        "scope_isolation"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "网关服务指标采集通道决策：采用 StatsD，其他方案暂不考虑。",
+          "subject": "网关服务",
+          "predicate": "指标采集通道",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "网关服务指标采集通道变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "网关服务",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "网关服务的存储后端策略（全局）：采用本地落盘。",
+          "subject": "网关服务",
+          "predicate": "存储后端策略",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.7
+        },
+        {
+          "id": "M4",
+          "content": "网关服务在分支 feat-remote-store 上的存储后端策略：改为对象存储，仅该分支生效。",
+          "subject": "网关服务",
+          "predicate": "存储后端策略",
+          "scope": "branch:feat-remote-store",
+          "memory_type": "DECISION",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M3"
+          ]
+        },
+        {
+          "id": "M5",
+          "content": "网关服务改用 OpenTelemetry 作为 指标采集通道。",
+          "subject": "网关服务",
+          "predicate": "指标采集通道",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 StatsD 在协议标准化与生态兼容性方面逐渐成为瓶颈，团队切换到 OpenTelemetry。"
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：OpenTelemetry 上线后一周内跟踪错误率变化。",
+          "subject": "网关服务",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M5"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "网关服务全局的存储后端策略是什么？分支 feat-remote-store 上又改成了什么？指标采集通道还在用 StatsD 吗，还是已经换成了 OpenTelemetry？",
+          "must_include": [
+            "本地落盘",
+            "对象存储",
+            "OpenTelemetry"
+          ],
+          "must_exclude": [
+            "StatsD"
+          ],
+          "expect_nodes": [
+            "M3",
+            "M4",
+            "M5"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "网关服务的指标采集通道变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么网关服务的指标采集通道从 StatsD 切换到了 OpenTelemetry？",
+          "must_include": [
+            "协议标准化与生态兼容性"
+          ],
+          "must_exclude": [],
+          "old_keyword": "StatsD"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S27",
+      "domain": "api",
+      "description": "开放平台的接口协议从 SOAP 演进到 gRPC，且含同时挂两个父节点的多亲事件。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(SOAP) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(gRPC, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 SOAP 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=SOAP 只能从 residual_diff 解释通道获得。 另含 M7 同时挂 M2/M4 两个父节点的多亲事件。",
+      "tags": [
+        "evolution",
+        "multi_parent"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "开放平台接口协议决策：采用 SOAP，其他方案暂不考虑。",
+          "subject": "开放平台",
+          "predicate": "接口协议",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "开放平台接口协议变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "开放平台",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好开放平台的接口协议变更走灰度发布，避免一次性全量切换。",
+          "subject": "开放平台",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "开放平台改用 gRPC 作为 接口协议。",
+          "subject": "开放平台",
+          "predicate": "接口协议",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 SOAP 在强类型契约与传输效率方面逐渐成为瓶颈，团队切换到 gRPC。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：开放平台的接口协议凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "开放平台",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：gRPC 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "开放平台",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        },
+        {
+          "id": "M7",
+          "content": "临时记录：同步跟踪 gRPC 迁移进度与接口协议规范落地情况。",
+          "subject": "开放平台",
+          "predicate": "迁移跟踪",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.2,
+          "parent_ids": [
+            "M2",
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "开放平台现在的接口协议是什么？还在用 SOAP 吗，还是已经换成了 gRPC？",
+          "must_include": [
+            "gRPC"
+          ],
+          "must_exclude": [
+            "SOAP"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "开放平台的接口协议变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么开放平台的接口协议从 SOAP 切换到了 gRPC？",
+          "must_include": [
+            "强类型契约与传输效率"
+          ],
+          "must_exclude": [],
+          "old_keyword": "SOAP"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S28",
+      "domain": "security",
+      "description": "风控接口的WAF 引擎从 ModSecurity 2.9 演进到 Coraza 3 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(ModSecurity 2.9) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Coraza 3, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 ModSecurity 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=ModSecurity 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "风控接口WAF 引擎决策：采用 ModSecurity 2.9，其他方案暂不考虑。",
+          "subject": "风控接口",
+          "predicate": "WAF 引擎",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "风控接口WAF 引擎变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "风控接口",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好风控接口的WAF 引擎变更走灰度发布，避免一次性全量切换。",
+          "subject": "风控接口",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "风控接口改用 Coraza 3 作为 WAF 引擎。",
+          "subject": "风控接口",
+          "predicate": "WAF 引擎",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 ModSecurity 在规则语法现代性与社区维护方面逐渐成为瓶颈，团队切换到 Coraza 3。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：风控接口的WAF 引擎凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "风控接口",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Coraza 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "风控接口",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "风控接口现在的WAF 引擎是什么？还在用 ModSecurity 吗，还是已经换成了 Coraza？",
+          "must_include": [
+            "Coraza"
+          ],
+          "must_exclude": [
+            "ModSecurity"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "风控接口的WAF 引擎变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么风控接口的WAF 引擎从 ModSecurity 切换到了 Coraza？",
+          "must_include": [
+            "规则语法现代性与社区维护"
+          ],
+          "must_exclude": [],
+          "old_keyword": "ModSecurity"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S29",
+      "domain": "cache",
+      "description": "控制组：限流模块的默认告警渠道从 PagerDuty 迁移到 Webhook，覆盖不涉及 anti_trap 靶子。",
+      "is_control": true,
+      "construction_note": "控制组：覆盖仅发生在偏好槽位（默认告警渠道），anti_trap 靶子 M2 为根节点、不在被覆盖节点 M1 的子孙链上，因此分支 B 的连坐不会误杀靶子；current_state 的 must_exclude 留空，用于证明分支 A 并非必然失败。",
+      "tags": [
+        "control"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "团队偏好：限流模块统一采用 PagerDuty 作为默认告警渠道。",
+          "subject": "限流模块",
+          "predicate": "默认告警渠道",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M2",
+          "content": "限流模块运维规范：所有告警必须附带 trace_id，禁止静默失败。",
+          "subject": "限流模块",
+          "predicate": "运维规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7
+        },
+        {
+          "id": "M3",
+          "content": "限流模块改用 Webhook 作为默认告警渠道。",
+          "subject": "限流模块",
+          "predicate": "默认告警渠道",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6,
+          "residual_diff": "因为 PagerDuty 的表达能力和工具链支持逐渐不足，团队迁移到 Webhook。"
+        },
+        {
+          "id": "M4",
+          "content": "限流模块的变更记录统一归档到运维知识库，附变更单号。",
+          "subject": "限流模块",
+          "predicate": "变更归档",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M5",
+          "content": "临时观察：trace_id 覆盖率是否达到 100%。",
+          "subject": "限流模块",
+          "predicate": "规范观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M2"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "团队偏好周五下午发布，避开周一流量高峰。",
+          "subject": "限流模块",
+          "predicate": "发布窗口偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.4,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "团队现在限流模块的默认告警渠道是什么？已经用上 Webhook 了吗？",
+          "must_include": [
+            "Webhook"
+          ],
+          "must_exclude": [],
+          "expect_nodes": [
+            "M3"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "限流模块的运维规范对告警和 trace_id 有什么要求？",
+          "must_include": [
+            "trace_id"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么限流模块的默认告警渠道从 PagerDuty 改成了 Webhook？",
+          "must_include": [
+            "表达能力和工具链支持"
+          ],
+          "must_exclude": [],
+          "old_keyword": "PagerDuty"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S30",
+      "domain": "build",
+      "description": "发布流水线的CI 引擎从 Jenkins 2 演进到 GitHub Actions 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Jenkins 2) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(GitHub Actions, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Jenkins 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Jenkins 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "发布流水线CI 引擎决策：采用 Jenkins 2，其他方案暂不考虑。",
+          "subject": "发布流水线",
+          "predicate": "CI 引擎",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "发布流水线CI 引擎变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "发布流水线",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好发布流水线的CI 引擎变更走灰度发布，避免一次性全量切换。",
+          "subject": "发布流水线",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "发布流水线改用 GitHub Actions 作为 CI 引擎。",
+          "subject": "发布流水线",
+          "predicate": "CI 引擎",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Jenkins 在插件生态与维护成本方面逐渐成为瓶颈，团队切换到 GitHub Actions。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：发布流水线的CI 引擎凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "发布流水线",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：GitHub Actions 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "发布流水线",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "发布流水线现在的CI 引擎是什么？还在用 Jenkins 吗，还是已经换成了 GitHub Actions？",
+          "must_include": [
+            "GitHub Actions"
+          ],
+          "must_exclude": [
+            "Jenkins"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "发布流水线的CI 引擎变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么发布流水线的CI 引擎从 Jenkins 切换到了 GitHub Actions？",
+          "must_include": [
+            "插件生态与维护成本"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Jenkins"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S31",
+      "domain": "db",
+      "description": "用户服务的主数据库从 MySQL 8.0 演进到 PostgreSQL 16 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(MySQL 8.0) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(PostgreSQL 16, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 MySQL 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=MySQL 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "用户服务主数据库决策：采用 MySQL 8.0，其他方案暂不考虑。",
+          "subject": "用户服务",
+          "predicate": "主数据库",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "用户服务主数据库变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "用户服务",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好用户服务的主数据库变更走灰度发布，避免一次性全量切换。",
+          "subject": "用户服务",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "用户服务改用 PostgreSQL 16 作为 主数据库。",
+          "subject": "用户服务",
+          "predicate": "主数据库",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 MySQL 在许可证模式与云托管成本方面逐渐成为瓶颈，团队切换到 PostgreSQL 16。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：用户服务的主数据库凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "用户服务",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：PostgreSQL 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "用户服务",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "用户服务现在的主数据库是什么？还在用 MySQL 吗，还是已经换成了 PostgreSQL？",
+          "must_include": [
+            "PostgreSQL"
+          ],
+          "must_exclude": [
+            "MySQL"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "用户服务的主数据库变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么用户服务的主数据库从 MySQL 切换到了 PostgreSQL？",
+          "must_include": [
+            "许可证模式与云托管成本"
+          ],
+          "must_exclude": [],
+          "old_keyword": "MySQL"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S32",
+      "domain": "auth",
+      "description": "登录模块的会话存储从 Memcached 1.6 演进到 Redis 7 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Memcached 1.6) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Redis 7, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Memcached 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Memcached 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "登录模块会话存储决策：采用 Memcached 1.6，其他方案暂不考虑。",
+          "subject": "登录模块",
+          "predicate": "会话存储",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "登录模块会话存储变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "登录模块",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好登录模块的会话存储变更走灰度发布，避免一次性全量切换。",
+          "subject": "登录模块",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "登录模块改用 Redis 7 作为 会话存储。",
+          "subject": "登录模块",
+          "predicate": "会话存储",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Memcached 在数据结构丰富度与持久化能力方面逐渐成为瓶颈，团队切换到 Redis 7。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：登录模块的会话存储凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "登录模块",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Redis 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "登录模块",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "登录模块现在的会话存储是什么？还在用 Memcached 吗，还是已经换成了 Redis？",
+          "must_include": [
+            "Redis"
+          ],
+          "must_exclude": [
+            "Memcached"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "登录模块的会话存储变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么登录模块的会话存储从 Memcached 切换到了 Redis？",
+          "must_include": [
+            "数据结构丰富度与持久化能力"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Memcached"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S33",
+      "domain": "frontend",
+      "description": "管理后台的构建工具从 webpack 4 演进到 Vite 5，并含同 (subject, predicate) 跨 scope 的隔离节点对（branch:feat-dark-mode）。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(webpack 4) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Vite 5, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 webpack 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=webpack 只能从 residual_diff 解释通道获得。 另含 M3/M4 同 (subject, predicate) 不同 scope（global vs branch:feat-dark-mode）的隔离对，current_state 探针同时断言两侧共存、互不覆盖。",
+      "tags": [
+        "evolution",
+        "scope_isolation"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "管理后台构建工具决策：采用 webpack 4，其他方案暂不考虑。",
+          "subject": "管理后台",
+          "predicate": "构建工具",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "管理后台构建工具变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "管理后台",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "管理后台的主题方案（全局）：采用浅色主题。",
+          "subject": "管理后台",
+          "predicate": "主题方案",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.7
+        },
+        {
+          "id": "M4",
+          "content": "管理后台在分支 feat-dark-mode 上的主题方案：改为深色主题，仅该分支生效。",
+          "subject": "管理后台",
+          "predicate": "主题方案",
+          "scope": "branch:feat-dark-mode",
+          "memory_type": "DECISION",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M3"
+          ]
+        },
+        {
+          "id": "M5",
+          "content": "管理后台改用 Vite 5 作为 构建工具。",
+          "subject": "管理后台",
+          "predicate": "构建工具",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 webpack 在冷启动与热更新速度方面逐渐成为瓶颈，团队切换到 Vite 5。"
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Vite 上线后一周内跟踪错误率变化。",
+          "subject": "管理后台",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M5"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "管理后台全局的主题方案是什么？分支 feat-dark-mode 上又改成了什么？构建工具还在用 webpack 吗，还是已经换成了 Vite？",
+          "must_include": [
+            "浅色主题",
+            "深色主题",
+            "Vite"
+          ],
+          "must_exclude": [
+            "webpack"
+          ],
+          "expect_nodes": [
+            "M3",
+            "M4",
+            "M5"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "管理后台的构建工具变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么管理后台的构建工具从 webpack 切换到了 Vite？",
+          "must_include": [
+            "冷启动与热更新速度"
+          ],
+          "must_exclude": [],
+          "old_keyword": "webpack"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S34",
+      "domain": "testing",
+      "description": "控制组：性能测试的默认压测工具从 JMeter 迁移到 k6，覆盖不涉及 anti_trap 靶子。",
+      "is_control": true,
+      "construction_note": "控制组：覆盖仅发生在偏好槽位（默认压测工具），anti_trap 靶子 M2 为根节点、不在被覆盖节点 M1 的子孙链上，因此分支 B 的连坐不会误杀靶子；current_state 的 must_exclude 留空，用于证明分支 A 并非必然失败。",
+      "tags": [
+        "control"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "团队偏好：性能测试统一采用 JMeter 作为默认压测工具。",
+          "subject": "性能测试",
+          "predicate": "默认压测工具",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M2",
+          "content": "性能测试运维规范：所有告警必须附带 trace_id，禁止静默失败。",
+          "subject": "性能测试",
+          "predicate": "运维规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7
+        },
+        {
+          "id": "M3",
+          "content": "性能测试改用 k6 作为默认压测工具。",
+          "subject": "性能测试",
+          "predicate": "默认压测工具",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6,
+          "residual_diff": "因为 JMeter 的表达能力和工具链支持逐渐不足，团队迁移到 k6。"
+        },
+        {
+          "id": "M4",
+          "content": "性能测试的变更记录统一归档到运维知识库，附变更单号。",
+          "subject": "性能测试",
+          "predicate": "变更归档",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M5",
+          "content": "临时观察：trace_id 覆盖率是否达到 100%。",
+          "subject": "性能测试",
+          "predicate": "规范观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M2"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "团队偏好周五下午发布，避开周一流量高峰。",
+          "subject": "性能测试",
+          "predicate": "发布窗口偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.4,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "团队现在性能测试的默认压测工具是什么？已经用上 k6 了吗？",
+          "must_include": [
+            "k6"
+          ],
+          "must_exclude": [],
+          "expect_nodes": [
+            "M3"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "性能测试的运维规范对告警和 trace_id 有什么要求？",
+          "must_include": [
+            "trace_id"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么性能测试的默认压测工具从 JMeter 改成了 k6？",
+          "must_include": [
+            "表达能力和工具链支持"
+          ],
+          "must_exclude": [],
+          "old_keyword": "JMeter"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S35",
+      "domain": "deploy",
+      "description": "订单服务的容器编排平台从 Docker Swarm 演进到 Kubernetes 1.29，并含同实体不同属性的假冲突对（发布节奏偏好）。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Docker Swarm) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Kubernetes 1.29, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Swarm 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Swarm 只能从 residual_diff 解释通道获得。 另含 M1/M3 同 subject 不同 predicate（发布节奏偏好）的假冲突对，槽位三元组不同，不得发生覆盖。",
+      "tags": [
+        "evolution",
+        "fake_conflict"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "订单服务容器编排平台决策：采用 Docker Swarm，其他方案暂不考虑。",
+          "subject": "订单服务",
+          "predicate": "容器编排平台",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "订单服务容器编排平台变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "订单服务",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "订单服务的发布节奏偏好：统一使用 金丝雀发布。",
+          "subject": "订单服务",
+          "predicate": "发布节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "订单服务改用 Kubernetes 1.29 作为 容器编排平台。",
+          "subject": "订单服务",
+          "predicate": "容器编排平台",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Swarm 在生态成熟度与调度能力方面逐渐成为瓶颈，团队切换到 Kubernetes 1.29。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：订单服务的容器编排平台凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "订单服务",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Kubernetes 上线后一周内跟踪 P99 延迟变化。",
+          "subject": "订单服务",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "订单服务现在的容器编排平台是什么？已经从 Swarm 换成 Kubernetes 了吗？发布节奏偏好有变化吗？",
+          "must_include": [
+            "Kubernetes",
+            "金丝雀发布"
+          ],
+          "must_exclude": [
+            "Swarm"
+          ],
+          "expect_nodes": [
+            "M3",
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "订单服务的容器编排平台变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么订单服务的容器编排平台从 Swarm 切换到了 Kubernetes？",
+          "must_include": [
+            "生态成熟度与调度能力"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Swarm"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S36",
+      "domain": "observability",
+      "description": "网关服务的指标采集通道从 StatsD 演进到 OpenTelemetry 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(StatsD) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(OpenTelemetry, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 StatsD 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=StatsD 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "网关服务指标采集通道决策：采用 StatsD，其他方案暂不考虑。",
+          "subject": "网关服务",
+          "predicate": "指标采集通道",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "网关服务指标采集通道变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "网关服务",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好网关服务的指标采集通道变更走灰度发布，避免一次性全量切换。",
+          "subject": "网关服务",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "网关服务改用 OpenTelemetry 作为 指标采集通道。",
+          "subject": "网关服务",
+          "predicate": "指标采集通道",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 StatsD 在协议标准化与生态兼容性方面逐渐成为瓶颈，团队切换到 OpenTelemetry。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：网关服务的指标采集通道凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "网关服务",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：OpenTelemetry 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "网关服务",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "网关服务现在的指标采集通道是什么？还在用 StatsD 吗，还是已经换成了 OpenTelemetry？",
+          "must_include": [
+            "OpenTelemetry"
+          ],
+          "must_exclude": [
+            "StatsD"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "网关服务的指标采集通道变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么网关服务的指标采集通道从 StatsD 切换到了 OpenTelemetry？",
+          "must_include": [
+            "协议标准化与生态兼容性"
+          ],
+          "must_exclude": [],
+          "old_keyword": "StatsD"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S37",
+      "domain": "api",
+      "description": "开放平台的接口协议从 SOAP 演进到 gRPC，并含同 (subject, predicate) 跨 scope 的隔离节点对（branch:feat-slide-rl）。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(SOAP) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(gRPC, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 SOAP 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=SOAP 只能从 residual_diff 解释通道获得。 另含 M3/M4 同 (subject, predicate) 不同 scope（global vs branch:feat-slide-rl）的隔离对，current_state 探针同时断言两侧共存、互不覆盖。",
+      "tags": [
+        "evolution",
+        "scope_isolation"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "开放平台接口协议决策：采用 SOAP，其他方案暂不考虑。",
+          "subject": "开放平台",
+          "predicate": "接口协议",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "开放平台接口协议变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "开放平台",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "开放平台的限流策略（全局）：采用固定窗口。",
+          "subject": "开放平台",
+          "predicate": "限流策略",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.7
+        },
+        {
+          "id": "M4",
+          "content": "开放平台在分支 feat-slide-rl 上的限流策略：改为滑动窗口，仅该分支生效。",
+          "subject": "开放平台",
+          "predicate": "限流策略",
+          "scope": "branch:feat-slide-rl",
+          "memory_type": "DECISION",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M3"
+          ]
+        },
+        {
+          "id": "M5",
+          "content": "开放平台改用 gRPC 作为 接口协议。",
+          "subject": "开放平台",
+          "predicate": "接口协议",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 SOAP 在强类型契约与传输效率方面逐渐成为瓶颈，团队切换到 gRPC。"
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：gRPC 上线后一周内跟踪错误率变化。",
+          "subject": "开放平台",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M5"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "开放平台全局的限流策略是什么？分支 feat-slide-rl 上又改成了什么？接口协议还在用 SOAP 吗，还是已经换成了 gRPC？",
+          "must_include": [
+            "固定窗口",
+            "滑动窗口",
+            "gRPC"
+          ],
+          "must_exclude": [
+            "SOAP"
+          ],
+          "expect_nodes": [
+            "M3",
+            "M4",
+            "M5"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "开放平台的接口协议变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么开放平台的接口协议从 SOAP 切换到了 gRPC？",
+          "must_include": [
+            "强类型契约与传输效率"
+          ],
+          "must_exclude": [],
+          "old_keyword": "SOAP"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S38",
+      "domain": "security",
+      "description": "风控接口的WAF 引擎从 ModSecurity 2.9 演进到 Coraza 3，且含同时挂两个父节点的多亲事件。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(ModSecurity 2.9) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(Coraza 3, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 ModSecurity 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=ModSecurity 只能从 residual_diff 解释通道获得。 另含 M7 同时挂 M2/M4 两个父节点的多亲事件。",
+      "tags": [
+        "evolution",
+        "multi_parent"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "风控接口WAF 引擎决策：采用 ModSecurity 2.9，其他方案暂不考虑。",
+          "subject": "风控接口",
+          "predicate": "WAF 引擎",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "风控接口WAF 引擎变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "风控接口",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好风控接口的WAF 引擎变更走灰度发布，避免一次性全量切换。",
+          "subject": "风控接口",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "风控接口改用 Coraza 3 作为 WAF 引擎。",
+          "subject": "风控接口",
+          "predicate": "WAF 引擎",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 ModSecurity 在规则语法现代性与社区维护方面逐渐成为瓶颈，团队切换到 Coraza 3。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：风控接口的WAF 引擎凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "风控接口",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：Coraza 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "风控接口",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        },
+        {
+          "id": "M7",
+          "content": "临时记录：同步跟踪 Coraza 迁移进度与WAF 引擎规范落地情况。",
+          "subject": "风控接口",
+          "predicate": "迁移跟踪",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.2,
+          "parent_ids": [
+            "M2",
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "风控接口现在的WAF 引擎是什么？还在用 ModSecurity 吗，还是已经换成了 Coraza？",
+          "must_include": [
+            "Coraza"
+          ],
+          "must_exclude": [
+            "ModSecurity"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "风控接口的WAF 引擎变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么风控接口的WAF 引擎从 ModSecurity 切换到了 Coraza？",
+          "must_include": [
+            "规则语法现代性与社区维护"
+          ],
+          "must_exclude": [],
+          "old_keyword": "ModSecurity"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S39",
+      "domain": "cache",
+      "description": "控制组：配置中心的默认配置格式从 YAML 迁移到 TOML，覆盖不涉及 anti_trap 靶子。",
+      "is_control": true,
+      "construction_note": "控制组：覆盖仅发生在偏好槽位（默认配置格式），anti_trap 靶子 M2 为根节点、不在被覆盖节点 M1 的子孙链上，因此分支 B 的连坐不会误杀靶子；current_state 的 must_exclude 留空，用于证明分支 A 并非必然失败。",
+      "tags": [
+        "control"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "团队偏好：配置中心统一采用 YAML 作为默认配置格式。",
+          "subject": "配置中心",
+          "predicate": "默认配置格式",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M2",
+          "content": "配置中心运维规范：所有告警必须附带 trace_id，禁止静默失败。",
+          "subject": "配置中心",
+          "predicate": "运维规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7
+        },
+        {
+          "id": "M3",
+          "content": "配置中心改用 TOML 作为默认配置格式。",
+          "subject": "配置中心",
+          "predicate": "默认配置格式",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.6,
+          "residual_diff": "因为 YAML 的表达能力和工具链支持逐渐不足，团队迁移到 TOML。"
+        },
+        {
+          "id": "M4",
+          "content": "配置中心的变更记录统一归档到运维知识库，附变更单号。",
+          "subject": "配置中心",
+          "predicate": "变更归档",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.6
+        },
+        {
+          "id": "M5",
+          "content": "临时观察：trace_id 覆盖率是否达到 100%。",
+          "subject": "配置中心",
+          "predicate": "规范观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M2"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "团队偏好周五下午发布，避开周一流量高峰。",
+          "subject": "配置中心",
+          "predicate": "发布窗口偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.4,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "团队现在配置中心的默认配置格式是什么？已经用上 TOML 了吗？",
+          "must_include": [
+            "TOML"
+          ],
+          "must_exclude": [],
+          "expect_nodes": [
+            "M3"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "配置中心的运维规范对告警和 trace_id 有什么要求？",
+          "must_include": [
+            "trace_id"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么配置中心的默认配置格式从 YAML 改成了 TOML？",
+          "must_include": [
+            "表达能力和工具链支持"
+          ],
+          "must_exclude": [],
+          "old_keyword": "YAML"
+        }
+      ]
+    },
+    {
+      "scenario_id": "S40",
+      "domain": "build",
+      "description": "发布流水线的CI 引擎从 Jenkins 2 演进到 GitHub Actions 的标准记忆演化场景。",
+      "is_control": false,
+      "construction_note": "标准形态：M1 旧决策(Jenkins 2) -> M2 规范(Anti-trap 靶子, 父=M1) -> M3 偏好(父=M1) -> M4 新决策(GitHub Actions, 同槽覆盖 M1, 带 residual_diff) -> M5 安全约束(父=M1) -> M6 临时观察(父=M4)。current_state 的 must_exclude 含 Jenkins 以暴露分支 A 新旧并存的污染失败；anti_trap 靶子 M2 挂在旧节点 M1 之下以暴露分支 B 强连坐误杀；evolution_why 的 old_keyword=Jenkins 只能从 residual_diff 解释通道获得。",
+      "tags": [
+        "evolution"
+      ],
+      "session_events": [
+        {
+          "id": "M1",
+          "content": "发布流水线CI 引擎决策：采用 Jenkins 2，其他方案暂不考虑。",
+          "subject": "发布流水线",
+          "predicate": "CI 引擎",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9
+        },
+        {
+          "id": "M2",
+          "content": "发布流水线CI 引擎变更规范：所有改动必须先在测试环境演练，并回填数据字典。",
+          "subject": "发布流水线",
+          "predicate": "变更流程规范",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.7,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M3",
+          "content": "团队偏好发布流水线的CI 引擎变更走灰度发布，避免一次性全量切换。",
+          "subject": "发布流水线",
+          "predicate": "变更节奏偏好",
+          "scope": "global",
+          "memory_type": "PREFERENCE",
+          "input_weight": 0.5,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M4",
+          "content": "发布流水线改用 GitHub Actions 作为 CI 引擎。",
+          "subject": "发布流水线",
+          "predicate": "CI 引擎",
+          "scope": "global",
+          "memory_type": "DECISION",
+          "input_weight": 0.9,
+          "residual_diff": "因为 Jenkins 在插件生态与维护成本方面逐渐成为瓶颈，团队切换到 GitHub Actions。"
+        },
+        {
+          "id": "M5",
+          "content": "安全约束：发布流水线的CI 引擎凭据禁止写入代码仓库，统一走密钥管理。",
+          "subject": "发布流水线",
+          "predicate": "凭据安全约束",
+          "scope": "global",
+          "memory_type": "CONSTRAINT",
+          "input_weight": 0.8,
+          "parent_ids": [
+            "M1"
+          ]
+        },
+        {
+          "id": "M6",
+          "content": "临时观察：GitHub Actions 上线后一周内跟踪 P99 延迟变化，到期自动归档。",
+          "subject": "发布流水线",
+          "predicate": "上线观察",
+          "scope": "global",
+          "memory_type": "EPHEMERAL",
+          "input_weight": 0.3,
+          "parent_ids": [
+            "M4"
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "probe_type": "current_state",
+          "query": "发布流水线现在的CI 引擎是什么？还在用 Jenkins 吗，还是已经换成了 GitHub Actions？",
+          "must_include": [
+            "GitHub Actions"
+          ],
+          "must_exclude": [
+            "Jenkins"
+          ],
+          "expect_nodes": [
+            "M4"
+          ]
+        },
+        {
+          "probe_type": "anti_trap",
+          "query": "发布流水线的CI 引擎变更需要遵守什么规范流程？",
+          "must_include": [
+            "测试环境"
+          ],
+          "must_exclude": [],
+          "expect_survive": [
+            "M2"
+          ]
+        },
+        {
+          "probe_type": "evolution_why",
+          "query": "为什么发布流水线的CI 引擎从 Jenkins 切换到了 GitHub Actions？",
+          "must_include": [
+            "插件生态与维护成本"
+          ],
+          "must_exclude": [],
+          "old_keyword": "Jenkins"
+        }
+      ]
+    }
+  ]
+}
