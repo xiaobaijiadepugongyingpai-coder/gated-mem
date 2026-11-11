@@ -1,0 +1,212 @@
+{
+  "auditor": "auditor2 / gemini-3.8-flash",
+  "contract_version": "1.0.0",
+  "probes_checked": 360,
+  "divergences": [],
+  "divergence_count": 0,
+  "recomputed_metrics": {
+    "contract_version": "1.0.0",
+    "dataset_sha256": "8ec9e4053143d40c16b48d4ef6a96a024ee4e65d7ec7135e8cfc6308f6fd5c5b",
+    "cases_total": 40,
+    "probes_per_branch": 120,
+    "per_branch_probe": {
+      "A": {
+        "current_state": {
+          "passed": 8,
+          "total": 40,
+          "rate": 0.2
+        },
+        "anti_trap": {
+          "passed": 40,
+          "total": 40,
+          "rate": 1.0
+        },
+        "evolution_why": {
+          "passed": 0,
+          "total": 40,
+          "rate": 0.0
+        }
+      },
+      "B": {
+        "current_state": {
+          "passed": 37,
+          "total": 40,
+          "rate": 0.925
+        },
+        "anti_trap": {
+          "passed": 8,
+          "total": 40,
+          "rate": 0.2
+        },
+        "evolution_why": {
+          "passed": 40,
+          "total": 40,
+          "rate": 1.0
+        }
+      },
+      "C": {
+        "current_state": {
+          "passed": 40,
+          "total": 40,
+          "rate": 1.0
+        },
+        "anti_trap": {
+          "passed": 40,
+          "total": 40,
+          "rate": 1.0
+        },
+        "evolution_why": {
+          "passed": 40,
+          "total": 40,
+          "rate": 1.0
+        }
+      }
+    },
+    "by_group": {
+      "control": {
+        "A": {
+          "current_state": {
+            "passed": 8,
+            "total": 8,
+            "rate": 1.0
+          },
+          "anti_trap": {
+            "passed": 8,
+            "total": 8,
+            "rate": 1.0
+          },
+          "evolution_why": {
+            "passed": 0,
+            "total": 8,
+            "rate": 0.0
+          }
+        },
+        "B": {
+          "current_state": {
+            "passed": 8,
+            "total": 8,
+            "rate": 1.0
+          },
+          "anti_trap": {
+            "passed": 8,
+            "total": 8,
+            "rate": 1.0
+          },
+          "evolution_why": {
+            "passed": 8,
+            "total": 8,
+            "rate": 1.0
+          }
+        },
+        "C": {
+          "current_state": {
+            "passed": 8,
+            "total": 8,
+            "rate": 1.0
+          },
+          "anti_trap": {
+            "passed": 8,
+            "total": 8,
+            "rate": 1.0
+          },
+          "evolution_why": {
+            "passed": 8,
+            "total": 8,
+            "rate": 1.0
+          }
+        }
+      },
+      "non_control": {
+        "A": {
+          "current_state": {
+            "passed": 0,
+            "total": 32,
+            "rate": 0.0
+          },
+          "anti_trap": {
+            "passed": 32,
+            "total": 32,
+            "rate": 1.0
+          },
+          "evolution_why": {
+            "passed": 0,
+            "total": 32,
+            "rate": 0.0
+          }
+        },
+        "B": {
+          "current_state": {
+            "passed": 29,
+            "total": 32,
+            "rate": 0.90625
+          },
+          "anti_trap": {
+            "passed": 0,
+            "total": 32,
+            "rate": 0.0
+          },
+          "evolution_why": {
+            "passed": 32,
+            "total": 32,
+            "rate": 1.0
+          }
+        },
+        "C": {
+          "current_state": {
+            "passed": 32,
+            "total": 32,
+            "rate": 1.0
+          },
+          "anti_trap": {
+            "passed": 32,
+            "total": 32,
+            "rate": 1.0
+          },
+          "evolution_why": {
+            "passed": 32,
+            "total": 32,
+            "rate": 1.0
+          }
+        }
+      }
+    },
+    "gates": {
+      "G1_current_state_lead_pp": {
+        "a": 0.2,
+        "c": 1.0,
+        "delta_pp": 80.0,
+        "threshold_pp": 20.0,
+        "pass": true
+      },
+      "G2_anti_trap_c_gt_b": {
+        "b": 0.2,
+        "c": 1.0,
+        "pass": true
+      },
+      "G3_evolution_why": {
+        "c": 1.0,
+        "threshold": 0.85,
+        "pass": true
+      }
+    },
+    "gate1_overall_pass": true
+  },
+  "metrics_match": true,
+  "retrace": {
+    "mode": "reimplement",
+    "cases_checked": [
+      "S05",
+      "S07",
+      "S24"
+    ],
+    "node_set_match": true,
+    "notes": "S05：三分支 × 三探针全部一致（注入集合、候选集合、状态）；S07：三分支 × 三探针全部一致（注入集合、候选集合、状态）；S24：三分支 × 三探针全部一致（注入集合、候选集合、状态）；数值层（全 360 条 × 全部候选）：共比对 1779 个节点-探针三元组的 rel/f/score，最大绝对偏差 0.000000000（契约 §1.6 只要求 round 到 6 位，偏差 <= 5e-7 属舍入公差）"
+  },
+  "gate1_signoff": {
+    "G1": true,
+    "G2": true,
+    "G3": true,
+    "overall": true,
+    "signed_by": "auditor2 / gemini-3.8-flash"
+  }
+}
