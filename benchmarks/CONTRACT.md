@@ -411,7 +411,7 @@ python benchmarks/audit/independent_scorer.py \
 1. **Python 3.9 语法**：禁止 `match`、禁止运行期 `X | Y` 标注；类型注解只在函数签名用 `typing.Optional/List/Dict`。
 2. **仅标准库**：`import` 任何第三方包即视为交付失败。
 3. **中文注释**：所有模块 docstring 与关键注释用中文。
-4. **Git**：每个任务交付后单独提交，**只 `git add` 自己写作用域内的文件**，提交信息用中文（示例见下）。若遇到 `.git/index.lock`，等待 2 秒重试，最多 5 次。
+4. **Git**：**成员一律不执行任何 `git` 命令**（多人共用同一 index 会撞 `.git/index.lock`）。由队长在每个任务交付后统一提交，提交信息用中文：
    - `feat(dataset): 40 组演进与 Anti-trap 测试集`
    - `feat(dataset): 九条硬约束校验器与标签复核`
    - `feat(spike): 三分支首刀运行器与自检`
