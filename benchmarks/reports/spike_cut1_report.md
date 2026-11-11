@@ -72,7 +72,22 @@ B 的 current_state 是 92.50%（37/40），三条失分 S07 / S19 / S35 缺 `Op
 - A 的 20.00% 完全由控制组比例决定（8/40），不是能力分布 —— 32 个非控制组无一幸免。
 - A 的 evolution_why = 0.00%：A 从不记录 `residual_diff`，`returned_diff` 恒空（`diff_empty = True` 出现 40 次）。这是契约 §5.3 明写的设计意图，不是 bug。
 
-### 3.4 C 分支的 `residual_diff` 双通道设计成立
+### 3.4 重大发现：TOPK 截断在 B/C 分支上几乎从未发生 —— 本实验测的主要是状态门控，不是检索排序
+
+跨模型审计（gemini_audit）独立发现并经队长从 `raw_runs.json` 复核确认：
+
+| 分支 | 每次检索的候选数分布 | 候选数 ≤ 5（未截断）的 run 数 | 真正发生截断的 run 数 |
+| :--- | :--- | ---: | ---: |
+| **A** | 6×108、7×12 | **0 / 120** | 120 / 120 |
+| **B** | 3×69、4×27、5×24 | **120 / 120** | **0 / 120** |
+| **C** | 5×108、6×12 | **108 / 120** | **12 / 120** |
+
+- 单用例仅 6–8 条事件，覆盖/连坐后活跃节点急剧萎缩到 3–6 个，**几乎总是被全量注入**。
+- 含义：排序公式 `Score = rel(q,v) · [F_t(v)]^λ` 的**筛选能力在 B/C 分支上基本没有被检验**。阶段一实质上是「图节点状态门控」的正确性验证实验，**不是**检索排序实验。
+- λ 参数扫描（0.0 / 0.3 / 0.6）门禁全过，现在有了第二条解释：不是结论稳健，而是**λ 根本没有机会发挥作用**——排序没有取舍，λ 就无从影响注入集合。
+- **A 分支是唯一真正发生截断的分支（120/120）**，所以 A 的 20% 里还混入了「排序筛选」的影响，与 B/C 的口径并不完全对等。
+
+### 3.5 C 分支的 `residual_diff` 双通道设计成立
 
 - C 的 evolution_why = 100.00%，`diff_empty` 在 C 分支出现 **0 次**。
 - 得分路径：覆盖时写 `[Replaced: 旧subject / 旧content[:30]] + 原始原因` → §4 的 `retrieval_text` 在 B/C 拼上 `residual_diff` → §5.2 回执通道送进 `returned_diff` → 旧技术词稳定出现在回执里。
@@ -110,7 +125,18 @@ B 的 current_state 是 92.50%（37/40），三条失分 S07 / S19 / S35 缺 `Op
 
 5 组变异测试全部被抓到：翻转 verdict → 1 条 divergence；反转注入顺序 → 1 条；删 run → 1 条；只改 metrics rate → `metrics_match = false`。且 `gate1_signoff.overall` 同步翻 false。
 
-### 5.3 审计发现的覆盖缺口（阶段二必须处理）
+### 5.3 跨模型复核（gemini_audit / antigravity-gemini-3.8-flash）
+
+由于 auditor2 与 kernel 同为 `deepseek-v4.1-flash`，为补上制衡，追加了一次**异模型黑盒复核**（`benchmarks/reports/audit_crosscheck_gemini.md`）：
+
+- 独立复算 9 格 + 18 个分组格，与 `metrics.json` **逐格一致**；
+- 360 条 run 逐条比对，`verdict` 与 `injected_node_ids`（含顺序）**360/360 一致**，`divergence_count = 0`；
+- 三项门禁 + overall **PASS**；
+- **独家发现**：TOPK 截断在 B/C 上几乎从未发生（见 §3.4），auditor2 漏掉了这一机制事实。
+
+**签署：同意放行门禁 1，附带阶段二 3 项 P0 整改约束（见交接文档 §5.4）。**
+
+### 5.4 审计发现的覆盖缺口（阶段二必须处理）
 
 | 编号 | 问题 | 影响 |
 | :--- | :--- | :--- |
@@ -178,5 +204,6 @@ python benchmarks/audit/independent_scorer.py \
 | `benchmarks/audit/independent_scorer.py` | auditor2 | ✅ 27991 B |
 | `benchmarks/results/audit_scores.json` | auditor2 | ✅ 零分歧 |
 | `benchmarks/reports/audit_phase1.md` | auditor2 | ✅ 门禁签署 |
+| `benchmarks/reports/audit_crosscheck_gemini.md` | gemini_audit | ✅ 异模型复核 |
 | `benchmarks/reports/spike_cut1_report.md` | Lead | ✅ 本文件 |
 | `docs/phase1_handoff.md` | Lead | ✅ 阶段二交接 |
