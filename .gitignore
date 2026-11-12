@@ -16,3 +16,7 @@ desktop.ini
 # --- coverage ---
 .coverage
 htmlcov/
+
+# --- 构建产物（release 时由 CI 重建）---
+dist/
+build/
