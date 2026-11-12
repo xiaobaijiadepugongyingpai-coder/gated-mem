@@ -12,3 +12,7 @@ __pycache__/
 .idea/
 Thumbs.db
 desktop.ini
+
+# --- coverage ---
+.coverage
+htmlcov/
