@@ -160,6 +160,43 @@ class DshAdapter(BaseAgentAdapter):
         fm = _yaml_front_matter(self._skill_front_matter())
         return fm + "\n" + SKILL_BODY + "\n"
 
+    def uninstall(self, project_dir: Path, dry_run: bool = False) -> List[str]:
+        """精准摘除 Gated-Mem 注入的补丁块与 SKILL.md，保留用户其他配置。
+
+        这是 P4 §3.3 的「来去无痕」要求：绝不能整文件删除 cordis.patch.yml——
+        那会连带清掉用户自己的所有插件配置。
+        """
+        removed: List[str] = []
+        patch_path = self.profile_dir() / "cordis.patch.yml"
+        if patch_path.exists():
+            removed.append(str(patch_path))
+            if not dry_run:
+                text = patch_path.read_text(encoding="utf-8")
+                cleaned = _strip_patch_block(text, self.mcp_entry())
+                if cleaned != text:
+                    if cleaned.strip():
+                        _write_text_exact(patch_path, cleaned)
+                    else:
+                        # 只剩空序列时还原成 DSH 全新 profile 的默认形态
+                        _write_text_exact(patch_path, "[]\n")
+        else:
+            removed.append(str(patch_path))
+
+        skill = self.skill_path()
+        removed.append(str(skill))
+        if not dry_run and skill.exists():
+            try:
+                skill.unlink()
+            except OSError:
+                pass
+            # 目录空了就顺手删掉，避免留一个空壳
+            try:
+                if not any(skill.parent.iterdir()):
+                    skill.parent.rmdir()
+            except OSError:
+                pass
+        return removed
+
     def install(self, project_dir: Path, dry_run: bool = False) -> List[str]:
         """DSH 的安装需要特殊处理：cordis.patch.yml 是追加而非覆盖。"""
         written: List[str] = []
@@ -261,20 +298,79 @@ def _append_patch_block(path: Path, entry: Dict[str, Any]) -> None:
     ]
 
     if not meaningful:
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(header + body + "\n")
+        _write_text_exact(path, header + body + "\n")
         return
 
     if len(meaningful) == 1 and meaningful[0].strip() in ("[]", "[ ]"):
         kept = [ln for ln in existing.splitlines() if ln.lstrip().startswith("#")]
         text = ("\n".join(kept) + "\n" if kept else "") + header + body + "\n"
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(text)
+        _write_text_exact(path, text)
         return
 
     prefix = "" if existing.endswith("\n") else "\n"
-    with open(path, "a", encoding="utf-8") as f:
-        f.write(prefix + header + body + "\n")
+    _write_text_exact(path, existing + prefix + header + body + "\n")
+
+
+def _write_text_exact(path: Path, text: str) -> None:
+    """按字节精确写入，不做 Windows 换行转换。
+
+    pathlib.write_text 在 Windows 上会把 \n 转成 \r\n，
+    导致「装完再卸」回来的文件与原文件不是逐字节相同。
+    """
+    with open(str(path), "wb") as f:
+        f.write(text.encode("utf-8"))
+
+
+def _strip_patch_block(text: str, entry: Dict[str, Any]) -> str:
+    """从 cordis.patch.yml 文本中精确摘除本适配器注入的那一段。
+
+    策略：定位「# --- Gated-Mem MCP ... ---」注释行到下一个顶层条目
+    （以 "- " 开头且不在我们块内的行）之间的内容，整段删除。
+    找不到标记时原样返回，避免误伤用户配置。
+    """
+    marker = "# --- Gated-Mem MCP"
+    lines = text.splitlines(True)
+
+    # 第一步：定位 marker 行
+    start = None
+    for i, line in enumerate(lines):
+        if line.lstrip().startswith(marker):
+            start = i
+            break
+    if start is None:
+        return text
+
+    # 第二步：从 marker 之后往下找块尾。
+    #
+    # 我们注入的块形如：
+    #     # --- Gated-Mem MCP ... ---
+    #     - insert:                 <- 顶格
+    #         - id: mcp-gated-mem   <- 4 空格缩进，也以 "- " 开头！
+    #           name: ...
+    #
+    # 关键：块内条目虽然以 "- " 开头，但它们是**缩进的**。
+    # 所以判据必须是「顶格（第 0 列）且以 "- " 开头」才算下一个顶层条目。
+    # 之前只看 lstrip() 导致误判，把 "- id:" 当成了块尾，留下残骸。
+    end = len(lines)
+    for i in range(start + 1, len(lines)):
+        line = lines[i]
+        if not line.strip():
+            continue
+        at_column_zero = line[:1] not in (" ", "\t")
+        if at_column_zero and line.lstrip().startswith("- "):
+            if line.lstrip().startswith("- insert:"):
+                continue
+            end = i
+            break
+        if at_column_zero:
+            # 顶格但不是列表项，说明回到了文档层级
+            end = i
+            break
+
+    cleaned = "".join(lines[:start] + lines[end:])
+    while "\n\n\n" in cleaned:
+        cleaned = cleaned.replace("\n\n\n", "\n\n")
+    return cleaned
 
 
 class _PatchAppender(str):

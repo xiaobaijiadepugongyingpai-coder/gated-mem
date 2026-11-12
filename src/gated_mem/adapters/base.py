@@ -113,6 +113,25 @@ class BaseAgentAdapter(object):
         """Gated-Mem 是否已在该项目里挂载过。"""
         return any(p.exists() for p in self.config_paths(project_dir))
 
+    # -- 卸载（P4 §3.3：来去无痕）---------------------------------------
+    def uninstall(self, project_dir: Path, dry_run: bool = False) -> List[str]:
+        """撤销 install() 的写入，返回被清理的路径列表。
+
+        默认实现：直接删除 config_paths() 列出的文件。
+        需要「保留文件、只摘掉自己那块」的适配器（如 DSH 的 patch.yml）
+        必须覆写本方法。
+        """
+        removed: List[str] = []
+        for path in self.config_paths(project_dir):
+            removed.append(str(path))
+            if dry_run or not path.exists():
+                continue
+            try:
+                path.unlink()
+            except OSError as exc:  # pragma: no cover - 权限异常
+                raise AdapterError("无法删除 %s: %s" % (path, exc))
+        return removed
+
 
 def _deep_merge(base: Dict[str, Any], overlay: Dict[str, Any]) -> Dict[str, Any]:
     """深合并，overlay 覆盖 base，dict 递归，其余整体替换。"""

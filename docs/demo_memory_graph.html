@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gated-Mem 记忆图谱</title>
+<style>
+:root{--bg:#0f1115;--fg:#e6e6e6;--muted:#8b949e;--active:#3fb950;--superseded:#f85149;
+--killed:#6e7681;--pinned:#a371f7;--stale:#d29922;--edge:#30363d;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,
+BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;display:flex;
+height:100vh;overflow:hidden}
+#graph{flex:1;position:relative;min-width:0}
+canvas{display:block;width:100%;height:100%;cursor:grab}
+canvas:active{cursor:grabbing}
+#side{width:340px;border-left:1px solid var(--edge);padding:16px;overflow-y:auto;
+background:#0b0d11;flex-shrink:0}
+h1{font-size:15px;margin:0 0 12px;letter-spacing:.5px}
+h2{font-size:12px;margin:16px 0 6px;color:var(--muted);text-transform:uppercase;
+letter-spacing:1px;font-weight:600}
+.item{border-left:3px solid var(--edge);padding:6px 0 6px 10px;margin-bottom:8px;
+font-size:13px;word-break:break-word}
+.item.active{border-color:var(--active)}
+.item.superseded{border-color:var(--superseded)}
+.item.killed{border-color:var(--killed)}
+.item.pinned{border-color:var(--pinned);border-left-width:4px}
+.item.stale{background:rgba(210,153,34,.08)}
+.id{color:var(--muted);font-size:11px;font-family:ui-monospace,monospace}
+.diff{color:var(--stale);font-size:12px;margin-top:4px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--muted);
+margin-top:10px}
+.legend span::before{content:"●";margin-right:4px}
+.lg-active::before{color:var(--active)}.lg-superseded::before{color:var(--superseded)}
+.lg-killed::before{color:var(--killed)}.lg-pinned::before{color:var(--pinned)}
+.lg-stale::before{color:var(--stale)}
+#empty{color:var(--muted);font-size:13px}
+#slider{width:100%;margin-top:10px}
+#stepLabel{color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<div id="graph"><canvas id="cv"></canvas></div>
+<div id="side">
+  <h1>Gated-Mem 记忆图谱</h1>
+  <div class="legend">
+    <span class="lg-active">active</span>
+    <span class="lg-superseded">superseded</span>
+    <span class="lg-killed">killed</span>
+    <span class="lg-pinned">pinned</span>
+    <span class="lg-stale">stale 祖先</span>
+  </div>
+  <h2>Step 时光机</h2>
+  <input id="slider" type="range" min="0" max="100" value="100">
+  <div id="stepLabel"></div>
+  <h2>节点详情</h2>
+  <div id="detail"><div id="empty">点击画布上的节点查看详情</div></div>
+</div>
+<script id="data" type="application/json">{"nodes": [{"id": "M1", "content": "主数据库选用 MySQL 8.0 作为生产存储，三节点主从复制。", "memory_type": "DECISION", "subject": "主数据库", "predicate": "选型", "scope": "global", "status": "superseded", "pinned": false, "created_step": 1, "last_cited_step": 1, "residual_diff": "", "stale": false, "stale_ancestors": []}, {"id": "M2", "content": "单元测试必须 mock 数据库连接，禁止直连生产库。", "memory_type": "CONSTRAINT", "subject": "测试规范", "predicate": "隔离", "scope": "global", "status": "active", "pinned": false, "created_step": 12, "last_cited_step": 12, "residual_diff": "", "stale": true, "stale_ancestors": ["M1"]}, {"id": "M3", "content": "注释一律使用中文，变量名保持英文。", "memory_type": "PREFERENCE", "subject": "代码风格", "predicate": "注释语言", "scope": "global", "status": "active", "pinned": false, "created_step": 20, "last_cited_step": 20, "residual_diff": "", "stale": true, "stale_ancestors": ["M1"]}, {"id": "M4", "content": "全库禁止硬编码任何密钥，一律走环境变量注入。", "memory_type": "CONSTRAINT", "subject": "安全约束", "predicate": "密钥管理", "scope": "global", "status": "active", "pinned": true, "created_step": 28, "last_cited_step": 28, "residual_diff": "", "stale": true, "stale_ancestors": ["M1"]}, {"id": "M6", "content": "分片键统一使用 tenant_id，禁止使用自增主键作为路由依据。", "memory_type": "CONSTRAINT", "subject": "分库分表", "predicate": "分片键", "scope": "global", "status": "active", "pinned": false, "created_step": 60, "last_cited_step": 60, "residual_diff": "", "stale": true, "stale_ancestors": ["M1"]}, {"id": "M7", "content": "连接池大小固定为 20，超过则触发告警而非自动扩容。", "memory_type": "CONSTRAINT", "subject": "连接池", "predicate": "容量", "scope": "global", "status": "active", "pinned": false, "created_step": 75, "last_cited_step": 75, "residual_diff": "", "stale": true, "stale_ancestors": ["M1"]}, {"id": "M8", "content": "慢查询阈值设为 200ms，超过即记录到审计表。", "memory_type": "PREFERENCE", "subject": "可观测性", "predicate": "慢查询阈值", "scope": "global", "status": "active", "pinned": false, "created_step": 90, "last_cited_step": 90, "residual_diff": "", "stale": true, "stale_ancestors": ["M1"]}, {"id": "M9", "content": "认证方案使用 Session Cookie，有效期 7 天。", "memory_type": "DECISION", "subject": "认证", "predicate": "方案", "scope": "global", "status": "superseded", "pinned": false, "created_step": 110, "last_cited_step": 110, "residual_diff": "", "stale": false, "stale_ancestors": []}, {"id": "M11", "content": "前端构建器使用 webpack 5，配置集中在 config/ 目录。", "memory_type": "DECISION", "subject": "前端构建", "predicate": "工具", "scope": "global", "status": "superseded", "pinned": false, "created_step": 130, "last_cited_step": 130, "residual_diff": "", "stale": false, "stale_ancestors": []}, {"id": "M5", "content": "主数据库切换为 PostgreSQL 16，以支持 JSONB 高并发索引查询。", "memory_type": "DECISION", "subject": "主数据库", "predicate": "选型", "scope": "global", "status": "active", "pinned": false, "created_step": 140, "last_cited_step": 140, "residual_diff": "[Replaced: MySQL] 连接池在写入高峰期持续打满，JSONB 查询需求无法满足。", "stale": false, "stale_ancestors": []}, {"id": "M10", "content": "认证方案升级为 OAuth 2.1 + PKCE，不再使用服务端会话。", "memory_type": "DECISION", "subject": "认证", "predicate": "方案", "scope": "global", "status": "active", "pinned": false, "created_step": 210, "last_cited_step": 210, "residual_diff": "[Replaced: Session Cookie] 多端登录与会话劫持风险无法在接受范围内收敛。", "stale": false, "stale_ancestors": []}, {"id": "M12", "content": "前端构建器替换为 Vite 5，开发期冷启动从 40s 降到 1.2s。", "memory_type": "DECISION", "subject": "前端构建", "predicate": "工具", "scope": "global", "status": "active", "pinned": false, "created_step": 260, "last_cited_step": 260, "residual_diff": "[Replaced: webpack] 大型 monorepo 下 HMR 退化严重，构建耗时不可接受。", "stale": false, "stale_ancestors": []}, {"id": "M13", "content": "昨晚编译失败疑似 CI 缓存未清理，已手动清理待观察。", "memory_type": "EPHEMERAL", "subject": "CI", "predicate": "临时观察", "scope": "global", "status": "active", "pinned": false, "created_step": 300, "last_cited_step": 300, "residual_diff": "", "stale": false, "stale_ancestors": []}, {"id": "M14", "content": "发布窗口固定在每周二与周四 20:00-22:00，其余时间禁止上线。", "memory_type": "CONSTRAINT", "subject": "发布流程", "predicate": "窗口", "scope": "global", "status": "active", "pinned": true, "created_step": 320, "last_cited_step": 320, "residual_diff": "", "stale": false, "stale_ancestors": []}, {"id": "M15", "content": "告警通道从 PagerDuty 迁移到 Grafana OnCall，降低误报噪音。", "memory_type": "DECISION", "subject": "告警", "predicate": "通道", "scope": "global", "status": "active", "pinned": false, "created_step": 340, "last_cited_step": 340, "residual_diff": "[Replaced: PagerDuty] 分级策略无法自定义，值班同学半夜被无意义告警吵醒。", "stale": false, "stale_ancestors": []}], "edges": [{"source": "M2", "target": "M1", "type": "BELONGS_TO"}, {"source": "M3", "target": "M1", "type": "BELONGS_TO"}, {"source": "M4", "target": "M1", "type": "BELONGS_TO"}, {"source": "M6", "target": "M1", "type": "BELONGS_TO"}, {"source": "M7", "target": "M6", "type": "BELONGS_TO"}, {"source": "M8", "target": "M7", "type": "BELONGS_TO"}], "max_step": 340}</script>
+<script>
+(function(){
+  "use strict";
+  var DATA = JSON.parse(document.getElementById("data").textContent);
+  var canvas = document.getElementById("cv");
+  var ctx = canvas.getContext("2d");
+  var nodes = DATA.nodes.map(function(n, i){
+    var a = (i / Math.max(1, DATA.nodes.length)) * Math.PI * 2;
+    return { d: n, x: Math.cos(a) * 180 + 300, y: Math.sin(a) * 180 + 300,
+             vx: 0, vy: 0 };
+  });
+  var byId = {};
+  nodes.forEach(function(n){ byId[n.d.id] = n; });
+  var edges = DATA.edges.filter(function(e){ return byId[e.source] && byId[e.target]; });
+
+  var W = 0, H = 0, DPR = window.devicePixelRatio || 1;
+  function resize(){
+    var r = canvas.parentElement.getBoundingClientRect();
+    W = r.width; H = r.height;
+    canvas.width = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  window.addEventListener("resize", resize);
+
+  var scale = 1, ox = 0, oy = 0, drag = null;
+  canvas.addEventListener("wheel", function(ev){
+    ev.preventDefault();
+    scale *= (ev.deltaY < 0 ? 1.1 : 0.9);
+    scale = Math.min(4, Math.max(0.2, scale));
+  }, { passive: false });
+  canvas.addEventListener("mousedown", function(ev){
+    drag = { x: ev.clientX, y: ev.clientY, ox: ox, oy: oy, moved: false };
+  });
+  window.addEventListener("mousemove", function(ev){
+    if(!drag) return;
+    ox = drag.ox + (ev.clientX - drag.x);
+    oy = drag.oy + (ev.clientY - drag.y);
+    if(Math.abs(ev.clientX - drag.x) + Math.abs(ev.clientY - drag.y) > 3) drag.moved = true;
+  });
+  window.addEventListener("mouseup", function(ev){
+    if(drag && !drag.moved){
+      var hit = pick(ev);
+      if(hit) showDetail(hit.d);
+    }
+    drag = null;
+  });
+
+  function pick(ev){
+    var r = canvas.getBoundingClientRect();
+    var mx = ev.clientX - r.left, my = ev.clientY - r.top;
+    var best = null, bd = 900;
+    nodes.forEach(function(n){
+      var sx = n.x * scale + ox + W / 2, sy = n.y * scale + oy + H / 2;
+      var d = (sx - mx) * (sx - mx) + (sy - my) * (sy - my);
+      if(d < bd){ bd = d; best = n; }
+    });
+    return best;
+  }
+
+  function colorFor(n){
+    if(n.d.stale) return "#d29922";
+    if(n.d.pinned) return "#a371f7";
+    if(n.d.status === "killed") return "#6e7681";
+    if(n.d.status === "superseded") return "#f85149";
+    return "#3fb950";
+  }
+
+  var stepMax = DATA.max_step || 0;
+  var stepCur = stepMax;
+  var slider = document.getElementById("slider");
+  var stepLabel = document.getElementById("stepLabel");
+  function applyStep(){
+    stepLabel.textContent = "显示 step <= " + stepCur + " / " + stepMax;
+  }
+  slider.addEventListener("input", function(){
+    stepCur = Math.round(stepMax * (parseInt(slider.value, 10) / 100));
+    applyStep();
+  });
+  applyStep();
+
+  function visible(n){ return n.d.created_step <= stepCur; }
+
+  function tick(){
+    // 简易力导向：斥力 + 边弹簧
+    for(var i = 0; i < nodes.length; i++){
+      for(var j = i + 1; j < nodes.length; j++){
+        var a = nodes[i], b = nodes[j];
+        var dx = b.x - a.x, dy = b.y - a.y;
+        var d2 = dx * dx + dy * dy || 1;
+        var d = Math.sqrt(d2);
+        var f = 2200 / d2;
+        var ux = dx / d, uy = dy / d;
+        a.vx -= ux * f; a.vy -= uy * f;
+        b.vx += ux * f; b.vy += uy * f;
+      }
+    }
+    edges.forEach(function(e){
+      var a = byId[e.source], b = byId[e.target];
+      if(!a || !b) return;
+      var dx = b.x - a.x, dy = b.y - a.y;
+      var d = Math.sqrt(dx * dx + dy * dy) || 1;
+      var f = (d - 120) * 0.008;
+      var ux = dx / d, uy = dy / d;
+      a.vx += ux * f; a.vy += uy * f;
+      b.vx -= ux * f; b.vy -= uy * f;
+    });
+    nodes.forEach(function(n){
+      n.vx += (-n.x) * 0.002;
+      n.vy += (-n.y) * 0.002;
+      n.vx *= 0.85; n.vy *= 0.85;
+      n.x += n.vx; n.y += n.vy;
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    ctx.save();
+    ctx.translate(W / 2 + ox, H / 2 + oy);
+    ctx.scale(scale, scale);
+
+    ctx.strokeStyle = "#30363d";
+    ctx.lineWidth = 1 / scale;
+    edges.forEach(function(e){
+      var a = byId[e.source], b = byId[e.target];
+      if(!a || !b || !visible(a) || !visible(b)) return;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      if(e.type === "SUPERSEDES"){ ctx.setLineDash([4 / scale, 4 / scale]); }
+      else { ctx.setLineDash([]); }
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+
+    nodes.forEach(function(n){
+      if(!visible(n)) return;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = colorFor(n);
+      ctx.fill();
+      if(n.d.pinned){
+        ctx.strokeStyle = "#a371f7"; ctx.lineWidth = 2 / scale; ctx.stroke();
+      }
+      if(n.d.stale){
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 11, 0, Math.PI * 2);
+        ctx.strokeStyle = "#d29922"; ctx.lineWidth = 1.5 / scale; ctx.stroke();
+      }
+      ctx.fillStyle = "#8b949e";
+      ctx.font = (11 / scale) + "px ui-monospace,monospace";
+      ctx.fillText(n.d.id, n.x + 10 / scale, n.y + 4 / scale);
+    });
+    ctx.restore();
+  }
+
+  function showDetail(d){
+    var box = document.getElementById("detail");
+    box.textContent = "";
+    var wrap = document.createElement("div");
+    wrap.className = "item " + d.status + (d.pinned ? " pinned" : "") +
+                    (d.stale ? " stale" : "");
+    var idEl = document.createElement("div");
+    idEl.className = "id";
+    idEl.textContent = d.id + "  ·  " + d.memory_type + "  ·  step " + d.created_step;
+    var body = document.createElement("div");
+    body.textContent = d.content;
+    wrap.appendChild(idEl);
+    wrap.appendChild(body);
+    if(d.stale && d.stale_ancestors && d.stale_ancestors.length){
+      var w = document.createElement("div");
+      w.className = "diff";
+      w.textContent = "⚠ 祖先已废弃: " + d.stale_ancestors.join(", ");
+      wrap.appendChild(w);
+    }
+    if(d.residual_diff){
+      var dd = document.createElement("div");
+      dd.className = "diff";
+      dd.textContent = d.residual_diff;
+      wrap.appendChild(dd);
+    }
+    box.appendChild(wrap);
+  }
+
+  function loop(){ tick(); draw(); requestAnimationFrame(loop); }
+  resize();
+  loop();
+})();
+</script>
+</body>
+</html>

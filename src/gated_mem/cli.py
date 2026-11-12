@@ -137,11 +137,22 @@ def cmd_status(args) -> int:
 
 
 def cmd_doctor(args) -> int:
-    """体检：WAL / FTS5 / 向量维度一致性。"""
+    """环境健康诊断。
+
+    输出：Python 路径与版本、SQLite 版本、WAL 状态、FTS5 状态、
+    当前激活的 Embedder 名称与维度、库内向量一致性、已配置的 Agent 列表。
+    """
     store = open_store(args)
     p = Paint()
     ok = True
 
+    print(p("Gated-Mem 环境诊断", "bold"))
+    print("  Python : %s (%s)" % (sys.executable, sys.version.split()[0]))
+    import sqlite3 as _sqlite3
+
+    print("  SQLite : %s" % _sqlite3.sqlite_version)
+
+    # --- 数据库档位 ---
     mode = store.conn.execute("PRAGMA journal_mode").fetchone()[0]
     good = str(mode).lower() == "wal"
     ok = ok and good
@@ -149,30 +160,59 @@ def cmd_doctor(args) -> int:
 
     try:
         store.conn.execute("SELECT count(*) FROM memories_fts").fetchone()
-        print("  [OK] FTS5 虚表可查询")
+        print("  [OK] FTS5 全文索引可查询")
     except Exception as exc:
         ok = False
         print("  [FAIL] FTS5: %s" % exc)
 
+    # --- Embedder 档位 ---
+    requested = os.environ.get("GATED_MEM_EMBEDDING", "builtin")
+    provider = get_default_provider(requested)
+    tier = "满血语义（onnx）" if provider.model_id.startswith("fastembed") else "极速安全（零依赖）"
+    print("  [OK] Embedder = %s  dim=%d  档位=%s"
+          % (provider.model_id, provider.dim, tier))
+    if requested in ("fastembed", "auto") and not provider.model_id.startswith("fastembed"):
+        print("       (已请求 fastembed 但不可用，已降级；装 pip install \"gated-mem[onnx]\")")
+
+    # --- 库内向量一致性 ---
     dims = set()
+    models = set()
     for n in store.all_memories():
         if n.embedding:
             dims.add(len(n.embedding))
+            models.add(n.embedding_model)
     if len(dims) <= 1:
-        print("  [OK] 向量维度一致: %s" % (sorted(dims) or "无向量"))
+        print("  [OK] 库内向量维度一致: %s" % (sorted(dims) or "无向量"))
     else:
         ok = False
-        print("  [FAIL] 向量维度混杂: %s" % sorted(dims))
-
-    models = {n.embedding_model for n in store.all_memories() if n.embedding}
+        print("  [FAIL] 库内向量维度混杂: %s（需 rebuild_embeddings）" % sorted(dims))
     if len(models) <= 1:
-        print("  [OK] 向量模型一致: %s" % (sorted(models) or "无向量"))
+        print("  [OK] 库内向量模型一致: %s" % (sorted(models) or "无向量"))
     else:
         ok = False
-        print("  [FAIL] 向量模型混杂: %s" % sorted(models))
+        print("  [FAIL] 库内向量模型混杂: %s" % sorted(models))
+    if models and provider.model_id not in models:
+        print("  [WARN] 当前 Embedder 与库内向量模型不一致，检索前请统一")
+
+    # --- Agent 挂载状态 ---
+    print(p("  已配置的 Agent", "bold"))
+    project = Path(getattr(args, "project", None) or os.getcwd())
+    available = adapter_base.all_adapters()
+    if not available:
+        print("    （无可用适配器）")
+    for ad in available:
+        installed = ad.detect_installed()
+        mounted = ad.is_installed_at(project)
+        if mounted:
+            tag = p("已挂载", "green")
+        elif installed:
+            tag = p("已安装未挂载", "yellow")
+        else:
+            tag = p("未安装", "gray")
+        print("    %-12s %s  (priority=%d)" % (ad.agent_name, tag, ad.priority))
 
     store.close()
-    print("\n结论: %s" % ("健康" if ok else "存在问题"))
+    print("\n结论: %s" % (p("健康", "green") if ok else p("存在问题", "red")))
     return 0 if ok else 1
 
 
@@ -434,11 +474,12 @@ def cmd_export_html(args) -> int:
 
 
 def cmd_setup(args) -> int:
-    """自动扫描并安装适配器。"""
+    """自动扫描并安装 / 卸载适配器。"""
     p = Paint()
     project = Path(args.project or os.getcwd())
+    uninstall = bool(getattr(args, "uninstall", False))
 
-    if args.agent:
+    if args.agent and args.agent != "auto":
         try:
             ad = adapter_base.get_adapter(args.agent)
         except adapter_base.AdapterError as exc:
@@ -446,6 +487,7 @@ def cmd_setup(args) -> int:
             return 2
         targets = [ad]
     else:
+        # 不带参数：按 priority 自动探测已安装的 Agent（DSH 恒在最前）
         targets = adapter_base.detect_available()
         if not targets:
             sys.stderr.write(
@@ -454,22 +496,44 @@ def cmd_setup(args) -> int:
             )
             return 2
 
-    print(p("Gated-Mem 安装向导", "bold"))
+    title = "Gated-Mem 卸载向导" if uninstall else "Gated-Mem 安装向导"
+    print(p(title, "bold"))
+
     for ad in targets:
         installed = ad.detect_installed()
-        tag = p("已检测到", "green") if installed else p("未检测到", "gray")
-        print("\n  %s %s  [%s]" % (p("▸", "cyan"), ad.display_name, tag))
+        mounted = ad.is_installed_at(project)
+        if uninstall:
+            state = p("已挂载", "green") if mounted else p("未挂载", "gray")
+        else:
+            state = p("已检测到", "green") if installed else p("未检测到", "gray")
+        print("\n  %s %s  [%s]" % (p("▸", "cyan"), ad.display_name, state))
+
+        if uninstall:
+            if not mounted:
+                print("      无需清理")
+                continue
+            if args.dry_run:
+                for path in ad.config_paths(project):
+                    print("      将清理: %s" % path)
+                print("      (dry-run，未改动)")
+                continue
+            for w in ad.uninstall(project):
+                print("      %s 已清理 %s" % (p("✓", "green"), w))
+            continue
+
         for path in ad.config_paths(project):
             print("      将写入: %s" % path)
         if args.dry_run:
             print("      (dry-run，未写入)")
             continue
-        written = ad.install(project)
-        for w in written:
+        for w in ad.install(project):
             print("      %s %s" % (p("✓", "green"), w))
 
     if not args.dry_run and targets:
-        print("\n%s" % p("安装完成。重启对应 Agent 后即可使用 gated-mem 工具。", "green"))
+        if uninstall:
+            print("\n%s" % p("卸载完成。已移除注入的 MCP 配置与 Skill 文件。", "green"))
+        else:
+            print("\n%s" % p("安装完成。重启对应 Agent 后即可使用 gated-mem 工具。", "green"))
     return 0
 
 
@@ -482,13 +546,19 @@ def build_parser() -> argparse.ArgumentParser:
         prog="gated-mem",
         description="Gated-Mem：面向超长开发周期的本地可审计、可回滚架构状态引擎",
     )
+    from . import __version__
+
+    ap.add_argument("--version", action="version",
+                    version="gated-mem %s" % __version__)
     ap.add_argument("--db", help="数据库路径（默认 .gated-mem/memory.db）")
     ap.add_argument("--project-id", dest="project_id", default=None)
     sub = ap.add_subparsers(dest="command")
 
     sub.add_parser("init", help="初始化记忆库").set_defaults(func=cmd_init)
     sub.add_parser("status", help="显示状态概览").set_defaults(func=cmd_status)
-    sub.add_parser("doctor", help="体检 WAL/FTS5/向量一致性").set_defaults(func=cmd_doctor)
+    doc = sub.add_parser("doctor", help="环境健康诊断（WAL/FTS5/Embedder/Agent）")
+    doc.add_argument("--project", default=None)
+    doc.set_defaults(func=cmd_doctor)
 
     r = sub.add_parser("remember", help="写入一条记忆")
     r.add_argument("content")
@@ -536,10 +606,12 @@ def build_parser() -> argparse.ArgumentParser:
     eh.set_defaults(func=cmd_export_html)
 
     st = sub.add_parser("setup", help="为宿主 Agent 自动安装 MCP 配置")
-    st.add_argument("--agent", default=None,
+    st.add_argument("--agent", default="auto",
                     help="指定 agent（dsh / claude_code / cursor）；省略则自动扫描")
     st.add_argument("--project", default=None)
     st.add_argument("--dry-run", dest="dry_run", action="store_true")
+    st.add_argument("--uninstall", action="store_true",
+                    help="卸载已注入的 MCP 配置与 Skill 文件（来去无痕）")
     st.set_defaults(func=cmd_setup)
 
     return ap

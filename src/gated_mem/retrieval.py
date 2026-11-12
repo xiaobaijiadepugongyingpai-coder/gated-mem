@@ -327,10 +327,14 @@ class Retriever(object):
                         replaced_entity=_parse_replaced(node.residual_diff),
                     )
                 )
-            # 它 SUPERSEDES 了谁
-            for old_id in self.store.children_of(mid) or []:
-                pass
-        # 沿 SUPERSEDES 边找出被覆盖节点，把它们的 diff 也纳入
+        # 沿 SUPERSEDES 边找出被覆盖节点，把它们的 diff 也纳入。
+        # 去重键统一用 (memory_id, residual_diff)：新节点自身的 diff 与
+        # 它身上 SUPERSEDES 边的 diff 往往是同一句话，用不同键会把同一条
+        # 演进轨迹渲染两遍（真实踩过）。
+        content_seen = set()
+        for tr in traces:
+            content_seen.add((tr.memory_id, tr.residual_diff))
+
         for mid in injected_ids:
             rows = self.store.conn.execute(
                 "SELECT target_id, residual_diff FROM memory_edges"
@@ -339,13 +343,13 @@ class Retriever(object):
             ).fetchall()
             for r in rows:
                 old = all_nodes.get(r["target_id"])
-                key = "edge:%s:%s" % (mid, r["target_id"])
-                if key in seen:
-                    continue
-                seen.add(key)
                 diff = r["residual_diff"] or (old.residual_diff if old else "")
                 if not diff:
                     continue
+                key = (mid, diff)
+                if key in content_seen:
+                    continue
+                content_seen.add(key)
                 traces.append(
                     EvolutionTrace(
                         memory_id=mid,

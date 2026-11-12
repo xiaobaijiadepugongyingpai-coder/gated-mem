@@ -400,7 +400,8 @@ class Store(object):
                 " residual_diff, created_step, source_event_id) VALUES (?,?,?,?,?,?,?,?)",
                 (
                     edge.edge_id,
-                    edge.project_id,
+                    # 同 insert_memory：以 store 的 project_id 为准
+                    self.project_id,
                     edge.source_id,
                     edge.target_id,
                     edge.edge_type.value,

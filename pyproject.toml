@@ -1,0 +1,88 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gated-mem"
+version = "1.0.0"
+description = "Git for Agent Memory: Local, Auditable, Undoable State Engine for DSH, Claude Code & Cursor"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [{ name = "Gated-Mem Contributors" }]
+keywords = [
+  "agent-memory", "mcp", "llm", "coding-agent", "deepseek-harness",
+  "claude-code", "cursor", "event-sourcing", "sqlite", "fts5",
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Version Control",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+# ---------------------------------------------------------------------------
+# 生死级打包规范（GM-DIRECTIVE-P4-v3.0.0 §3.1）
+#
+# 核心包必须是**零第三方依赖**。原因不是洁癖，是真实事故：
+#   在主环境直接安装 fastembed 会强制拉 numpy>=2.0 + onnxruntime，
+#   瞬间打断用户已有的 numba / torch / spyder。
+#   开源用户装完 gated-mem 发现自己主力环境崩了，项目立刻被差评反噬。
+#
+# 所以默认安装只依赖 Python 标准库：
+#   sqlite3(FTS5+bm25+递归CTE) / json / argparse / hashlib / unicodedata / dataclasses
+#
+# 注意：早期版本用 pydantic 定义领域模型，导致 wheel 装进干净环境后
+# 导入 gated_mem 直接 ModuleNotFoundError，零依赖承诺是假的。
+# 阶段四已把 schema.py 改为 dataclass(frozen=True) + 自实现 model_copy，
+# 并用干净 venv 实测验证过（见 docs/ENVIRONMENT.md）。
+# ---------------------------------------------------------------------------
+dependencies = []
+
+[project.optional-dependencies]
+# 满血语义模式：本地 ONNX 向量引擎（bge-small-zh-v1.5）
+# 建议在独立虚拟环境或 uv tool install 下安装
+onnx = [
+    "fastembed>=0.3.0",
+    "numpy>=1.24.0",
+]
+# 更漂亮的终端输出（不装也能跑，会自动回退到标准库 ANSI）
+cli = [
+    "rich>=13.0.0",
+]
+all = [
+    "fastembed>=0.3.0",
+    "numpy>=1.24.0",
+    "rich>=13.0.0",
+]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "build>=1.0.0",
+]
+
+[project.scripts]
+gated-mem = "gated_mem.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/gated-mem/gated-mem"
+Repository = "https://github.com/gated-mem/gated-mem"
+Issues = "https://github.com/gated-mem/gated-mem/issues"
+Documentation = "https://github.com/gated-mem/gated-mem#readme"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["gated_mem*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]

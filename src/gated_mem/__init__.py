@@ -1,3 +1,6 @@
-"""Gated-Mem: 面向超长开发周期的本地可审计、可回滚架构状态引擎。"""
+"""Gated-Mem: Git for Agent Memory.
 
-__version__ = "2.1.2"
+本地、可审计、可回滚的 Agent 架构状态记忆引擎。
+"""
+
+__version__ = "1.0.0"

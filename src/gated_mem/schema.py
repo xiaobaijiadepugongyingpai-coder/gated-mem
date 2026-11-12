@@ -15,7 +15,8 @@ import unicodedata
 from enum import Enum
 from typing import Dict, List, Optional, Tuple
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from dataclasses import dataclass, field as _dc_field, replace as _dc_replace
+from typing import Any as _Any
 
 
 class MemoryType(str, Enum):
@@ -156,42 +157,97 @@ def tokenize(text: str) -> frozenset:
 
 
 # ---------------------------------------------------------------------------
-# Pydantic 模型
+# 领域模型基类（纯标准库实现，零第三方依赖）
+#
+# 为什么不用 pydantic：本项目的核心承诺是 `pip install gated-mem` 零依赖。
+# 早期版本用了 pydantic，导致 wheel 装进干净环境后 `import gated_mem` 直接
+# ModuleNotFoundError —— 那会把「零依赖」变成一句假话。
+# 所以这里用 dataclass(frozen=True) 自实现一个极小的模型基类，
+# 只保留我们真正需要的语义：不可变、字段校验、model_copy。
 # ---------------------------------------------------------------------------
-class MemoryNode(BaseModel):
-    """当前有效记忆投影。"""
+class _FrozenModel(object):
+    """不可变模型的极简基类（dataclass 之上的一层薄封装）。"""
 
-    model_config = ConfigDict(extra="forbid", frozen=True)
+    __slots__ = ()
+
+    def __setattr__(self, name, value):
+        # frozen 语义：禁止任何属性赋值
+        raise AttributeError("模型不可变：%s" % name)
+
+    def model_copy(self, *, update=None):
+        """返回一个替换了部分字段的新实例（对应 pydantic 的 model_copy）。"""
+        if not update:
+            return self
+        return _dc_replace(self, **update)
+
+    def __eq__(self, other):
+        if type(self) is not type(other):
+            return NotImplemented
+        return self.__dict__ == other.__dict__
+
+    def __repr__(self):
+        return "%s(%s)" % (type(self).__name__, self.__dict__)
+
+
+def _coerce_enum(obj, attr_name, enum_cls):
+    """把裸字符串字段归化成枚举成员，等价于 pydantic 的自动转换。"""
+    val = getattr(obj, attr_name, None)
+    if isinstance(val, str):
+        object.__setattr__(obj, attr_name, enum_cls(val))
+
+
+def _require(cond, msg):
+    """参数断言辅助。"""
+    if not cond:
+        raise ValueError(msg)
+
+
+
+# ---------------------------------------------------------------------------
+# 领域模型
+# ---------------------------------------------------------------------------
+@dataclass(frozen=True)
+class MemoryNode(_FrozenModel):
+    """当前有效记忆投影。"""
 
     memory_id: str
     project_id: str = "default"
-    content: str
-    memory_type: MemoryType
-    subject: str
-    predicate: str
+    content: str = ""
+    memory_type: MemoryType = MemoryType.DECISION
+    subject: str = ""
+    predicate: str = ""
     scope: str = "global"
     status: MemoryStatus = MemoryStatus.ACTIVE
-    input_weight: float = Field(default=0.5, ge=0.1, le=1.0)
-    citation_count: int = Field(default=0, ge=0)
+    input_weight: float = 0.5
+    citation_count: int = 0
     pinned: bool = False
     trust_tier: TrustTier = TrustTier.MODEL_INFERRED
     residual_diff: Optional[str] = None
     embedding: Optional[List[float]] = None
     embedding_model: str = "bge-small"
-    created_step: int = Field(default=0, ge=0)
-    last_cited_step: int = Field(default=0, ge=0)
+    created_step: int = 0
+    last_cited_step: int = 0
     source_event_id: str = ""
 
-    @field_validator("embedding")
-    @classmethod
-    def _check_embedding(cls, v: Optional[List[float]]) -> Optional[List[float]]:
-        """向量必须是有限浮点；这里只校验形状，不强制维度。"""
-        if v is None:
-            return None
-        for x in v:
-            if x != x or x in (float("inf"), float("-inf")):
-                raise ValueError("embedding 含 NaN 或 Inf")
-        return v
+    def __post_init__(self):
+        """构造后校验与类型归化。
+
+        pydantic 会自动把 'DECISION' 这样的裸字符串转成 MemoryType 枚举成员；
+        dataclass 不会。这里必须显式做，否则从 SQLite 读回来的行会让
+        compute_t0() 拿到 str 而崩溃。
+        """
+        _coerce_enum(self, "memory_type", MemoryType)
+        _coerce_enum(self, "status", MemoryStatus)
+        _coerce_enum(self, "trust_tier", TrustTier)
+        _require(0.1 <= self.input_weight <= 1.0,
+                 "input_weight 必须落在 [0.1, 1.0]：%r" % (self.input_weight,))
+        _require(self.citation_count >= 0, "citation_count 不能为负")
+        _require(self.created_step >= 0, "created_step 不能为负")
+        _require(self.last_cited_step >= 0, "last_cited_step 不能为负")
+        if self.embedding is not None:
+            for x in self.embedding:
+                if x != x or x in (float("inf"), float("-inf")):
+                    raise ValueError("embedding 含 NaN 或 Inf")
 
     @property
     def slot(self) -> Tuple[str, str, str]:
@@ -199,48 +255,48 @@ class MemoryNode(BaseModel):
         return (self.subject, self.predicate, self.scope)
 
 
-class MemoryEdge(BaseModel):
+@dataclass(frozen=True)
+class MemoryEdge(_FrozenModel):
     """拓扑边。方向恒为 source_id(子) -> target_id(父)。"""
-
-    model_config = ConfigDict(extra="forbid", frozen=True)
 
     edge_id: str
     project_id: str = "default"
-    source_id: str  # 子节点
-    target_id: str  # 父节点
+    source_id: str = ""  # 子节点
+    target_id: str = ""  # 父节点
     edge_type: EdgeType = EdgeType.BELONGS_TO
     residual_diff: Optional[str] = None
-    created_step: int = Field(default=0, ge=0)
+    created_step: int = 0
     source_event_id: str = ""
 
-    @field_validator("target_id")
-    @classmethod
-    def _no_self_loop(cls, v: str, info) -> str:
+    def __post_init__(self):
         """自环直接拒绝。真正的多跳成环由 traversal 的 visited 集合阻断。"""
-        src = info.data.get("source_id")
-        if src is not None and src == v:
+        _coerce_enum(self, "edge_type", EdgeType)
+        if self.source_id and self.source_id == self.target_id:
             raise ValueError("边不允许自环：source_id 与 target_id 相同")
-        return v
+        _require(self.created_step >= 0, "created_step 不能为负")
 
 
-class MemoryEvent(BaseModel):
+@dataclass(frozen=True)
+class MemoryEvent(_FrozenModel):
     """不可变事件。"""
-
-    model_config = ConfigDict(extra="forbid", frozen=True)
 
     event_id: str
     project_id: str = "default"
-    step: int = Field(ge=0)
-    event_type: EventType
+    step: int = 0
+    event_type: EventType = EventType.MEMORY_CREATED
     causation_id: Optional[str] = None
-    correlation_id: str
-    payload_json: str
+    correlation_id: str = ""
+    payload_json: str = ""
+
+    def __post_init__(self):
+        """事件步数必须非负。"""
+        _coerce_enum(self, "event_type", EventType)
+        _require(self.step >= 0, "step 不能为负")
 
 
-class EvolutionTrace(BaseModel):
+@dataclass(frozen=True)
+class EvolutionTrace(_FrozenModel):
     """演进轨迹通道。绝不与正文混淆。"""
-
-    model_config = ConfigDict(extra="forbid", frozen=True)
 
     memory_id: str
     subject: str
@@ -248,10 +304,9 @@ class EvolutionTrace(BaseModel):
     replaced_entity: str = ""
 
 
-class RecallItem(BaseModel):
+@dataclass(frozen=True)
+class RecallItem(_FrozenModel):
     """召回条目。stale_parent_warning 与 stale_ancestor_ids 是一等公民。"""
-
-    model_config = ConfigDict(extra="forbid", frozen=True)
 
     memory_id: str
     content: str
@@ -264,20 +319,24 @@ class RecallItem(BaseModel):
     vitality: float = 1.0
     score: float = 0.0
     stale_parent_warning: bool = False
-    stale_ancestor_ids: List[str] = Field(default_factory=list)
+    stale_ancestor_ids: List[str] = _dc_field(default_factory=list)
+
+    def __post_init__(self):
+        """归化枚举类型（dataclass 不做自动转换）。"""
+        _coerce_enum(self, "memory_type", MemoryType)
+        _coerce_enum(self, "trust_tier", TrustTier)
 
 
-class RecallReceipt(BaseModel):
+@dataclass(frozen=True)
+class RecallReceipt(_FrozenModel):
     """检索回执。双通道物理隔离：正文与演进轨迹分属不同字段。"""
 
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    recall_event_id: str
-    query: str
-    injected_items: List[RecallItem] = Field(default_factory=list)
-    evolution_traces: List[EvolutionTrace] = Field(default_factory=list)
-    excluded_stale_ids: List[str] = Field(default_factory=list)
-    stale_warning_ids: List[str] = Field(default_factory=list)
+    recall_event_id: str = ""
+    query: str = ""
+    injected_items: List[RecallItem] = _dc_field(default_factory=list)
+    evolution_traces: List[EvolutionTrace] = _dc_field(default_factory=list)
+    excluded_stale_ids: List[str] = _dc_field(default_factory=list)
+    stale_warning_ids: List[str] = _dc_field(default_factory=list)
     tokens_used: int = 0
     truncated_candidates: int = 0
     candidate_pool_size: int = 0
