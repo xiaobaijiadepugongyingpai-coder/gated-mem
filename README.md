@@ -5,8 +5,8 @@
 
 <p align="center">
 
-![Tests](https://img.shields.io/badge/Tests-169%20Passed-brightgreen)
-![Coverage](https://img.shields.io/badge/Coverage-91%25-brightgreen)
+![Tests](https://img.shields.io/badge/Tests-176%20Passed-brightgreen)
+![Coverage](https://img.shields.io/badge/Coverage-90%25-brightgreen)
 ![Python](https://img.shields.io/badge/Python-%3E%3D3.9-blue)
 ![Dependencies](https://img.shields.io/badge/Core%20Dependencies-Zero-success)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
@@ -232,9 +232,9 @@ try. Semantic mode is opt-in, and `doctor` tells you which tier is active.
 ## Verifying the Claims
 
 ```bash
-python -m pytest tests/ -q                       # 169 tests
+python -m pytest tests/ -q                       # 176 tests
 python -m coverage run --source=src/gated_mem -m pytest tests/ -q
-python -m coverage report -m                     # 91%
+python -m coverage report -m                     # 90%
 python benchmarks/gate3_check.py                 # 16/16 release gates
 python benchmarks/eval_phase3_hybrid.py --provider builtin
 python benchmarks/build_demo_graph.py            # regenerate docs/demo_memory_graph.html
