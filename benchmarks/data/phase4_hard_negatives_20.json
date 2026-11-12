@@ -1,0 +1,1371 @@
+{
+  "case_count": 20,
+  "cases": [
+    {
+      "case_id": "H01",
+      "entity_kind": "error_code",
+      "expected_id": "H01_M5",
+      "expected_top3": [
+        "H01_M5"
+      ],
+      "identifier": "ERR_XA_PROTO_08",
+      "memories": [
+        {
+          "content": "在分布式事务重试模块的联调复盘里，值守团队把错误码 ERR_XA_RMFAIL_04 的处置动作固化为一条记录：先将重试退避阈值 tx_backoff_ms 调整为 500，再保持幂等去重窗口开启，最后把本次变更登记到当班值守日志的回滚开关清单；该策略自上线以来运行平稳，未再触发重试风暴，与同族错误码共用同一套处置模板，仅参数取值不同，评审时按编号逐条核对即可。",
+          "id": "H01_M1",
+          "identifier": "ERR_XA_RMFAIL_04",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "处置记录",
+          "step": 1,
+          "subject": "分布式事务重试模块",
+          "value": "500"
+        },
+        {
+          "content": "在分布式事务重试模块的联调复盘里，值守团队把错误码 ERR_XA_RMERR_05 的处置动作固化为一条记录：先将重试退避阈值 tx_backoff_ms 调整为 1500，再保持幂等去重窗口开启，最后把本次变更登记到当班值守日志的回滚开关清单；该策略自上线以来运行平稳，未再触发重试风暴，与同族错误码共用同一套处置模板，仅参数取值不同，评审时按编号逐条核对即可。",
+          "id": "H01_M2",
+          "identifier": "ERR_XA_RMERR_05",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "处置记录",
+          "step": 2,
+          "subject": "分布式事务重试模块",
+          "value": "1500"
+        },
+        {
+          "content": "在分布式事务重试模块的联调复盘里，值守团队把错误码 ERR_XA_NOTA_06 的处置动作固化为一条记录：先将重试退避阈值 tx_backoff_ms 调整为 800，再保持幂等去重窗口开启，最后把本次变更登记到当班值守日志的回滚开关清单；该策略自上线以来运行平稳，未再触发重试风暴，与同族错误码共用同一套处置模板，仅参数取值不同，评审时按编号逐条核对即可。",
+          "id": "H01_M3",
+          "identifier": "ERR_XA_NOTA_06",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "处置记录",
+          "step": 3,
+          "subject": "分布式事务重试模块",
+          "value": "800"
+        },
+        {
+          "content": "在分布式事务重试模块的联调复盘里，值守团队把错误码 ERR_XA_INVAL_07 的处置动作固化为一条记录：先将重试退避阈值 tx_backoff_ms 调整为 1200，再保持幂等去重窗口开启，最后把本次变更登记到当班值守日志的回滚开关清单；该策略自上线以来运行平稳，未再触发重试风暴，与同族错误码共用同一套处置模板，仅参数取值不同，评审时按编号逐条核对即可。",
+          "id": "H01_M4",
+          "identifier": "ERR_XA_INVAL_07",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "处置记录",
+          "step": 4,
+          "subject": "分布式事务重试模块",
+          "value": "1200"
+        },
+        {
+          "content": "在分布式事务重试模块的联调复盘里，值守团队把错误码 ERR_XA_PROTO_08 的处置动作固化为一条记录：先将重试退避阈值 tx_backoff_ms 调整为 2000，再保持幂等去重窗口开启，最后把本次变更登记到当班值守日志的回滚开关清单；该策略自上线以来运行平稳，未再触发重试风暴，与同族错误码共用同一套处置模板，仅参数取值不同，评审时按编号逐条核对即可。",
+          "id": "H01_M5",
+          "identifier": "ERR_XA_PROTO_08",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "处置记录",
+          "step": 5,
+          "subject": "分布式事务重试模块",
+          "value": "2000"
+        }
+      ],
+      "module": "分布式事务重试模块",
+      "query": "高并发压测之后，分布式事务重试模块里错误码 ERR_XA_PROTO_08 的退避参数应按哪条记录调整？"
+    },
+    {
+      "case_id": "H02",
+      "entity_kind": "error_code",
+      "expected_id": "H02_M3",
+      "expected_top3": [
+        "H02_M3"
+      ],
+      "identifier": "PG_ERR_42704",
+      "memories": [
+        {
+          "content": "在存储网关巡检模块的巡检周报里，当 PostgreSQL 后端抛出错误码 PG_ERR_42P01 时，值班团队会把该错误码登记进巡检看板：先将连接重试上限 conn_retry_limit 调整为 3，再保持只读副本探活开启，最后把处置依据链接写进当班交接文档；该预案自上线以来稳定运行，未再出现误杀连接，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H02_M1",
+          "identifier": "PG_ERR_42P01",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "处置记录",
+          "step": 11,
+          "subject": "存储网关巡检模块",
+          "value": "3"
+        },
+        {
+          "content": "在存储网关巡检模块的巡检周报里，当 PostgreSQL 后端抛出错误码 PG_ERR_42P02 时，值班团队会把该错误码登记进巡检看板：先将连接重试上限 conn_retry_limit 调整为 5，再保持只读副本探活开启，最后把处置依据链接写进当班交接文档；该预案自上线以来稳定运行，未再出现误杀连接，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H02_M2",
+          "identifier": "PG_ERR_42P02",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "处置记录",
+          "step": 12,
+          "subject": "存储网关巡检模块",
+          "value": "5"
+        },
+        {
+          "content": "在存储网关巡检模块的巡检周报里，当 PostgreSQL 后端抛出错误码 PG_ERR_42704 时，值班团队会把该错误码登记进巡检看板：先将连接重试上限 conn_retry_limit 调整为 7，再保持只读副本探活开启，最后把处置依据链接写进当班交接文档；该预案自上线以来稳定运行，未再出现误杀连接，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H02_M3",
+          "identifier": "PG_ERR_42704",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "处置记录",
+          "step": 13,
+          "subject": "存储网关巡检模块",
+          "value": "7"
+        },
+        {
+          "content": "在存储网关巡检模块的巡检周报里，当 PostgreSQL 后端抛出错误码 PG_ERR_42883 时，值班团队会把该错误码登记进巡检看板：先将连接重试上限 conn_retry_limit 调整为 9，再保持只读副本探活开启，最后把处置依据链接写进当班交接文档；该预案自上线以来稳定运行，未再出现误杀连接，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H02_M4",
+          "identifier": "PG_ERR_42883",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "处置记录",
+          "step": 14,
+          "subject": "存储网关巡检模块",
+          "value": "9"
+        },
+        {
+          "content": "在存储网关巡检模块的巡检周报里，当 PostgreSQL 后端抛出错误码 PG_ERR_42P07 时，值班团队会把该错误码登记进巡检看板：先将连接重试上限 conn_retry_limit 调整为 11，再保持只读副本探活开启，最后把处置依据链接写进当班交接文档；该预案自上线以来稳定运行，未再出现误杀连接，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H02_M5",
+          "identifier": "PG_ERR_42P07",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "处置记录",
+          "step": 15,
+          "subject": "存储网关巡检模块",
+          "value": "11"
+        }
+      ],
+      "module": "存储网关巡检模块",
+      "query": "存储网关巡检模块的看板里，错误码 PG_ERR_42704 对应的处置参数记录在哪一条？"
+    },
+    {
+      "case_id": "H03",
+      "entity_kind": "error_code",
+      "expected_id": "H03_M1",
+      "expected_top3": [
+        "H03_M1"
+      ],
+      "identifier": "MQ_SEQ_GAP_11",
+      "memories": [
+        {
+          "content": "在消息队列接入模块的早班告警复盘里，序列号空洞告警 MQ_SEQ_GAP_11 触发后，值守团队按预案登记处置记录：先把序列回补步长 seq_refill_step 调整为 32，再保持消费位点校验开启，最后把告警窗口截图归档到当班交接文档；该预案自上线以来稳定运行，未再出现重复消费，与同族告警共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H03_M1",
+          "identifier": "MQ_SEQ_GAP_11",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "告警处置记录",
+          "step": 21,
+          "subject": "消息队列接入模块",
+          "value": "32"
+        },
+        {
+          "content": "在消息队列接入模块的早班告警复盘里，序列号空洞告警 MQ_SEQ_GAP_12 触发后，值守团队按预案登记处置记录：先把序列回补步长 seq_refill_step 调整为 64，再保持消费位点校验开启，最后把告警窗口截图归档到当班交接文档；该预案自上线以来稳定运行，未再出现重复消费，与同族告警共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H03_M2",
+          "identifier": "MQ_SEQ_GAP_12",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "告警处置记录",
+          "step": 22,
+          "subject": "消息队列接入模块",
+          "value": "64"
+        },
+        {
+          "content": "在消息队列接入模块的早班告警复盘里，序列号空洞告警 MQ_SEQ_GAP_13 触发后，值守团队按预案登记处置记录：先把序列回补步长 seq_refill_step 调整为 96，再保持消费位点校验开启，最后把告警窗口截图归档到当班交接文档；该预案自上线以来稳定运行，未再出现重复消费，与同族告警共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H03_M3",
+          "identifier": "MQ_SEQ_GAP_13",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "告警处置记录",
+          "step": 23,
+          "subject": "消息队列接入模块",
+          "value": "96"
+        },
+        {
+          "content": "在消息队列接入模块的早班告警复盘里，序列号空洞告警 MQ_SEQ_GAP_14 触发后，值守团队按预案登记处置记录：先把序列回补步长 seq_refill_step 调整为 128，再保持消费位点校验开启，最后把告警窗口截图归档到当班交接文档；该预案自上线以来稳定运行，未再出现重复消费，与同族告警共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H03_M4",
+          "identifier": "MQ_SEQ_GAP_14",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "告警处置记录",
+          "step": 24,
+          "subject": "消息队列接入模块",
+          "value": "128"
+        },
+        {
+          "content": "在消息队列接入模块的早班告警复盘里，序列号空洞告警 MQ_SEQ_GAP_15 触发后，值守团队按预案登记处置记录：先把序列回补步长 seq_refill_step 调整为 160，再保持消费位点校验开启，最后把告警窗口截图归档到当班交接文档；该预案自上线以来稳定运行，未再出现重复消费，与同族告警共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H03_M5",
+          "identifier": "MQ_SEQ_GAP_15",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "告警处置记录",
+          "step": 25,
+          "subject": "消息队列接入模块",
+          "value": "160"
+        }
+      ],
+      "module": "消息队列接入模块",
+      "query": "消息队列接入模块的早班复盘里，告警 MQ_SEQ_GAP_11 对应的回补参数记录在哪一条？"
+    },
+    {
+      "case_id": "H04",
+      "entity_kind": "error_code",
+      "expected_id": "H04_M4",
+      "expected_top3": [
+        "H04_M4"
+      ],
+      "identifier": "CFG_HOT_SYNC_FAIL_34",
+      "memories": [
+        {
+          "content": "在配置中心热更新模块的变更审计里，当热更新同步失败并上报错误码 CFG_HOT_SYNC_FAIL_31 时，值守团队会把处置动作写进变更审计簿：先将全量对账间隔 full_reconcile_sec 调整为 30，再保持灰度名单校验开启，最后把受影响租户清单附在当班交接文档；该预案自上线以来稳定运行，未再出现配置漂移，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H04_M1",
+          "identifier": "CFG_HOT_SYNC_FAIL_31",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "变更处置记录",
+          "step": 31,
+          "subject": "配置中心热更新模块",
+          "value": "30"
+        },
+        {
+          "content": "在配置中心热更新模块的变更审计里，当热更新同步失败并上报错误码 CFG_HOT_SYNC_FAIL_32 时，值守团队会把处置动作写进变更审计簿：先将全量对账间隔 full_reconcile_sec 调整为 45，再保持灰度名单校验开启，最后把受影响租户清单附在当班交接文档；该预案自上线以来稳定运行，未再出现配置漂移，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H04_M2",
+          "identifier": "CFG_HOT_SYNC_FAIL_32",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "变更处置记录",
+          "step": 32,
+          "subject": "配置中心热更新模块",
+          "value": "45"
+        },
+        {
+          "content": "在配置中心热更新模块的变更审计里，当热更新同步失败并上报错误码 CFG_HOT_SYNC_FAIL_33 时，值守团队会把处置动作写进变更审计簿：先将全量对账间隔 full_reconcile_sec 调整为 60，再保持灰度名单校验开启，最后把受影响租户清单附在当班交接文档；该预案自上线以来稳定运行，未再出现配置漂移，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H04_M3",
+          "identifier": "CFG_HOT_SYNC_FAIL_33",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "变更处置记录",
+          "step": 33,
+          "subject": "配置中心热更新模块",
+          "value": "60"
+        },
+        {
+          "content": "在配置中心热更新模块的变更审计里，当热更新同步失败并上报错误码 CFG_HOT_SYNC_FAIL_34 时，值守团队会把处置动作写进变更审计簿：先将全量对账间隔 full_reconcile_sec 调整为 75，再保持灰度名单校验开启，最后把受影响租户清单附在当班交接文档；该预案自上线以来稳定运行，未再出现配置漂移，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H04_M4",
+          "identifier": "CFG_HOT_SYNC_FAIL_34",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "变更处置记录",
+          "step": 34,
+          "subject": "配置中心热更新模块",
+          "value": "75"
+        },
+        {
+          "content": "在配置中心热更新模块的变更审计里，当热更新同步失败并上报错误码 CFG_HOT_SYNC_FAIL_35 时，值守团队会把处置动作写进变更审计簿：先将全量对账间隔 full_reconcile_sec 调整为 90，再保持灰度名单校验开启，最后把受影响租户清单附在当班交接文档；该预案自上线以来稳定运行，未再出现配置漂移，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H04_M5",
+          "identifier": "CFG_HOT_SYNC_FAIL_35",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "变更处置记录",
+          "step": 35,
+          "subject": "配置中心热更新模块",
+          "value": "90"
+        }
+      ],
+      "module": "配置中心热更新模块",
+      "query": "配置中心热更新模块的审计簿里，错误码 CFG_HOT_SYNC_FAIL_34 的对账参数记录在哪一条？"
+    },
+    {
+      "case_id": "H05",
+      "entity_kind": "error_code",
+      "expected_id": "H05_M2",
+      "expected_top3": [
+        "H05_M2"
+      ],
+      "identifier": "IDEM_DUP_WIN_72",
+      "memories": [
+        {
+          "content": "在幂等去重模块的风控复盘里，当去重窗口冲突并抛出错误码 IDEM_DUP_WIN_71 时，值守团队会把处置动作登记成一条记录：先将去重窗口宽度 idem_window_ms 调整为 1000，再保持请求指纹校验开启，最后把冲突样本清单归档到当班交接文档；该预案自上线以来稳定运行，未再出现重复扣减，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H05_M1",
+          "identifier": "IDEM_DUP_WIN_71",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "风控处置记录",
+          "step": 41,
+          "subject": "幂等去重模块",
+          "value": "1000"
+        },
+        {
+          "content": "在幂等去重模块的风控复盘里，当去重窗口冲突并抛出错误码 IDEM_DUP_WIN_72 时，值守团队会把处置动作登记成一条记录：先将去重窗口宽度 idem_window_ms 调整为 1500，再保持请求指纹校验开启，最后把冲突样本清单归档到当班交接文档；该预案自上线以来稳定运行，未再出现重复扣减，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H05_M2",
+          "identifier": "IDEM_DUP_WIN_72",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "风控处置记录",
+          "step": 42,
+          "subject": "幂等去重模块",
+          "value": "1500"
+        },
+        {
+          "content": "在幂等去重模块的风控复盘里，当去重窗口冲突并抛出错误码 IDEM_DUP_WIN_73 时，值守团队会把处置动作登记成一条记录：先将去重窗口宽度 idem_window_ms 调整为 2000，再保持请求指纹校验开启，最后把冲突样本清单归档到当班交接文档；该预案自上线以来稳定运行，未再出现重复扣减，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H05_M3",
+          "identifier": "IDEM_DUP_WIN_73",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "风控处置记录",
+          "step": 43,
+          "subject": "幂等去重模块",
+          "value": "2000"
+        },
+        {
+          "content": "在幂等去重模块的风控复盘里，当去重窗口冲突并抛出错误码 IDEM_DUP_WIN_74 时，值守团队会把处置动作登记成一条记录：先将去重窗口宽度 idem_window_ms 调整为 2500，再保持请求指纹校验开启，最后把冲突样本清单归档到当班交接文档；该预案自上线以来稳定运行，未再出现重复扣减，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H05_M4",
+          "identifier": "IDEM_DUP_WIN_74",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "风控处置记录",
+          "step": 44,
+          "subject": "幂等去重模块",
+          "value": "2500"
+        },
+        {
+          "content": "在幂等去重模块的风控复盘里，当去重窗口冲突并抛出错误码 IDEM_DUP_WIN_75 时，值守团队会把处置动作登记成一条记录：先将去重窗口宽度 idem_window_ms 调整为 3000，再保持请求指纹校验开启，最后把冲突样本清单归档到当班交接文档；该预案自上线以来稳定运行，未再出现重复扣减，与同族错误码共用同一模板，仅参数不同，评审时逐条核对即可。",
+          "id": "H05_M5",
+          "identifier": "IDEM_DUP_WIN_75",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "风控处置记录",
+          "step": 45,
+          "subject": "幂等去重模块",
+          "value": "3000"
+        }
+      ],
+      "module": "幂等去重模块",
+      "query": "幂等去重模块的复盘记录里，错误码 IDEM_DUP_WIN_72 的窗口参数对应哪一条？"
+    },
+    {
+      "case_id": "H06",
+      "entity_kind": "config_key",
+      "expected_id": "H06_M2",
+      "expected_top3": [
+        "H06_M2"
+      ],
+      "identifier": "read_buffer_size_mb",
+      "memories": [
+        {
+          "content": "在网关读缓冲调优模块的容量评审里，配置项 read_buffer_size_kb 的推荐取值被写成一条记录：先把读缓冲上限落到该配置项并设为 512，再保持背压水位探测开启，最后把压测曲线截图附到当班交接文档；该取值自上线以来稳定运行，未再触发缓冲抖动，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H06_M1",
+          "identifier": "read_buffer_size_kb",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "容量评审记录",
+          "step": 51,
+          "subject": "网关读缓冲调优模块",
+          "value": "512"
+        },
+        {
+          "content": "在网关读缓冲调优模块的容量评审里，配置项 read_buffer_size_mb 的推荐取值被写成一条记录：先把读缓冲上限落到该配置项并设为 1024，再保持背压水位探测开启，最后把压测曲线截图附到当班交接文档；该取值自上线以来稳定运行，未再触发缓冲抖动，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H06_M2",
+          "identifier": "read_buffer_size_mb",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "容量评审记录",
+          "step": 52,
+          "subject": "网关读缓冲调优模块",
+          "value": "1024"
+        },
+        {
+          "content": "在网关读缓冲调优模块的容量评审里，配置项 read_buffer_size_gb 的推荐取值被写成一条记录：先把读缓冲上限落到该配置项并设为 2048，再保持背压水位探测开启，最后把压测曲线截图附到当班交接文档；该取值自上线以来稳定运行，未再触发缓冲抖动，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H06_M3",
+          "identifier": "read_buffer_size_gb",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "容量评审记录",
+          "step": 53,
+          "subject": "网关读缓冲调优模块",
+          "value": "2048"
+        },
+        {
+          "content": "在网关读缓冲调优模块的容量评审里，配置项 read_buffer_size_kib 的推荐取值被写成一条记录：先把读缓冲上限落到该配置项并设为 4096，再保持背压水位探测开启，最后把压测曲线截图附到当班交接文档；该取值自上线以来稳定运行，未再触发缓冲抖动，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H06_M4",
+          "identifier": "read_buffer_size_kib",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "容量评审记录",
+          "step": 54,
+          "subject": "网关读缓冲调优模块",
+          "value": "4096"
+        },
+        {
+          "content": "在网关读缓冲调优模块的容量评审里，配置项 read_buffer_size_mib 的推荐取值被写成一条记录：先把读缓冲上限落到该配置项并设为 8192，再保持背压水位探测开启，最后把压测曲线截图附到当班交接文档；该取值自上线以来稳定运行，未再触发缓冲抖动，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H06_M5",
+          "identifier": "read_buffer_size_mib",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "容量评审记录",
+          "step": 55,
+          "subject": "网关读缓冲调优模块",
+          "value": "8192"
+        }
+      ],
+      "module": "网关读缓冲调优模块",
+      "query": "网关读缓冲调优模块的评审记录里，配置项 read_buffer_size_mb 的推荐取值是哪一条？"
+    },
+    {
+      "case_id": "H07",
+      "entity_kind": "config_key",
+      "expected_id": "H07_M3",
+      "expected_top3": [
+        "H07_M3"
+      ],
+      "identifier": "session_gc_interval_hr",
+      "memories": [
+        {
+          "content": "在会话过期调度模块的容量复盘里，配置项 session_gc_interval_min 的基线取值被登记成一条记录：先把会话清扫节奏落到该配置项并设为 15，再保持过期键抽样校验开启，最后把清扫耗时曲线附到当班交接文档；该取值自上线以来稳定运行，未再出现清扫积压，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H07_M1",
+          "identifier": "session_gc_interval_min",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "容量复盘记录",
+          "step": 61,
+          "subject": "会话过期调度模块",
+          "value": "15"
+        },
+        {
+          "content": "在会话过期调度模块的容量复盘里，配置项 session_gc_interval_sec 的基线取值被登记成一条记录：先把会话清扫节奏落到该配置项并设为 30，再保持过期键抽样校验开启，最后把清扫耗时曲线附到当班交接文档；该取值自上线以来稳定运行，未再出现清扫积压，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H07_M2",
+          "identifier": "session_gc_interval_sec",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "容量复盘记录",
+          "step": 62,
+          "subject": "会话过期调度模块",
+          "value": "30"
+        },
+        {
+          "content": "在会话过期调度模块的容量复盘里，配置项 session_gc_interval_hr 的基线取值被登记成一条记录：先把会话清扫节奏落到该配置项并设为 45，再保持过期键抽样校验开启，最后把清扫耗时曲线附到当班交接文档；该取值自上线以来稳定运行，未再出现清扫积压，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H07_M3",
+          "identifier": "session_gc_interval_hr",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "容量复盘记录",
+          "step": 63,
+          "subject": "会话过期调度模块",
+          "value": "45"
+        },
+        {
+          "content": "在会话过期调度模块的容量复盘里，配置项 session_gc_interval_day 的基线取值被登记成一条记录：先把会话清扫节奏落到该配置项并设为 60，再保持过期键抽样校验开启，最后把清扫耗时曲线附到当班交接文档；该取值自上线以来稳定运行，未再出现清扫积压，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H07_M4",
+          "identifier": "session_gc_interval_day",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "容量复盘记录",
+          "step": 64,
+          "subject": "会话过期调度模块",
+          "value": "60"
+        },
+        {
+          "content": "在会话过期调度模块的容量复盘里，配置项 session_gc_interval_tick 的基线取值被登记成一条记录：先把会话清扫节奏落到该配置项并设为 75，再保持过期键抽样校验开启，最后把清扫耗时曲线附到当班交接文档；该取值自上线以来稳定运行，未再出现清扫积压，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H07_M5",
+          "identifier": "session_gc_interval_tick",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "容量复盘记录",
+          "step": 65,
+          "subject": "会话过期调度模块",
+          "value": "75"
+        }
+      ],
+      "module": "会话过期调度模块",
+      "query": "会话过期调度模块的复盘里，配置项 session_gc_interval_hr 的基线取值是哪一条？"
+    },
+    {
+      "case_id": "H08",
+      "entity_kind": "config_key",
+      "expected_id": "H08_M1",
+      "expected_top3": [
+        "H08_M1"
+      ],
+      "identifier": "tls_handshake_timeout_ms",
+      "memories": [
+        {
+          "content": "在 TLS 握手压测模块的调优纪要里，配置项 tls_handshake_timeout_ms 的推荐取值被登记成一条记录：先把握手超时上限落到该配置项并设为 200，再保持会话票据复用开启，最后把握手分位数曲线附到当班交接文档；该取值自上线以来稳定运行，未再出现握手雪崩，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H08_M1",
+          "identifier": "tls_handshake_timeout_ms",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "调优纪要记录",
+          "step": 71,
+          "subject": "TLS 握手压测模块",
+          "value": "200"
+        },
+        {
+          "content": "在 TLS 握手压测模块的调优纪要里，配置项 tls_handshake_timeout_us 的推荐取值被登记成一条记录：先把握手超时上限落到该配置项并设为 400，再保持会话票据复用开启，最后把握手分位数曲线附到当班交接文档；该取值自上线以来稳定运行，未再出现握手雪崩，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H08_M2",
+          "identifier": "tls_handshake_timeout_us",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "调优纪要记录",
+          "step": 72,
+          "subject": "TLS 握手压测模块",
+          "value": "400"
+        },
+        {
+          "content": "在 TLS 握手压测模块的调优纪要里，配置项 tls_handshake_timeout_ns 的推荐取值被登记成一条记录：先把握手超时上限落到该配置项并设为 600，再保持会话票据复用开启，最后把握手分位数曲线附到当班交接文档；该取值自上线以来稳定运行，未再出现握手雪崩，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H08_M3",
+          "identifier": "tls_handshake_timeout_ns",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "调优纪要记录",
+          "step": 73,
+          "subject": "TLS 握手压测模块",
+          "value": "600"
+        },
+        {
+          "content": "在 TLS 握手压测模块的调优纪要里，配置项 tls_handshake_timeout_s 的推荐取值被登记成一条记录：先把握手超时上限落到该配置项并设为 800，再保持会话票据复用开启，最后把握手分位数曲线附到当班交接文档；该取值自上线以来稳定运行，未再出现握手雪崩，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H08_M4",
+          "identifier": "tls_handshake_timeout_s",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "调优纪要记录",
+          "step": 74,
+          "subject": "TLS 握手压测模块",
+          "value": "800"
+        },
+        {
+          "content": "在 TLS 握手压测模块的调优纪要里，配置项 tls_handshake_timeout_sec 的推荐取值被登记成一条记录：先把握手超时上限落到该配置项并设为 1000，再保持会话票据复用开启，最后把握手分位数曲线附到当班交接文档；该取值自上线以来稳定运行，未再出现握手雪崩，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H08_M5",
+          "identifier": "tls_handshake_timeout_sec",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "调优纪要记录",
+          "step": 75,
+          "subject": "TLS 握手压测模块",
+          "value": "1000"
+        }
+      ],
+      "module": "TLS 握手压测模块",
+      "query": "TLS 握手压测模块的纪要里，配置项 tls_handshake_timeout_ms 的推荐取值是哪一条？"
+    },
+    {
+      "case_id": "H09",
+      "entity_kind": "config_key",
+      "expected_id": "H09_M4",
+      "expected_top3": [
+        "H09_M4"
+      ],
+      "identifier": "log_rotate_max_size_tb",
+      "memories": [
+        {
+          "content": "在日志轮转模块的巡检纪要里，配置项 log_rotate_max_size_mb 的基线取值被登记成一条记录：先把单文件轮转上限落到该配置项并设为 64，再保持磁盘水位告警开启，最后把轮转耗时统计附到当班交接文档；该取值自上线以来稳定运行，未再出现日志盘写满，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H09_M1",
+          "identifier": "log_rotate_max_size_mb",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 81,
+          "subject": "日志轮转模块",
+          "value": "64"
+        },
+        {
+          "content": "在日志轮转模块的巡检纪要里，配置项 log_rotate_max_size_kb 的基线取值被登记成一条记录：先把单文件轮转上限落到该配置项并设为 128，再保持磁盘水位告警开启，最后把轮转耗时统计附到当班交接文档；该取值自上线以来稳定运行，未再出现日志盘写满，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H09_M2",
+          "identifier": "log_rotate_max_size_kb",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 82,
+          "subject": "日志轮转模块",
+          "value": "128"
+        },
+        {
+          "content": "在日志轮转模块的巡检纪要里，配置项 log_rotate_max_size_gb 的基线取值被登记成一条记录：先把单文件轮转上限落到该配置项并设为 256，再保持磁盘水位告警开启，最后把轮转耗时统计附到当班交接文档；该取值自上线以来稳定运行，未再出现日志盘写满，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H09_M3",
+          "identifier": "log_rotate_max_size_gb",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 83,
+          "subject": "日志轮转模块",
+          "value": "256"
+        },
+        {
+          "content": "在日志轮转模块的巡检纪要里，配置项 log_rotate_max_size_tb 的基线取值被登记成一条记录：先把单文件轮转上限落到该配置项并设为 512，再保持磁盘水位告警开启，最后把轮转耗时统计附到当班交接文档；该取值自上线以来稳定运行，未再出现日志盘写满，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H09_M4",
+          "identifier": "log_rotate_max_size_tb",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 84,
+          "subject": "日志轮转模块",
+          "value": "512"
+        },
+        {
+          "content": "在日志轮转模块的巡检纪要里，配置项 log_rotate_max_size_pb 的基线取值被登记成一条记录：先把单文件轮转上限落到该配置项并设为 1024，再保持磁盘水位告警开启，最后把轮转耗时统计附到当班交接文档；该取值自上线以来稳定运行，未再出现日志盘写满，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H09_M5",
+          "identifier": "log_rotate_max_size_pb",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 85,
+          "subject": "日志轮转模块",
+          "value": "1024"
+        }
+      ],
+      "module": "日志轮转模块",
+      "query": "日志轮转模块的巡检纪要里，配置项 log_rotate_max_size_tb 的基线取值是哪一条？"
+    },
+    {
+      "case_id": "H10",
+      "entity_kind": "config_key",
+      "expected_id": "H10_M4",
+      "expected_top3": [
+        "H10_M4"
+      ],
+      "identifier": "rate_limit_burst_512",
+      "memories": [
+        {
+          "content": "在限流器调参模块的攻防演练纪要里，配置项 rate_limit_burst_64 的基线取值被登记成一条记录：先把突发容量落到该配置项并设为 2，再保持令牌桶回填探测开启，最后把限流命中分布附到当班交接文档；该取值自上线以来稳定运行，未再出现突发击穿，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H10_M1",
+          "identifier": "rate_limit_burst_64",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "演练纪要记录",
+          "step": 91,
+          "subject": "限流器调参模块",
+          "value": "2"
+        },
+        {
+          "content": "在限流器调参模块的攻防演练纪要里，配置项 rate_limit_burst_128 的基线取值被登记成一条记录：先把突发容量落到该配置项并设为 4，再保持令牌桶回填探测开启，最后把限流命中分布附到当班交接文档；该取值自上线以来稳定运行，未再出现突发击穿，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H10_M2",
+          "identifier": "rate_limit_burst_128",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "演练纪要记录",
+          "step": 92,
+          "subject": "限流器调参模块",
+          "value": "4"
+        },
+        {
+          "content": "在限流器调参模块的攻防演练纪要里，配置项 rate_limit_burst_256 的基线取值被登记成一条记录：先把突发容量落到该配置项并设为 6，再保持令牌桶回填探测开启，最后把限流命中分布附到当班交接文档；该取值自上线以来稳定运行，未再出现突发击穿，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H10_M3",
+          "identifier": "rate_limit_burst_256",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "演练纪要记录",
+          "step": 93,
+          "subject": "限流器调参模块",
+          "value": "6"
+        },
+        {
+          "content": "在限流器调参模块的攻防演练纪要里，配置项 rate_limit_burst_512 的基线取值被登记成一条记录：先把突发容量落到该配置项并设为 8，再保持令牌桶回填探测开启，最后把限流命中分布附到当班交接文档；该取值自上线以来稳定运行，未再出现突发击穿，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H10_M4",
+          "identifier": "rate_limit_burst_512",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "演练纪要记录",
+          "step": 94,
+          "subject": "限流器调参模块",
+          "value": "8"
+        },
+        {
+          "content": "在限流器调参模块的攻防演练纪要里，配置项 rate_limit_burst_1024 的基线取值被登记成一条记录：先把突发容量落到该配置项并设为 10，再保持令牌桶回填探测开启，最后把限流命中分布附到当班交接文档；该取值自上线以来稳定运行，未再出现突发击穿，与同族配置项共用同一模板，仅后缀与取值不同，评审时逐条核对即可。",
+          "id": "H10_M5",
+          "identifier": "rate_limit_burst_1024",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "演练纪要记录",
+          "step": 95,
+          "subject": "限流器调参模块",
+          "value": "10"
+        }
+      ],
+      "module": "限流器调参模块",
+      "query": "限流器调参模块的演练纪要里，配置项 rate_limit_burst_512 的冷却参数记录在哪一条？"
+    },
+    {
+      "case_id": "H11",
+      "entity_kind": "version",
+      "expected_id": "H11_M1",
+      "expected_top3": [
+        "H11_M1"
+      ],
+      "identifier": "v2.14.37-rc1",
+      "memories": [
+        {
+          "content": "在网关灰度发布模块的演练档案里，版本 v2.14.37-rc1 的灰度表现被登记成一条记录：先在该版本的批次里把放量比例 rollout_ratio_pct 设为 5，再保持错误率熔断探测开启，最后把批次观测结论附到当班交接文档；该版本自上线以来稳定运行，未再触发回滚预案，与同族版本共用同一模板，仅版本号与比例不同，评审时逐条核对即可。",
+          "id": "H11_M1",
+          "identifier": "v2.14.37-rc1",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "演练档案记录",
+          "step": 101,
+          "subject": "网关灰度发布模块",
+          "value": "5"
+        },
+        {
+          "content": "在网关灰度发布模块的演练档案里，版本 v2.14.38-rc1 的灰度表现被登记成一条记录：先在该版本的批次里把放量比例 rollout_ratio_pct 设为 10，再保持错误率熔断探测开启，最后把批次观测结论附到当班交接文档；该版本自上线以来稳定运行，未再触发回滚预案，与同族版本共用同一模板，仅版本号与比例不同，评审时逐条核对即可。",
+          "id": "H11_M2",
+          "identifier": "v2.14.38-rc1",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "演练档案记录",
+          "step": 102,
+          "subject": "网关灰度发布模块",
+          "value": "10"
+        },
+        {
+          "content": "在网关灰度发布模块的演练档案里，版本 v2.14.39-rc1 的灰度表现被登记成一条记录：先在该版本的批次里把放量比例 rollout_ratio_pct 设为 15，再保持错误率熔断探测开启，最后把批次观测结论附到当班交接文档；该版本自上线以来稳定运行，未再触发回滚预案，与同族版本共用同一模板，仅版本号与比例不同，评审时逐条核对即可。",
+          "id": "H11_M3",
+          "identifier": "v2.14.39-rc1",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "演练档案记录",
+          "step": 103,
+          "subject": "网关灰度发布模块",
+          "value": "15"
+        },
+        {
+          "content": "在网关灰度发布模块的演练档案里，版本 v2.14.40-rc1 的灰度表现被登记成一条记录：先在该版本的批次里把放量比例 rollout_ratio_pct 设为 20，再保持错误率熔断探测开启，最后把批次观测结论附到当班交接文档；该版本自上线以来稳定运行，未再触发回滚预案，与同族版本共用同一模板，仅版本号与比例不同，评审时逐条核对即可。",
+          "id": "H11_M4",
+          "identifier": "v2.14.40-rc1",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "演练档案记录",
+          "step": 104,
+          "subject": "网关灰度发布模块",
+          "value": "20"
+        },
+        {
+          "content": "在网关灰度发布模块的演练档案里，版本 v2.14.41-rc1 的灰度表现被登记成一条记录：先在该版本的批次里把放量比例 rollout_ratio_pct 设为 25，再保持错误率熔断探测开启，最后把批次观测结论附到当班交接文档；该版本自上线以来稳定运行，未再触发回滚预案，与同族版本共用同一模板，仅版本号与比例不同，评审时逐条核对即可。",
+          "id": "H11_M5",
+          "identifier": "v2.14.41-rc1",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "演练档案记录",
+          "step": 105,
+          "subject": "网关灰度发布模块",
+          "value": "25"
+        }
+      ],
+      "module": "网关灰度发布模块",
+      "query": "网关灰度发布模块的演练档案里，版本 v2.14.37-rc1 的放量比例记录在哪一条？"
+    },
+    {
+      "case_id": "H12",
+      "entity_kind": "version",
+      "expected_id": "H12_M4",
+      "expected_top3": [
+        "H12_M4"
+      ],
+      "identifier": "fw_1.8.55-hotfix",
+      "memories": [
+        {
+          "content": "在网卡固件升级模块的机房纪要里，固件版本 fw_1.8.52-hotfix 的升级表现被登记成一条记录：先在该版本的批次里把批量刷写间隔 batch_flash_interval_sec 设为 30，再保持固件签名校验开启，最后把刷写成功率附到当班交接文档；该版本自上线以来稳定运行，未再触发回退流程，与同族版本共用同一模板，仅版本号与间隔不同，评审时逐条核对即可。",
+          "id": "H12_M1",
+          "identifier": "fw_1.8.52-hotfix",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "机房纪要记录",
+          "step": 111,
+          "subject": "网卡固件升级模块",
+          "value": "30"
+        },
+        {
+          "content": "在网卡固件升级模块的机房纪要里，固件版本 fw_1.8.53-hotfix 的升级表现被登记成一条记录：先在该版本的批次里把批量刷写间隔 batch_flash_interval_sec 设为 45，再保持固件签名校验开启，最后把刷写成功率附到当班交接文档；该版本自上线以来稳定运行，未再触发回退流程，与同族版本共用同一模板，仅版本号与间隔不同，评审时逐条核对即可。",
+          "id": "H12_M2",
+          "identifier": "fw_1.8.53-hotfix",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "机房纪要记录",
+          "step": 112,
+          "subject": "网卡固件升级模块",
+          "value": "45"
+        },
+        {
+          "content": "在网卡固件升级模块的机房纪要里，固件版本 fw_1.8.54-hotfix 的升级表现被登记成一条记录：先在该版本的批次里把批量刷写间隔 batch_flash_interval_sec 设为 60，再保持固件签名校验开启，最后把刷写成功率附到当班交接文档；该版本自上线以来稳定运行，未再触发回退流程，与同族版本共用同一模板，仅版本号与间隔不同，评审时逐条核对即可。",
+          "id": "H12_M3",
+          "identifier": "fw_1.8.54-hotfix",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "机房纪要记录",
+          "step": 113,
+          "subject": "网卡固件升级模块",
+          "value": "60"
+        },
+        {
+          "content": "在网卡固件升级模块的机房纪要里，固件版本 fw_1.8.55-hotfix 的升级表现被登记成一条记录：先在该版本的批次里把批量刷写间隔 batch_flash_interval_sec 设为 75，再保持固件签名校验开启，最后把刷写成功率附到当班交接文档；该版本自上线以来稳定运行，未再触发回退流程，与同族版本共用同一模板，仅版本号与间隔不同，评审时逐条核对即可。",
+          "id": "H12_M4",
+          "identifier": "fw_1.8.55-hotfix",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "机房纪要记录",
+          "step": 114,
+          "subject": "网卡固件升级模块",
+          "value": "75"
+        },
+        {
+          "content": "在网卡固件升级模块的机房纪要里，固件版本 fw_1.8.56-hotfix 的升级表现被登记成一条记录：先在该版本的批次里把批量刷写间隔 batch_flash_interval_sec 设为 90，再保持固件签名校验开启，最后把刷写成功率附到当班交接文档；该版本自上线以来稳定运行，未再触发回退流程，与同族版本共用同一模板，仅版本号与间隔不同，评审时逐条核对即可。",
+          "id": "H12_M5",
+          "identifier": "fw_1.8.56-hotfix",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "机房纪要记录",
+          "step": 115,
+          "subject": "网卡固件升级模块",
+          "value": "90"
+        }
+      ],
+      "module": "网卡固件升级模块",
+      "query": "网卡固件升级模块的机房纪要里，固件版本 fw_1.8.55-hotfix 的刷写间隔记录在哪一条？"
+    },
+    {
+      "case_id": "H13",
+      "entity_kind": "version",
+      "expected_id": "H13_M2",
+      "expected_top3": [
+        "H13_M2"
+      ],
+      "identifier": "sdk_3.4.22-beta",
+      "memories": [
+        {
+          "content": "在客户端 SDK 发布模块的发布评审里，SDK 版本 sdk_3.4.21-beta 的发布表现被登记成一条记录：先在该版本的批次里把预热流量比例 warmup_traffic_pct 设为 10，再保持崩溃率哨兵探测开启，最后把兼容性结论附到当班交接文档；该版本自上线以来稳定运行，未再触发紧急下架，与同族版本共用同一模板，仅版本号与比例不同，评审时逐条核对即可。",
+          "id": "H13_M1",
+          "identifier": "sdk_3.4.21-beta",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "发布评审记录",
+          "step": 121,
+          "subject": "客户端 SDK 发布模块",
+          "value": "10"
+        },
+        {
+          "content": "在客户端 SDK 发布模块的发布评审里，SDK 版本 sdk_3.4.22-beta 的发布表现被登记成一条记录：先在该版本的批次里把预热流量比例 warmup_traffic_pct 设为 20，再保持崩溃率哨兵探测开启，最后把兼容性结论附到当班交接文档；该版本自上线以来稳定运行，未再触发紧急下架，与同族版本共用同一模板，仅版本号与比例不同，评审时逐条核对即可。",
+          "id": "H13_M2",
+          "identifier": "sdk_3.4.22-beta",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "发布评审记录",
+          "step": 122,
+          "subject": "客户端 SDK 发布模块",
+          "value": "20"
+        },
+        {
+          "content": "在客户端 SDK 发布模块的发布评审里，SDK 版本 sdk_3.4.23-beta 的发布表现被登记成一条记录：先在该版本的批次里把预热流量比例 warmup_traffic_pct 设为 30，再保持崩溃率哨兵探测开启，最后把兼容性结论附到当班交接文档；该版本自上线以来稳定运行，未再触发紧急下架，与同族版本共用同一模板，仅版本号与比例不同，评审时逐条核对即可。",
+          "id": "H13_M3",
+          "identifier": "sdk_3.4.23-beta",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "发布评审记录",
+          "step": 123,
+          "subject": "客户端 SDK 发布模块",
+          "value": "30"
+        },
+        {
+          "content": "在客户端 SDK 发布模块的发布评审里，SDK 版本 sdk_3.4.24-beta 的发布表现被登记成一条记录：先在该版本的批次里把预热流量比例 warmup_traffic_pct 设为 40，再保持崩溃率哨兵探测开启，最后把兼容性结论附到当班交接文档；该版本自上线以来稳定运行，未再触发紧急下架，与同族版本共用同一模板，仅版本号与比例不同，评审时逐条核对即可。",
+          "id": "H13_M4",
+          "identifier": "sdk_3.4.24-beta",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "发布评审记录",
+          "step": 124,
+          "subject": "客户端 SDK 发布模块",
+          "value": "40"
+        },
+        {
+          "content": "在客户端 SDK 发布模块的发布评审里，SDK 版本 sdk_3.4.25-beta 的发布表现被登记成一条记录：先在该版本的批次里把预热流量比例 warmup_traffic_pct 设为 50，再保持崩溃率哨兵探测开启，最后把兼容性结论附到当班交接文档；该版本自上线以来稳定运行，未再触发紧急下架，与同族版本共用同一模板，仅版本号与比例不同，评审时逐条核对即可。",
+          "id": "H13_M5",
+          "identifier": "sdk_3.4.25-beta",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "发布评审记录",
+          "step": 125,
+          "subject": "客户端 SDK 发布模块",
+          "value": "50"
+        }
+      ],
+      "module": "客户端 SDK 发布模块",
+      "query": "客户端 SDK 发布模块的评审里，SDK 版本 sdk_3.4.22-beta 的预热比例记录在哪一条？"
+    },
+    {
+      "case_id": "H14",
+      "entity_kind": "version",
+      "expected_id": "H14_M5",
+      "expected_top3": [
+        "H14_M5"
+      ],
+      "identifier": "img_1.21.48-stable",
+      "memories": [
+        {
+          "content": "在容器镜像发布模块的值守纪要里，镜像版本 img_1.21.44-stable 的部署表现被登记成一条记录：先在该版本的批次里把滚动窗口宽度 rolling_window_sec 设为 60，再保持健康探针门禁开启，最后把回滚点清单附到当班交接文档；该版本自上线以来稳定运行，未再出现起播失败，与同族版本共用同一模板，仅版本号与窗口不同，评审时逐条核对即可。",
+          "id": "H14_M1",
+          "identifier": "img_1.21.44-stable",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "值守纪要记录",
+          "step": 131,
+          "subject": "容器镜像发布模块",
+          "value": "60"
+        },
+        {
+          "content": "在容器镜像发布模块的值守纪要里，镜像版本 img_1.21.45-stable 的部署表现被登记成一条记录：先在该版本的批次里把滚动窗口宽度 rolling_window_sec 设为 90，再保持健康探针门禁开启，最后把回滚点清单附到当班交接文档；该版本自上线以来稳定运行，未再出现起播失败，与同族版本共用同一模板，仅版本号与窗口不同，评审时逐条核对即可。",
+          "id": "H14_M2",
+          "identifier": "img_1.21.45-stable",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "值守纪要记录",
+          "step": 132,
+          "subject": "容器镜像发布模块",
+          "value": "90"
+        },
+        {
+          "content": "在容器镜像发布模块的值守纪要里，镜像版本 img_1.21.46-stable 的部署表现被登记成一条记录：先在该版本的批次里把滚动窗口宽度 rolling_window_sec 设为 120，再保持健康探针门禁开启，最后把回滚点清单附到当班交接文档；该版本自上线以来稳定运行，未再出现起播失败，与同族版本共用同一模板，仅版本号与窗口不同，评审时逐条核对即可。",
+          "id": "H14_M3",
+          "identifier": "img_1.21.46-stable",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "值守纪要记录",
+          "step": 133,
+          "subject": "容器镜像发布模块",
+          "value": "120"
+        },
+        {
+          "content": "在容器镜像发布模块的值守纪要里，镜像版本 img_1.21.47-stable 的部署表现被登记成一条记录：先在该版本的批次里把滚动窗口宽度 rolling_window_sec 设为 150，再保持健康探针门禁开启，最后把回滚点清单附到当班交接文档；该版本自上线以来稳定运行，未再出现起播失败，与同族版本共用同一模板，仅版本号与窗口不同，评审时逐条核对即可。",
+          "id": "H14_M4",
+          "identifier": "img_1.21.47-stable",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "值守纪要记录",
+          "step": 134,
+          "subject": "容器镜像发布模块",
+          "value": "150"
+        },
+        {
+          "content": "在容器镜像发布模块的值守纪要里，镜像版本 img_1.21.48-stable 的部署表现被登记成一条记录：先在该版本的批次里把滚动窗口宽度 rolling_window_sec 设为 180，再保持健康探针门禁开启，最后把回滚点清单附到当班交接文档；该版本自上线以来稳定运行，未再出现起播失败，与同族版本共用同一模板，仅版本号与窗口不同，评审时逐条核对即可。",
+          "id": "H14_M5",
+          "identifier": "img_1.21.48-stable",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "值守纪要记录",
+          "step": 135,
+          "subject": "容器镜像发布模块",
+          "value": "180"
+        }
+      ],
+      "module": "容器镜像发布模块",
+      "query": "容器镜像发布模块的值守纪要里，镜像版本 img_1.21.48-stable 的滚动窗口记录在哪一条？"
+    },
+    {
+      "case_id": "H15",
+      "entity_kind": "version",
+      "expected_id": "H15_M3",
+      "expected_top3": [
+        "H15_M3"
+      ],
+      "identifier": "kmod_6.2.19-lts",
+      "memories": [
+        {
+          "content": "在内核模块兼容性模块的回归纪要里，内核模块版本 kmod_6.2.17-lts 的回归表现被登记成一条记录：先在该版本的批次里把回归用例并发数 regression_parallelism 设为 4，再保持符号版本校验开启，最后把失败用例清单附到当班交接文档；该版本自上线以来稳定运行，未再出现加载失败，与同族版本共用同一模板，仅版本号与并发数不同，评审时逐条核对即可。",
+          "id": "H15_M1",
+          "identifier": "kmod_6.2.17-lts",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "回归纪要记录",
+          "step": 141,
+          "subject": "内核模块兼容性模块",
+          "value": "4"
+        },
+        {
+          "content": "在内核模块兼容性模块的回归纪要里，内核模块版本 kmod_6.2.18-lts 的回归表现被登记成一条记录：先在该版本的批次里把回归用例并发数 regression_parallelism 设为 6，再保持符号版本校验开启，最后把失败用例清单附到当班交接文档；该版本自上线以来稳定运行，未再出现加载失败，与同族版本共用同一模板，仅版本号与并发数不同，评审时逐条核对即可。",
+          "id": "H15_M2",
+          "identifier": "kmod_6.2.18-lts",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "回归纪要记录",
+          "step": 142,
+          "subject": "内核模块兼容性模块",
+          "value": "6"
+        },
+        {
+          "content": "在内核模块兼容性模块的回归纪要里，内核模块版本 kmod_6.2.19-lts 的回归表现被登记成一条记录：先在该版本的批次里把回归用例并发数 regression_parallelism 设为 8，再保持符号版本校验开启，最后把失败用例清单附到当班交接文档；该版本自上线以来稳定运行，未再出现加载失败，与同族版本共用同一模板，仅版本号与并发数不同，评审时逐条核对即可。",
+          "id": "H15_M3",
+          "identifier": "kmod_6.2.19-lts",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "回归纪要记录",
+          "step": 143,
+          "subject": "内核模块兼容性模块",
+          "value": "8"
+        },
+        {
+          "content": "在内核模块兼容性模块的回归纪要里，内核模块版本 kmod_6.2.20-lts 的回归表现被登记成一条记录：先在该版本的批次里把回归用例并发数 regression_parallelism 设为 10，再保持符号版本校验开启，最后把失败用例清单附到当班交接文档；该版本自上线以来稳定运行，未再出现加载失败，与同族版本共用同一模板，仅版本号与并发数不同，评审时逐条核对即可。",
+          "id": "H15_M4",
+          "identifier": "kmod_6.2.20-lts",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "回归纪要记录",
+          "step": 144,
+          "subject": "内核模块兼容性模块",
+          "value": "10"
+        },
+        {
+          "content": "在内核模块兼容性模块的回归纪要里，内核模块版本 kmod_6.2.21-lts 的回归表现被登记成一条记录：先在该版本的批次里把回归用例并发数 regression_parallelism 设为 12，再保持符号版本校验开启，最后把失败用例清单附到当班交接文档；该版本自上线以来稳定运行，未再出现加载失败，与同族版本共用同一模板，仅版本号与并发数不同，评审时逐条核对即可。",
+          "id": "H15_M5",
+          "identifier": "kmod_6.2.21-lts",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "回归纪要记录",
+          "step": 145,
+          "subject": "内核模块兼容性模块",
+          "value": "12"
+        }
+      ],
+      "module": "内核模块兼容性模块",
+      "query": "内核模块兼容性模块的回归纪要里，版本 kmod_6.2.19-lts 的回归并发记录在哪一条？"
+    },
+    {
+      "case_id": "H16",
+      "entity_kind": "function_name",
+      "expected_id": "H16_M1",
+      "expected_top3": [
+        "H16_M1"
+      ],
+      "identifier": "reconcile_ledger_entries",
+      "memories": [
+        {
+          "content": "在账务对账服务模块的值班纪要里，函数 reconcile_ledger_entries 的调用约定被登记成一条记录：先在该函数的封装层把分片大小 shard_batch_rows 设为 500，再保持幂等键校验开启，最后把调用耗时分布附到当班交接文档；该约定自上线以来稳定运行，未再出现对账缺口，与同族函数共用同一模板，仅函数名与分片不同，评审时逐条核对即可。",
+          "id": "H16_M1",
+          "identifier": "reconcile_ledger_entries",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "值班纪要记录",
+          "step": 151,
+          "subject": "账务对账服务模块",
+          "value": "500"
+        },
+        {
+          "content": "在账务对账服务模块的值班纪要里，函数 reconcile_ledger_entry 的调用约定被登记成一条记录：先在该函数的封装层把分片大小 shard_batch_rows 设为 1000，再保持幂等键校验开启，最后把调用耗时分布附到当班交接文档；该约定自上线以来稳定运行，未再出现对账缺口，与同族函数共用同一模板，仅函数名与分片不同，评审时逐条核对即可。",
+          "id": "H16_M2",
+          "identifier": "reconcile_ledger_entry",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "值班纪要记录",
+          "step": 152,
+          "subject": "账务对账服务模块",
+          "value": "1000"
+        },
+        {
+          "content": "在账务对账服务模块的值班纪要里，函数 reconcile_ledger_vouchers 的调用约定被登记成一条记录：先在该函数的封装层把分片大小 shard_batch_rows 设为 1500，再保持幂等键校验开启，最后把调用耗时分布附到当班交接文档；该约定自上线以来稳定运行，未再出现对账缺口，与同族函数共用同一模板，仅函数名与分片不同，评审时逐条核对即可。",
+          "id": "H16_M3",
+          "identifier": "reconcile_ledger_vouchers",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "值班纪要记录",
+          "step": 153,
+          "subject": "账务对账服务模块",
+          "value": "1500"
+        },
+        {
+          "content": "在账务对账服务模块的值班纪要里，函数 reconcile_ledger_invoices 的调用约定被登记成一条记录：先在该函数的封装层把分片大小 shard_batch_rows 设为 2000，再保持幂等键校验开启，最后把调用耗时分布附到当班交接文档；该约定自上线以来稳定运行，未再出现对账缺口，与同族函数共用同一模板，仅函数名与分片不同，评审时逐条核对即可。",
+          "id": "H16_M4",
+          "identifier": "reconcile_ledger_invoices",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "值班纪要记录",
+          "step": 154,
+          "subject": "账务对账服务模块",
+          "value": "2000"
+        },
+        {
+          "content": "在账务对账服务模块的值班纪要里，函数 reconcile_ledger_receipts 的调用约定被登记成一条记录：先在该函数的封装层把分片大小 shard_batch_rows 设为 2500，再保持幂等键校验开启，最后把调用耗时分布附到当班交接文档；该约定自上线以来稳定运行，未再出现对账缺口，与同族函数共用同一模板，仅函数名与分片不同，评审时逐条核对即可。",
+          "id": "H16_M5",
+          "identifier": "reconcile_ledger_receipts",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "值班纪要记录",
+          "step": 155,
+          "subject": "账务对账服务模块",
+          "value": "2500"
+        }
+      ],
+      "module": "账务对账服务模块",
+      "query": "账务对账服务模块的值班纪要里，函数 reconcile_ledger_entries 的分片大小记录在哪一条？"
+    },
+    {
+      "case_id": "H17",
+      "entity_kind": "function_name",
+      "expected_id": "H17_M3",
+      "expected_top3": [
+        "H17_M3"
+      ],
+      "identifier": "parse_wire_trailer",
+      "memories": [
+        {
+          "content": "在流解析服务模块的性能复盘里，函数 parse_wire_payload 的解析约定被登记成一条记录：先在该函数的入口层把解析缓冲区 parse_buffer_kb 设为 64，再保持非法帧计数器开启，最后把吞吐基线附到当班交接文档；该约定自上线以来稳定运行，未再出现解析卡顿，与同族函数共用同一模板，仅函数名与缓冲不同，评审时逐条核对即可。",
+          "id": "H17_M1",
+          "identifier": "parse_wire_payload",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "性能复盘记录",
+          "step": 161,
+          "subject": "流解析服务模块",
+          "value": "64"
+        },
+        {
+          "content": "在流解析服务模块的性能复盘里，函数 parse_wire_header 的解析约定被登记成一条记录：先在该函数的入口层把解析缓冲区 parse_buffer_kb 设为 128，再保持非法帧计数器开启，最后把吞吐基线附到当班交接文档；该约定自上线以来稳定运行，未再出现解析卡顿，与同族函数共用同一模板，仅函数名与缓冲不同，评审时逐条核对即可。",
+          "id": "H17_M2",
+          "identifier": "parse_wire_header",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "性能复盘记录",
+          "step": 162,
+          "subject": "流解析服务模块",
+          "value": "128"
+        },
+        {
+          "content": "在流解析服务模块的性能复盘里，函数 parse_wire_trailer 的解析约定被登记成一条记录：先在该函数的入口层把解析缓冲区 parse_buffer_kb 设为 256，再保持非法帧计数器开启，最后把吞吐基线附到当班交接文档；该约定自上线以来稳定运行，未再出现解析卡顿，与同族函数共用同一模板，仅函数名与缓冲不同，评审时逐条核对即可。",
+          "id": "H17_M3",
+          "identifier": "parse_wire_trailer",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "性能复盘记录",
+          "step": 163,
+          "subject": "流解析服务模块",
+          "value": "256"
+        },
+        {
+          "content": "在流解析服务模块的性能复盘里，函数 parse_wire_checksum 的解析约定被登记成一条记录：先在该函数的入口层把解析缓冲区 parse_buffer_kb 设为 512，再保持非法帧计数器开启，最后把吞吐基线附到当班交接文档；该约定自上线以来稳定运行，未再出现解析卡顿，与同族函数共用同一模板，仅函数名与缓冲不同，评审时逐条核对即可。",
+          "id": "H17_M4",
+          "identifier": "parse_wire_checksum",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "性能复盘记录",
+          "step": 164,
+          "subject": "流解析服务模块",
+          "value": "512"
+        },
+        {
+          "content": "在流解析服务模块的性能复盘里，函数 parse_wire_padding 的解析约定被登记成一条记录：先在该函数的入口层把解析缓冲区 parse_buffer_kb 设为 1024，再保持非法帧计数器开启，最后把吞吐基线附到当班交接文档；该约定自上线以来稳定运行，未再出现解析卡顿，与同族函数共用同一模板，仅函数名与缓冲不同，评审时逐条核对即可。",
+          "id": "H17_M5",
+          "identifier": "parse_wire_padding",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "性能复盘记录",
+          "step": 165,
+          "subject": "流解析服务模块",
+          "value": "1024"
+        }
+      ],
+      "module": "流解析服务模块",
+      "query": "流解析服务模块的复盘里，函数 parse_wire_trailer 的缓冲区参数记录在哪一条？"
+    },
+    {
+      "case_id": "H18",
+      "entity_kind": "function_name",
+      "expected_id": "H18_M2",
+      "expected_top3": [
+        "H18_M2"
+      ],
+      "identifier": "drain_flush_queues",
+      "memories": [
+        {
+          "content": "在刷写队列服务模块的巡检纪要里，函数 drain_flush_queue 的调度约定被登记成一条记录：先在该函数的调度层把单轮配额 drain_quota_per_round 设为 100，再保持队列水位探测开启，最后把排空耗时附到当班交接文档；该约定自上线以来稳定运行，未再出现队列淤积，与同族函数共用同一模板，仅函数名与配额不同，评审时逐条核对即可。",
+          "id": "H18_M1",
+          "identifier": "drain_flush_queue",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 171,
+          "subject": "刷写队列服务模块",
+          "value": "100"
+        },
+        {
+          "content": "在刷写队列服务模块的巡检纪要里，函数 drain_flush_queues 的调度约定被登记成一条记录：先在该函数的调度层把单轮配额 drain_quota_per_round 设为 200，再保持队列水位探测开启，最后把排空耗时附到当班交接文档；该约定自上线以来稳定运行，未再出现队列淤积，与同族函数共用同一模板，仅函数名与配额不同，评审时逐条核对即可。",
+          "id": "H18_M2",
+          "identifier": "drain_flush_queues",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 172,
+          "subject": "刷写队列服务模块",
+          "value": "200"
+        },
+        {
+          "content": "在刷写队列服务模块的巡检纪要里，函数 drain_flush_queued 的调度约定被登记成一条记录：先在该函数的调度层把单轮配额 drain_quota_per_round 设为 300，再保持队列水位探测开启，最后把排空耗时附到当班交接文档；该约定自上线以来稳定运行，未再出现队列淤积，与同族函数共用同一模板，仅函数名与配额不同，评审时逐条核对即可。",
+          "id": "H18_M3",
+          "identifier": "drain_flush_queued",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 173,
+          "subject": "刷写队列服务模块",
+          "value": "300"
+        },
+        {
+          "content": "在刷写队列服务模块的巡检纪要里，函数 drain_purge_queue 的调度约定被登记成一条记录：先在该函数的调度层把单轮配额 drain_quota_per_round 设为 400，再保持队列水位探测开启，最后把排空耗时附到当班交接文档；该约定自上线以来稳定运行，未再出现队列淤积，与同族函数共用同一模板，仅函数名与配额不同，评审时逐条核对即可。",
+          "id": "H18_M4",
+          "identifier": "drain_purge_queue",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 174,
+          "subject": "刷写队列服务模块",
+          "value": "400"
+        },
+        {
+          "content": "在刷写队列服务模块的巡检纪要里，函数 drain_retry_queue 的调度约定被登记成一条记录：先在该函数的调度层把单轮配额 drain_quota_per_round 设为 500，再保持队列水位探测开启，最后把排空耗时附到当班交接文档；该约定自上线以来稳定运行，未再出现队列淤积，与同族函数共用同一模板，仅函数名与配额不同，评审时逐条核对即可。",
+          "id": "H18_M5",
+          "identifier": "drain_retry_queue",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 175,
+          "subject": "刷写队列服务模块",
+          "value": "500"
+        }
+      ],
+      "module": "刷写队列服务模块",
+      "query": "刷写队列服务模块的巡检纪要里，函数 drain_flush_queues 的单轮配额记录在哪一条？"
+    },
+    {
+      "case_id": "H19",
+      "entity_kind": "function_name",
+      "expected_id": "H19_M1",
+      "expected_top3": [
+        "H19_M1"
+      ],
+      "identifier": "scrape_targat_refresh",
+      "memories": [
+        {
+          "content": "在指标抓取服务模块的观测纪要里，函数 scrape_targat_refresh 的抓取约定被登记成一条记录：先在该函数的采集层把抓取超时 scrape_timeout_ms 设为 1000，再保持目标去重校验开启，最后把抓取成功率附到当班交接文档；该约定自上线以来稳定运行，未再出现指标断流，与同族函数共用同一模板，仅函数名与超时不同，评审时逐条核对即可。",
+          "id": "H19_M1",
+          "identifier": "scrape_targat_refresh",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "观测纪要记录",
+          "step": 181,
+          "subject": "指标抓取服务模块",
+          "value": "1000"
+        },
+        {
+          "content": "在指标抓取服务模块的观测纪要里，函数 scrape_target_refresh 的抓取约定被登记成一条记录：先在该函数的采集层把抓取超时 scrape_timeout_ms 设为 2000，再保持目标去重校验开启，最后把抓取成功率附到当班交接文档；该约定自上线以来稳定运行，未再出现指标断流，与同族函数共用同一模板，仅函数名与超时不同，评审时逐条核对即可。",
+          "id": "H19_M2",
+          "identifier": "scrape_target_refresh",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "观测纪要记录",
+          "step": 182,
+          "subject": "指标抓取服务模块",
+          "value": "2000"
+        },
+        {
+          "content": "在指标抓取服务模块的观测纪要里，函数 scrape_targets_refresh 的抓取约定被登记成一条记录：先在该函数的采集层把抓取超时 scrape_timeout_ms 设为 3000，再保持目标去重校验开启，最后把抓取成功率附到当班交接文档；该约定自上线以来稳定运行，未再出现指标断流，与同族函数共用同一模板，仅函数名与超时不同，评审时逐条核对即可。",
+          "id": "H19_M3",
+          "identifier": "scrape_targets_refresh",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "观测纪要记录",
+          "step": 183,
+          "subject": "指标抓取服务模块",
+          "value": "3000"
+        },
+        {
+          "content": "在指标抓取服务模块的观测纪要里，函数 scrape_target_relabel 的抓取约定被登记成一条记录：先在该函数的采集层把抓取超时 scrape_timeout_ms 设为 4000，再保持目标去重校验开启，最后把抓取成功率附到当班交接文档；该约定自上线以来稳定运行，未再出现指标断流，与同族函数共用同一模板，仅函数名与超时不同，评审时逐条核对即可。",
+          "id": "H19_M4",
+          "identifier": "scrape_target_relabel",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "观测纪要记录",
+          "step": 184,
+          "subject": "指标抓取服务模块",
+          "value": "4000"
+        },
+        {
+          "content": "在指标抓取服务模块的观测纪要里，函数 scrape_target_expired 的抓取约定被登记成一条记录：先在该函数的采集层把抓取超时 scrape_timeout_ms 设为 5000，再保持目标去重校验开启，最后把抓取成功率附到当班交接文档；该约定自上线以来稳定运行，未再出现指标断流，与同族函数共用同一模板，仅函数名与超时不同，评审时逐条核对即可。",
+          "id": "H19_M5",
+          "identifier": "scrape_target_expired",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "观测纪要记录",
+          "step": 185,
+          "subject": "指标抓取服务模块",
+          "value": "5000"
+        }
+      ],
+      "module": "指标抓取服务模块",
+      "query": "指标抓取服务模块的观测纪要里，函数 scrape_targat_refresh 的抓取超时记录在哪一条？"
+    },
+    {
+      "case_id": "H20",
+      "entity_kind": "function_name",
+      "expected_id": "H20_M5",
+      "expected_top3": [
+        "H20_M5"
+      ],
+      "identifier": "compact_sst_tables",
+      "memories": [
+        {
+          "content": "在 SST 压实服务模块的巡检纪要里，函数 compact_sst_segments 的压实约定被登记成一条记录：先在该函数的执行层把单批压实页数 compact_pages_per_batch 设为 128，再保持写放大监控开启，最后把压实耗时分布附到当班交接文档；该约定自上线以来稳定运行，未再出现写停顿，与同族函数共用同一模板，仅函数名与页数不同，评审时逐条核对即可。",
+          "id": "H20_M1",
+          "identifier": "compact_sst_segments",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 191,
+          "subject": "SST 压实服务模块",
+          "value": "128"
+        },
+        {
+          "content": "在 SST 压实服务模块的巡检纪要里，函数 compact_sst_segment 的压实约定被登记成一条记录：先在该函数的执行层把单批压实页数 compact_pages_per_batch 设为 256，再保持写放大监控开启，最后把压实耗时分布附到当班交接文档；该约定自上线以来稳定运行，未再出现写停顿，与同族函数共用同一模板，仅函数名与页数不同，评审时逐条核对即可。",
+          "id": "H20_M2",
+          "identifier": "compact_sst_segment",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 192,
+          "subject": "SST 压实服务模块",
+          "value": "256"
+        },
+        {
+          "content": "在 SST 压实服务模块的巡检纪要里，函数 compact_sst_segmemts 的压实约定被登记成一条记录：先在该函数的执行层把单批压实页数 compact_pages_per_batch 设为 512，再保持写放大监控开启，最后把压实耗时分布附到当班交接文档；该约定自上线以来稳定运行，未再出现写停顿，与同族函数共用同一模板，仅函数名与页数不同，评审时逐条核对即可。",
+          "id": "H20_M3",
+          "identifier": "compact_sst_segmemts",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 193,
+          "subject": "SST 压实服务模块",
+          "value": "512"
+        },
+        {
+          "content": "在 SST 压实服务模块的巡检纪要里，函数 compact_sst_blocks 的压实约定被登记成一条记录：先在该函数的执行层把单批压实页数 compact_pages_per_batch 设为 1024，再保持写放大监控开启，最后把压实耗时分布附到当班交接文档；该约定自上线以来稳定运行，未再出现写停顿，与同族函数共用同一模板，仅函数名与页数不同，评审时逐条核对即可。",
+          "id": "H20_M4",
+          "identifier": "compact_sst_blocks",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 194,
+          "subject": "SST 压实服务模块",
+          "value": "1024"
+        },
+        {
+          "content": "在 SST 压实服务模块的巡检纪要里，函数 compact_sst_tables 的压实约定被登记成一条记录：先在该函数的执行层把单批压实页数 compact_pages_per_batch 设为 2048，再保持写放大监控开启，最后把压实耗时分布附到当班交接文档；该约定自上线以来稳定运行，未再出现写停顿，与同族函数共用同一模板，仅函数名与页数不同，评审时逐条核对即可。",
+          "id": "H20_M5",
+          "identifier": "compact_sst_tables",
+          "input_weight": 0.5,
+          "memory_type": "DECISION",
+          "predicate": "巡检纪要记录",
+          "step": 195,
+          "subject": "SST 压实服务模块",
+          "value": "2048"
+        }
+      ],
+      "module": "SST 压实服务模块",
+      "query": "SST 压实服务模块的巡检纪要里，函数 compact_sst_tables 的单批页数记录在哪一条？"
+    }
+  ],
+  "dataset": "phase4_hard_negatives_20",
+  "description": "同语境高碰撞难负例基准：每组 5 条正文措辞高度雷同的长记忆，仅关键标识符差 1~2 个字符；单向量通道必然挤在一起，必须依赖 FTS5 精确 token 的 IDF 才能区分。",
+  "determinism": "纯字面模板生成；无 random/time/env；连跑两次逐字节相同",
+  "generator": "benchmarks/build_phase4_hard_negatives.py",
+  "memories_per_case": 5,
+  "version": "1.0.0"
+}
