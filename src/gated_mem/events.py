@@ -105,7 +105,20 @@ class EventLog(object):
         pid = project_id or self.store.project_id
         nodes: Dict[str, MemoryNode] = {}
         edges: Dict[str, MemoryEdge] = {}
-        for ev in self.history(pid, limit=1000000):
+        history = self.history(pid, limit=1000000)
+
+        # 第一遍：收集所有被 EVENT_UNDONE 撤销掉的 event_id。
+        # 没有这一步，undo 之后的逻辑投影会与物理表脱节（记录里仍残留被撤销的迁移）。
+        undone_ids = set()
+        for ev in history:
+            if ev.event_type == EventType.EVENT_UNDONE:
+                payload = json.loads(ev.payload_json) if ev.payload_json else {}
+                for uid in payload.get("undone_event_ids", []):
+                    undone_ids.add(uid)
+
+        for ev in history:
+            if ev.event_id in undone_ids:
+                continue
             payload = json.loads(ev.payload_json) if ev.payload_json else {}
             et = ev.event_type
             if et == EventType.MEMORY_CREATED:
