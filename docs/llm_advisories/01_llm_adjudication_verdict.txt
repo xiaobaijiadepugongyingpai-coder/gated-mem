@@ -1,0 +1,302 @@
+作为本次技术路线终审裁决模型，基于你提供的《Gated-Mem 方案综合归纳与大模型终审拍板案卷》，结合你“零实验经费、瞄准开源高星开发者工具”**的核心诉求，以及你手头现有的三大高性价比模型（**`DeepSeek-V4.1F`**、**`Gemini-3.8-Flash`**、**`GLM-5.3-Flash`**），现给出**最终拍板决定（Gated-Mem v2.1 终极基线）**与**三模型协同落地执行方案。
+
+---
+
+### 一、 大模型终审拍板裁决书（Adjudication Verdict）
+
+针对案卷第 5 节的六大待决争议，正式裁决如下：
+
+#### 1. 决策项 1（项目终极定位）：采纳【Option 1-A + Option 1-C 融合定位】
+
+
+
+* **最终定位**：**“Git for Agent Memory —— 面向超长开发周期的本地可审计、可回滚架构状态引擎”**。
+
+
+* **裁决理由**：StateMem Table 6 已确凿证明，在短历史（<15k tokens）下，纯 Prompt Wrapper（71.7~75.0 分）完胜重型持久化存储系统（23.3~36.3 分）。因此，Gated-Mem **严禁在短对话场景与 Prompt 方案争胜**，必须把壁垒焊死在 Prompt Wrapper 物理上做不到的三个痛点上：
+
+
+1. **跨会话上下文溢出时的确定性状态投影**（项目跨数周、历史超几十万 Token 装不下时）；
+
+
+2. **架构演进原因追溯（`residual_diff`）**（自动沉淀轻量级 ADR 架构决策记录，回答“当初为什么把 A 换成 B”）；
+
+
+3. **100% 因果可解释回执（Explain Receipt）与 $O(1)$ 级联撤销（`undo`）**。
+
+
+
+
+
+#### 2. 决策项 2（核心机制去留）：大刀阔斧砍除负收益复杂度
+
+
+
+* **覆盖连坐（$\psi=0.15$）** $\to$ **拍板 [A]：物理砍掉自动连坐降权，改为只读告警标签 `stale_parent_warning**`。
+
+
+* *依据*：StateMem 消融实验已证实依赖传播在 Anti-trap 上倒退 $-12.5\text{pp}$，去掉后 DeepSeek 总体准确率反而更高（0.373 vs 0.363），且多父 DAG 下 $0.15^k$ 会指数级误杀通用规范。改为：当父节点被 `superseded` 时，子节点不扣减生命力，但在检索注入时自动附带一行提示 `[Warning: 上游依赖节点 X 已废弃，请核实本规则是否仍适用]`。零误杀，且完美体现图谱拓扑价值！
+
+
+
+
+* **结构残差（`RESIDUAL_SHORTCUT`）** $\to$ **拍板 [A]：彻底砍掉**。
+
+
+* *依据*：补齐检索排序方程后，高频被引用的节点半衰期 $H_v$ 增长、生命力 $F_t(v)$ 接近 1.0，在检索时自然排在最前，无需在图数据库里乱连虚线破坏树状拓扑。
+
+
+
+
+* **状态残差（`residual_diff`）** $\to$ **拍板 [A]：提拔为一等公民核心卖点**。
+
+
+* *依据*：全网竞品（Mem0/claude-mem）均只管覆盖或共存，没人显式结构化记录“状态变更增量原因”。每次状态覆盖必须写入 `residual_diff`（如 `"因 JSONB 聚合性能不足，由 MySQL 迁移至 PostgreSQL"`）。
+
+
+
+
+* **正向激活扩散（$\gamma$）** $\to$ **拍板 [A]：严格限制为检索期 1-Hop 临时增益（$\gamma=0.2$），不改写数据库持久态，加环路检测**。
+
+
+* **力导向图 Web UI** $\to$ **拍板 [A/B]：首版砍掉交互式 Web Server，改为 CLI 树状图（`gated-mem graph` 仿 `git log --graph`）+ 静态单文件 HTML 导出器**。既省去 CORS/端口安全隐患，又能生成炫酷的静态图挂在 GitHub README 上吸星。
+
+
+
+#### 3. 决策项 3（检索排序方程与数学修正）：固化闭式解
+
+
+
+* **检索排序方程（采纳方案 A 乘幂门控）**：
+
+
+
+$$\text{Score}(v \mid q) = \text{rel}(q, v) \cdot \left[ F_t(v) \right]^\lambda, \qquad \lambda \in [0, 1] \text{（默认 }\lambda = 0.3\text{）}$$
+
+
+
+其中节点固有生命力 $F_t(v)$ 精简为无连坐安全形式：
+
+
+
+$$F_t(v) = \begin{cases} 1.0, & \text{if } v.\text{pinned} = 1 \\ \min\left(1.0,\; R(v, \Delta) + \gamma \cdot \max_{u \in \mathcal{N}_{\text{parent}}(v)} \mathbb{I}(u \text{ cited}) R(u, \Delta)\right), & \text{otherwise} \end{cases}$$
+
+
+* **`input_weight` ($i_v \in [0.1, 1.0]$) 接入公式（采纳选项 A）**：
+将输入门权重映射为初始时间尺度乘子：$t_0(v) = t_{0,\text{type}} \cdot (0.5 + i_v)$，从而直接决定初始半衰期 $H_v = t_0(v)(2^{1/\beta_{\text{type}}} - 1)$。
+
+
+* **单元测试修正**：
+废除错误的 `R(2H) == 0.25` 断言，修正为参数化精确断言：`assert math.isclose(R(2*H), (2 * 2**(1/beta) - 1)**(-beta), rel_tol=1e-6)` 且 `assert R(2*H) > 0.25`。
+
+
+
+#### 4. 决策项 4（Schema、因果撤销与状态机）：补齐工程闭环
+
+
+
+* **因果撤销 Schema**：`memory_events` 表强制增加 `causation_id TEXT`（上游触发事件 ID）与 `correlation_id TEXT`（同批次事务 ID）。执行 `gated-mem undo <event_id>` 时，通过 `WHERE correlation_id = ? OR causation_id = ?` 一次性精确定位所有关联变更并追加逆向补偿事件。
+
+
+* **拓扑边方向标准化**：`BELONGS_TO` 统一固化为 **`source_id = child` $\to$ `target_id = parent`（子指父）**，并在 `target_id` 上建立索引。
+
+
+* **状态迁移铁律**：`superseded` 与 `killed` 状态严禁被普通写入覆盖复活，仅允许通过 `undo` 或显式 `restore` 命令恢复。
+
+
+* **防注入安全边界**：增加 `trust_tier`（`user_verified` > `tool_derived` > `model_inferred`），且注入 Prompt 时强制使用 `<gated_memory_context readonly="true">` 标签包裹隔离。
+
+
+
+#### 5. 决策项 5 & 6（零经费验证与开发周期）：10 天敏捷交付 + 三模型免费互测
+
+
+
+* 放弃动辄耗资数千元的云端旗舰评测，利用你手头的 **`DeepSeek-V4.1F`、`Gemini-3.8-Flash`、`GLM-5.3-Flash**` 组建“生成-抽取-双盲裁判”流水线，在 **10 天内**完成从「第一刀基准验证」到「开源仓库发布」的全流程。
+
+
+
+---
+
+### 二、 手头三大 AI 模型协同分工矩阵（零经费榨干性能）
+
+你手头的三个模型恰好互补，且完美契合方法论中“生成用 A、评测用 B，严防裁判自偏置”的铁律：
+
+| 模型名称 | 核心优势 | 在本项目中的专属角色（工程开发期 + 实验验证期） |
+| --- | --- | --- |
+| **`DeepSeek-V4.1F`** | 代码逻辑严密、数学推导强、且恰好是 StateMem 论文 Table 6 的官方评测同源基座
+
+ | **1. 核心后端主程**：负责编写 `schema.py`、`gates.py`、`events.py`、`storage.py` 等底层严谨代码。<br>
+
+<br>**2. 实验被测系统 Backend**：在跑第一刀/第二刀测试时，统一作为回答问题的基座模型，直接对齐论文基线。
+
+ |
+| **`Gemini-3.8-Flash`** | 原生超长上下文窗口、跨文件全局视野极佳、前端与 CLI 排版能力强 | **1. 全局架构审计与 UI 主程**：负责编写 `cli.py`（树状图与回执展示）、单文件静态图导出器，以及跨文件一致性审查。
+
+<br>
+
+<br>**2. 实验“长窗口 Wrapper 对照组”**：在桥接实验中充当纯 Prompt Wrapper 强基线。
+
+<br>
+
+<br>**3. 一号独立裁判（Judge #1）**：对 DeepSeek 的回答进行闭池打分。
+
+ |
+| **`GLM-5.3-Flash`** | 中文及双语语义槽位提取极快、JSON 格式化稳定、吞吐量高 | **1. 槽位抽取与冲突分类器**：在写入门中负责将自然语言拆解为 `(subject, predicate, scope, residual_diff)` 并判定 5 类冲突关系。
+
+<br>
+
+<br>**2. 测试集合成工厂**：批量扩充包含 Anti-trap（防连坐误杀陷阱）的评测样本。
+
+<br>
+
+<br>**3. 二号独立裁判（Judge #2）**：与 Gemini 组成双盲交叉投票裁判组。
+
+ |
+
+---
+
+### 三、 10 天具体执行方案（含熔断阀门与专属 Prompt）
+
+#### 阶段一：Day 1–2「第一刀」零代码/轻脚本验证（决定生死）
+
+
+
+* **目标**：不写复杂的 SQLite 和 MCP，先用 150 行 Python 内存字典脚本跑通 **【纯向量检索 vs 两阶段槽位覆盖 + `residual_diff`】**，验证槽位覆盖在真实状态翻转与演进追问上的绝对优势。
+
+
+* **操作步骤**：
+1. 让 **`GLM-5.3-Flash`** 生成 40 组长周期软件工程状态翻转测试集（每组含：初始选型 $\to$ 干扰规范 $\to$ 局部修改（Anti-trap 陷阱）$\to$ 架构废弃与 `residual_diff` $\to$ 2 道探测题：1 道问当前状态，1 道问历史变更原因）。
+
+
+2. 让 **`DeepSeek-V4.1F`** 写一个纯内存对比脚本 `spike_cut1.py`，对比 3 个分支：① 纯向量 Top-3；② 槽位覆盖 + 连坐开启（$\psi=0.15$）；③ 槽位覆盖 + 连坐关闭（仅挂告警标签）+ `residual_diff`。
+
+
+3. 用 **`Gemini-3.8-Flash`** 和 **`GLM-5.3-Flash`** 双盲判分。
+
+
+
+
+* **🛑 熔断阀门 1**：你会亲眼看到分支②在 Anti-trap 题上发生误杀（复现论文 -12.5pp 现象），而分支③在当前状态准确率与演进原因问答上全面胜出。把这个实验结果表格直接保存，这就是你未来 GitHub README 最硬核的实证图表！
+
+
+
+> **📋 复制给 `GLM-5.3-Flash` 生成测试集的 Prompt：**
+> “请帮我生成 20 组 JSON 格式的软件工程状态演进测试集（用于测试 Agent 状态记忆插件）。每组包含一个 `session_events` 列表（按 step 递增的 6~8 条项目记忆，包含：早期技术选型、挂载在该技术栈下的通用工程规范[Anti-trap]、中期的模块配置精化 `REFINES`、后期的技术栈替换 `SUPERSEDES` 及替换原因 `residual_diff`），以及 3 个测试问题 `probes`：
+> 1. `current_state_query`：询问当前生效的技术栈（考察是否排除了过期状态）；
+> 2. `anti_trap_query`：询问那条通用工程规范是否仍然有效（考察技术栈替换时是否误杀了通用规范）；
+> 3. `evolution_why_query`：询问为什么放弃了早期技术栈（考察 `residual_diff` 召回能力）。
+> 每道题必须给出 `must_include`（必须包含的当前事实）和 `must_exclude`（绝不能当成当前有效事实输出的过期状态）。”
+> 
+> 
+> 
+> 
+
+---
+
+#### 阶段二：Day 3–5 打造 v2.1 核心安全底盘（`DeepSeek-V4.1F` 主刀）
+
+
+
+* **目标**：实现修正后的数学公式、带因果链的事件溯源与 SQLite 双阶段冲突引擎。
+
+
+* **模块清单**：
+* `src/gated_mem/schema.py`：固化 5 状态枚举、信任分级 `trust_tier`、标准边方向 `child -> parent`。
+
+
+* `src/gated_mem/gates.py`：实现 `compute_retention`（幂律衰减）、`compute_vitality`（1-hop 正向扩散，无连坐降权）、`compute_retrieval_score`（$\text{rel} \cdot F_t^\lambda$），并附带修复后的 `test_gates.py` 单测。
+
+
+* `src/gated_mem/events.py` & `storage.py`：开启 SQLite WAL 模式，实现带 `causation_id` 和 `correlation_id` 的不可变日志与 $O(1)$ `undo()`。
+
+
+
+
+
+> **📋 复制给 `DeepSeek-V4.1F` 编写核心数学与 Schema 的 Prompt：**
+> “你现在是 Gated-Mem v2.1 的核心主程。请使用 Python 3.11+ 和 Pydantic 编写 `schema.py` 和 `gates.py`，并编写对应的 `pytest` 单元测试 `test_gates.py`。请严格遵守以下终审架构规范：
+> 1. **记忆模型 (`MemoryNode`)**：包含 `memory_id`, `project_id`, `subject`, `predicate`, `scope`, `content`, `residual_diff` (可选，记录覆盖旧状态的原因), `memory_type` (`DECISION` $\beta=0.1$, `CONSTRAINT` $\beta=0.05$, `PREFERENCE` $\beta=0.15$, `EPHEMERAL` $\beta=1.2$), `status` (`active`, `candidate_conflict`, `superseded`, `archived`, `killed`), `input_weight` ($i_v \in [0.1, 1.0]$), `pinned` (bool), `trust_tier` (`user_verified`, `tool_derived`, `model_inferred`), `created_step`, `last_cited_step`。
+> 
+> 
+> 2. **事件模型 (`MemoryEvent`)**：包含 `event_id`, `project_id`, `step`, `event_type`, `causation_id` (上游触发事件ID), `correlation_id` (事务批次ID), `payload_json`。
+> 
+> 
+> 3. **数学公式 (`gates.py`)**：
+> * 初始时间常数 $t_0(v) = t_{0,\text{type}} \cdot (0.5 + i_v)$，半衰期 $H_v = t_0(v) \cdot (2^{1/\beta} - 1)$。
+> 
+> 
+> * 基础保留率 $R(v, \Delta) = (1 + \Delta / t_0(v))^{-\beta}$，其中 $\Delta = \max(0, \text{current\_step} - \text{last\_cited\_step})$。
+> 
+> 
+> * 合成生命力 $F_t(v)$：若 `pinned=True` 则返回 `1.0`；否则返回 $\min(1.0, R(v, \Delta) + 0.2 \cdot \max_{\text{parent}} R(\text{parent}, \Delta_{\text{parent}}))$（仅当父节点本轮被激活时加 1-hop 增益；严禁实现祖先覆盖连坐扣分，若父节点为 `superseded`，仅在返回结构体中置位 `stale_parent_warning=True`）。
+> 
+> 
+> * 检索排序得分：$\text{Score}(v \mid q) = \text{rel}(q, v) \cdot (F_t(v))^\lambda$，默认 $\lambda=0.3$。
+> 
+> 
+> 
+> 
+> 4. **单元测试 (`test_gates.py`)**：必须测试 $R(0)=1$, $R(H)=0.5$，且对 $R(2H)$ 断言其精确等于 $(2 \cdot 2^{1/\beta} - 1)^{-\beta}$ 并严格大于 $0.25$。”
+> 
+> 
+> 
+> 
+
+---
+
+#### 阶段三：Day 6–8 接入 MCP / Claude Code Hooks 与可解释 CLI（`Gemini-3.8-Flash` 主刀）
+
+
+
+* **目标**：完成宿主算力寄生闭环，打造让开发者一眼惊艳的 CLI 诊断与静态拓扑导出工具。
+
+
+* **操作步骤**：
+1. 用 **`DeepSeek-V4.1F`** 编写 `server.py`（MCP Server）与 `adapters/claude_code.py`（Hooks 适配器）。在 `gate_remember` 工具定义中要求宿主模型直接传入拆解好的 `(subject, predicate, scope, residual_diff)`，实现零外部 API 费用的算力寄生。
+
+
+2. 用 **`Gemini-3.8-Flash`** 编写 `cli.py`（基于 `rich` 库），实现四大核心命令：
+
+
+* `gated-mem explain <recall_event_id>`：打印本次注入回执（为什么注入 A、为什么拦截了過期的 B、附带了哪条 `residual_diff`、消耗多少 Token）。
+
+
+* `gated-mem log --graph`：仿 `git log --graph` 风格，在终端用彩色 ASCII 树展示状态演进链（如 `[M12: PostgreSQL (active)] ──supersedes (因 JSONB 性能)──> [M03: MySQL (superseded)]`）。
+
+
+* `gated-mem undo <event_id>`：利用 `causation_id` 一键回滚误操作并打印恢复报告。
+
+
+* `gated-mem export-html`：一键生成零 CDN 依赖（内联 SVG/Canvas 极简脚本）的静态可交互演进时间线文件 `memory_snapshot.html`，满足离线安全要求。
+
+
+
+
+
+
+
+---
+
+#### 阶段四：Day 9–10 全局审计、双窗口对比实验与开源发布
+
+
+
+* **目标**：完成跨文件 Bug 扫描，产出 README 核心评测表与 15 秒终端 GIF。
+* **操作步骤**：
+1. **全局代码终审**：将 `src/gated_mem/` 下所有 `.py` 文件一次性拖入 **`Gemini-3.8-Flash`**，执行一致性检查（重点排查：`BELONGS_TO` 是否全部遵守 `child -> parent`；SQLite 写操作是否在同一事务提交；stdio 模式下是否有任何 `print` 污染了 `stdout` 而非写向 `stderr`）。
+
+
+2. **打包 README 叙事**：
+* **首屏定位**：明确写出 *"Why Gated-Mem? Because vector RAG hoards stale decisions, and prompt wrappers fail when your project history overflows the context window."*（为什么需要 Gated-Mem？因为传统向量记忆囤积过期决策，而纯 Prompt 方案在项目历史撑爆上下文时彻底失效。）
+
+
+* **放上 Day 2 跑出的消融对比表**：展示【槽位覆盖 + 状态残差 `residual_diff` + 1-Hop 告警】如何在保持高准确率的同时，消除连坐机制在 Anti-trap 上的误杀。
+
+
+
+
+
+
+
+你现在就可以直接复制上面 **阶段一（给 `GLM-5.3-Flash`）** 和 **阶段二（给 `DeepSeek-V4.1F`）** 的两段 Prompt 开始动手。要不要我现在先帮你把 **阶段一的 150 行验证脚本 `spike_cut1.py**` 直接写出来，让你花 5 分钟在本地跑出第一组数据？
