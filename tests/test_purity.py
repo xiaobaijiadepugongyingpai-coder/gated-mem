@@ -18,17 +18,27 @@ def _py_files():
 
 
 class TestStdoutPurity(unittest.TestCase):
-    def test_no_bare_print(self):
-        """MCP stdio 铁律：src/ 下不得出现任何 print() 调用。"""
+    # MCP stdio 协议路径：这些模块一旦 print 就会污染 JSON-RPC 管道
+    MCP_PATH_MODULES = ("server.py", "storage.py", "retrieval.py", "gates.py",
+                        "schema.py", "events.py", "conflicts.py", "embeddings.py")
+
+    def test_no_bare_print_in_mcp_path(self):
+        """MCP stdio 铁律：协议路径上的模块不得出现任何 print()。
+
+        cli.py 与 exporter.py 是终端/文件输出工具，不参与 stdio 协议，允许 print。
+        """
         offenders = []
         for path in _py_files():
+            name = os.path.basename(path)
+            if name not in self.MCP_PATH_MODULES:
+                continue
             tree = ast.parse(open(path, "r", encoding="utf-8").read())
             for node in ast.walk(tree):
                 if isinstance(node, ast.Call):
                     fn = node.func
                     if isinstance(fn, ast.Name) and fn.id == "print":
-                        offenders.append((os.path.basename(path), node.lineno))
-        self.assertEqual(offenders, [], "src/ 中出现 print()：%r" % offenders)
+                        offenders.append((name, node.lineno))
+        self.assertEqual(offenders, [], "MCP 路径出现 print()：%r" % offenders)
 
     def test_no_todo_placeholders(self):
         """零 # TODO / # FIXME / 占位符。"""
@@ -53,15 +63,22 @@ class TestStdoutPurity(unittest.TestCase):
                     offenders.append((os.path.basename(path), node.id))
         self.assertEqual(offenders, [], "发现连坐残余：%r" % offenders)
 
-    def test_no_sys_stdout_writes(self):
-        """不得直接写 sys.stdout。"""
+    def test_no_sys_stdout_writes_in_mcp_path(self):
+        """MCP 协议路径不得直接写 sys.stdout。
+
+        server.py 走 sys.__stdout__（真实文件描述符），cli.py 走 print（终端工具）。
+        """
         offenders = []
         for path in _py_files():
+            name = os.path.basename(path)
+            if name not in self.MCP_PATH_MODULES:
+                continue
             tree = ast.parse(open(path, "r", encoding="utf-8").read())
             for node in ast.walk(tree):
                 if isinstance(node, ast.Attribute) and node.attr == "stdout":
-                    offenders.append((os.path.basename(path), node.lineno))
-        self.assertEqual(offenders, [], "发现 sys.stdout：%r" % offenders)
+                    # sys.__stdout__ 的 attr 名是 "__stdout__"，不会命中
+                    offenders.append((name, node.lineno))
+        self.assertEqual(offenders, [], "MCP 路径出现 sys.stdout：%r" % offenders)
 
     def test_python39_syntax_compat(self):
         """源码必须能在 3.9 语法下解析（禁 match 语句）。"""

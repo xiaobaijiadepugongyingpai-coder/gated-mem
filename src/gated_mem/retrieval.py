@@ -16,21 +16,32 @@ from __future__ import annotations
 
 import json
 import math
+import re
+import unicodedata
 import uuid
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
+_CJK_ONLY_RE = re.compile(r"[\u4e00-\u9fff]")
+_LATIN_TOKEN_RE = re.compile(r"[A-Za-z0-9_]+|[^\w\s]")
+
+
 from .gates import (
+    ALPHA_DEFAULT,
     GAMMA_DEFAULT,
     LAMBDA_DEFAULT,
     MAX_DEPTH_DEFAULT,
     TOPK_DEFAULT,
+    bm25_to_positive,
+    calibrated_fusion,
     compute_relevance,
     compute_retrieval_score,
     compute_retention,
     compute_t0,
     compute_vitality,
     rank_by_score,
+    saturate_bm25,
 )
+from .embeddings import non_negative_cosine
 from .schema import (
     EdgeType,
     EventType,
@@ -56,12 +67,19 @@ class Retriever(object):
         gamma: float = GAMMA_DEFAULT,
         topk: int = TOPK_DEFAULT,
         max_depth: int = MAX_DEPTH_DEFAULT,
+        alpha: float = ALPHA_DEFAULT,
+        provider=None,
+        use_hybrid: bool = True,
     ) -> None:
         self.store = store
         self.lam = lam
         self.gamma = gamma
         self.topk = topk
         self.max_depth = max_depth
+        # 有界校准融合参数（P3 §3.1）
+        self.alpha = alpha
+        self.provider = provider
+        self.use_hybrid = use_hybrid
 
     # -- 候选池 ---------------------------------------------------------
     def _candidate_ids(self, query: str, use_fts: bool = True) -> List[str]:
@@ -93,6 +111,7 @@ class Retriever(object):
         write_event: bool = True,
         use_fts: bool = True,
         use_vitality: bool = True,
+        auto_touch_on_recall: bool = False,
     ) -> RecallReceipt:
         """执行一次召回，返回双通道回执并落盘 RECALL_DELIVERED。"""
         k = topk if topk is not None else self.topk
@@ -103,6 +122,15 @@ class Retriever(object):
         q_tokens = tokenize(query)
         candidate_ids = self._candidate_ids(query, use_fts=use_fts)
 
+        # 0. 预取 FTS bm25 与查询向量（双通道信号源）
+        bm25_map = {}
+        if use_fts:
+            for mid, raw in self.store.fts_search(_fts_query(query), limit=500):
+                bm25_map[mid] = raw
+        q_vec = None
+        if self.use_hybrid and self.provider is not None:
+            q_vec = self.provider.embed_one(query)
+
         # 1. 只把 active 节点放进候选（被 superseded/killed 的绝不注入正文）
         scored: List[Tuple[MemoryNode, float]] = []
         for mid in candidate_ids:
@@ -111,7 +139,30 @@ class Retriever(object):
                 continue
             if node.status != MemoryStatus.ACTIVE:
                 continue
-            rel = compute_relevance(q_tokens, tokenize(_doc_text(node)))
+
+            # 通道 A：FTS5 BM25 -> 米氏饱和校准
+            s_fts = 0.0
+            if use_fts and mid in bm25_map:
+                s_fts = saturate_bm25(bm25_to_positive(bm25_map[mid]))
+
+            # 通道 B：向量余弦 -> 非负截断（严禁批次内 Min-Max 拉伸）
+            s_vec = 0.0
+            if q_vec is not None and node.embedding:
+                emb = node.embedding
+                if len(emb) == len(q_vec):
+                    s_vec = non_negative_cosine(q_vec, emb)
+
+            # 槽位精确命中奖励：subject/predicate 的原文出现在 query 里
+            slot_hit = _slot_hit(query, node)
+
+            if self.use_hybrid and (s_vec > 0.0 or s_fts > 0.0):
+                rel = calibrated_fusion(s_vec, s_fts, slot_hit, alpha=self.alpha)
+            else:
+                # 纯词法回退（无 provider 或两通道都空）
+                rel = calibrated_fusion(0.0, s_fts, slot_hit, alpha=0.0)
+                if rel <= 0.0:
+                    rel = compute_relevance(q_tokens, tokenize(_doc_text(node)))
+
             if use_vitality:
                 parent_rs = self._parent_retentions(node, all_nodes, case_step)
                 f = compute_vitality(node, parent_rs, gamma=self.gamma, case_step=case_step)
@@ -140,7 +191,7 @@ class Retriever(object):
             if max_tokens is not None and tokens_used + item_tokens > max_tokens and items:
                 break
             t0 = compute_t0(node.memory_type, node.input_weight)
-            rel = compute_relevance(q_tokens, tokenize(_doc_text(node)))
+            rel = _relevance_for(node, query, q_tokens, self, bm25_map, q_vec)
             f = compute_vitality(node, [], gamma=self.gamma, case_step=case_step)
             items.append(
                 RecallItem(
@@ -192,10 +243,13 @@ class Retriever(object):
                     "truncated_candidates": max(0, pool_size - len(items)),
                 },
                 correlation_id=str(uuid.uuid4()),
+                event_id=recall_event_id,
             )
-            # 刷新被引用节点的 last_cited_step
-            for i in items:
-                self.store.touch_citation(i.memory_id, case_step)
+            # 【P3 §3.3】召回本身绝不刷新 last_cited_step。
+            # 只有调用方显式传入 cited_ids（真正采纳）才续命，防止"热门噪音永生"。
+            if auto_touch_on_recall:
+                for i in items:
+                    self.store.touch_citation(i.memory_id, case_step)
 
         return RecallReceipt(
             recall_event_id=recall_event_id,
@@ -318,12 +372,8 @@ def _fts_query(query: str) -> str:
 
 
 def _approx_tokens(text: str) -> int:
-    """粗略 token 估算：中文按字、英文按 4 字符。"""
-    import re as _re
-
-    cjk = len(_re.findall(r"[\u4e00-\u9fff]", text))
-    others = len(text) - cjk
-    return cjk + max(1, others // 4)
+    """Token 估算。委托给 estimate_tokens（CJK 按字、英文按词与标点）。"""
+    return estimate_tokens(text)
 
 
 def _parse_replaced(diff: str) -> str:
@@ -332,3 +382,38 @@ def _parse_replaced(diff: str) -> str:
 
     m = _re.match(r"^\[Replaced:\s*([^\]]*)\]", diff)
     return m.group(1).strip() if m else ""
+
+
+def _slot_hit(query: str, node: MemoryNode) -> bool:
+    """槽位精确命中：subject 或 predicate 的原文出现在 query 中。"""
+    q = unicodedata.normalize("NFKC", query).lower()
+    for slot in (node.subject, node.predicate):
+        s = unicodedata.normalize("NFKC", slot or "").lower()
+        if s and s in q:
+            return True
+    return False
+
+
+def _relevance_for(node, query, q_tokens, retriever, bm25_map, q_vec) -> float:
+    """按与主打分路径一致的公式重算单节点相关性，用于回执展示。"""
+    s_fts = 0.0
+    if node.memory_id in bm25_map:
+        s_fts = saturate_bm25(bm25_to_positive(bm25_map[node.memory_id]))
+    s_vec = 0.0
+    if q_vec is not None and node.embedding and len(node.embedding) == len(q_vec):
+        s_vec = non_negative_cosine(q_vec, node.embedding)
+    hit = _slot_hit(query, node)
+    if retriever.use_hybrid and (s_vec > 0.0 or s_fts > 0.0):
+        return calibrated_fusion(s_vec, s_fts, hit, alpha=retriever.alpha)
+    return compute_relevance(q_tokens, tokenize(_doc_text(node)))
+
+
+def estimate_tokens(text: str) -> int:
+    """Token 估算：CJK 每字 1 token，英文按单词与标点切分。
+
+    比阶段二的「英文 4 字符 1 token」更贴近真实 BPE 计数，误差目标 <= 10%。
+    """
+    cjk = len(_CJK_ONLY_RE.findall(text))
+    rest = _CJK_ONLY_RE.sub(" ", text)
+    latin = _LATIN_TOKEN_RE.findall(rest)
+    return cjk + len(latin)

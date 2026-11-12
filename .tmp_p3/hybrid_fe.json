@@ -1,0 +1,618 @@
+{
+  "dataset": "benchmarks/data/phase3_hybrid_e2e_20.json",
+  "topk": 3,
+  "cases": 20,
+  "by_mode": {
+    "fts": {
+      "passed": 9,
+      "total": 20,
+      "rate": 0.45
+    },
+    "vec": {
+      "passed": 19,
+      "total": 20,
+      "rate": 0.95
+    },
+    "fusion": {
+      "passed": 19,
+      "total": 20,
+      "rate": 0.95
+    }
+  },
+  "by_category": {
+    "lexical": {
+      "fts": {
+        "passed": 9,
+        "total": 10
+      },
+      "vec": {
+        "passed": 10,
+        "total": 10
+      },
+      "fusion": {
+        "passed": 10,
+        "total": 10
+      }
+    },
+    "semantic": {
+      "fts": {
+        "passed": 0,
+        "total": 10
+      },
+      "vec": {
+        "passed": 9,
+        "total": 10
+      },
+      "fusion": {
+        "passed": 9,
+        "total": 10
+      }
+    }
+  },
+  "rows": [
+    {
+      "case_id": "E01",
+      "category": "lexical",
+      "fts": {
+        "top3": [
+          "M05",
+          "M01",
+          "M02"
+        ],
+        "hit": true
+      },
+      "vec": {
+        "top3": [
+          "M08",
+          "M05",
+          "M03"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M05",
+          "M08",
+          "M03"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E02",
+      "category": "lexical",
+      "fts": {
+        "top3": [
+          "M06",
+          "M01",
+          "M02"
+        ],
+        "hit": true
+      },
+      "vec": {
+        "top3": [
+          "M06",
+          "M01",
+          "M12"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M06",
+          "M01",
+          "M12"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E03",
+      "category": "lexical",
+      "fts": {
+        "top3": [
+          "M07",
+          "M01",
+          "M02"
+        ],
+        "hit": true
+      },
+      "vec": {
+        "top3": [
+          "M07",
+          "M12",
+          "M11"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M07",
+          "M12",
+          "M11"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E04",
+      "category": "lexical",
+      "fts": {
+        "top3": [
+          "M05",
+          "M01",
+          "M02"
+        ],
+        "hit": true
+      },
+      "vec": {
+        "top3": [
+          "M05",
+          "M03",
+          "M08"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M05",
+          "M03",
+          "M08"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E05",
+      "category": "lexical",
+      "fts": {
+        "top3": [
+          "M06",
+          "M01",
+          "M02"
+        ],
+        "hit": true
+      },
+      "vec": {
+        "top3": [
+          "M06",
+          "M07",
+          "M12"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M06",
+          "M07",
+          "M12"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E06",
+      "category": "lexical",
+      "fts": {
+        "top3": [
+          "M07",
+          "M01",
+          "M02"
+        ],
+        "hit": true
+      },
+      "vec": {
+        "top3": [
+          "M07",
+          "M04",
+          "M11"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M07",
+          "M04",
+          "M11"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E07",
+      "category": "lexical",
+      "fts": {
+        "top3": [
+          "M05",
+          "M01",
+          "M02"
+        ],
+        "hit": true
+      },
+      "vec": {
+        "top3": [
+          "M05",
+          "M12",
+          "M02"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M05",
+          "M12",
+          "M02"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E08",
+      "category": "lexical",
+      "fts": {
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit": false
+      },
+      "vec": {
+        "top3": [
+          "M10",
+          "M06",
+          "M12"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M10",
+          "M06",
+          "M12"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E09",
+      "category": "lexical",
+      "fts": {
+        "top3": [
+          "M07",
+          "M01",
+          "M02"
+        ],
+        "hit": true
+      },
+      "vec": {
+        "top3": [
+          "M09",
+          "M07",
+          "M02"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M07",
+          "M09",
+          "M02"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E10",
+      "category": "lexical",
+      "fts": {
+        "top3": [
+          "M05",
+          "M01",
+          "M02"
+        ],
+        "hit": true
+      },
+      "vec": {
+        "top3": [
+          "M05",
+          "M04",
+          "M09"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M05",
+          "M04",
+          "M09"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E11",
+      "category": "semantic",
+      "fts": {
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit": false
+      },
+      "vec": {
+        "top3": [
+          "M10",
+          "M14",
+          "M06"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M10",
+          "M14",
+          "M06"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E12",
+      "category": "semantic",
+      "fts": {
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit": false
+      },
+      "vec": {
+        "top3": [
+          "M10",
+          "M07",
+          "M11"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M10",
+          "M07",
+          "M11"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E13",
+      "category": "semantic",
+      "fts": {
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit": false
+      },
+      "vec": {
+        "top3": [
+          "M10",
+          "M07",
+          "M05"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M10",
+          "M07",
+          "M05"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E14",
+      "category": "semantic",
+      "fts": {
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit": false
+      },
+      "vec": {
+        "top3": [
+          "M10",
+          "M07",
+          "M06"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M10",
+          "M07",
+          "M06"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E15",
+      "category": "semantic",
+      "fts": {
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit": false
+      },
+      "vec": {
+        "top3": [
+          "M10",
+          "M07",
+          "M11"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M10",
+          "M07",
+          "M11"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E16",
+      "category": "semantic",
+      "fts": {
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit": false
+      },
+      "vec": {
+        "top3": [
+          "M10",
+          "M13",
+          "M05"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M10",
+          "M13",
+          "M05"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E17",
+      "category": "semantic",
+      "fts": {
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit": false
+      },
+      "vec": {
+        "top3": [
+          "M10",
+          "M12",
+          "M09"
+        ],
+        "hit": false
+      },
+      "fusion": {
+        "top3": [
+          "M10",
+          "M12",
+          "M09"
+        ],
+        "hit": false
+      }
+    },
+    {
+      "case_id": "E18",
+      "category": "semantic",
+      "fts": {
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit": false
+      },
+      "vec": {
+        "top3": [
+          "M10",
+          "M07",
+          "M03"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M10",
+          "M07",
+          "M03"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E19",
+      "category": "semantic",
+      "fts": {
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit": false
+      },
+      "vec": {
+        "top3": [
+          "M10",
+          "M14",
+          "M05"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M10",
+          "M14",
+          "M05"
+        ],
+        "hit": true
+      }
+    },
+    {
+      "case_id": "E20",
+      "category": "semantic",
+      "fts": {
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit": false
+      },
+      "vec": {
+        "top3": [
+          "M06",
+          "M10",
+          "M12"
+        ],
+        "hit": true
+      },
+      "fusion": {
+        "top3": [
+          "M06",
+          "M10",
+          "M12"
+        ],
+        "hit": true
+      }
+    }
+  ],
+  "gates": {
+    "G3-Hybrid": false
+  },
+  "overall": false
+}

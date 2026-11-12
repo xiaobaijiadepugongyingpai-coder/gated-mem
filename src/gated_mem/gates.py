@@ -25,6 +25,16 @@ GAMMA_DEFAULT = 0.2
 TOPK_DEFAULT = 5
 MAX_DEPTH_DEFAULT = 8
 
+# --- 有界校准融合常数（GM-DIRECTIVE-P3-v2.2.0 §3.1）---
+# alpha 是向量通道权重；1-alpha 给 FTS 通道。默认 0.60 略偏向量。
+ALPHA_DEFAULT = 0.60
+# 米氏饱和常数：bm25 原始正分达到 5.0 时映射到 0.5。
+KB_DEFAULT = 5.0
+# 槽位精确命中奖励。
+BETA_SLOT_DEFAULT = 0.15
+# FTS 单通道保底系数：防止专有名词精确命中被向量平均稀释。
+FTS_FLOOR_RATIO = 0.85
+
 
 def compute_t0(mem_type: MemoryType, input_weight: float) -> float:
     """t0 = t0_base(type) * (0.5 + input_weight)。
@@ -112,6 +122,52 @@ def compute_relevance(query_tokens: frozenset, doc_tokens: frozenset) -> float:
     if overlap == 0:
         return 0.0
     return overlap / math.sqrt(len(query_tokens) * len(doc_tokens))
+
+
+def saturate_bm25(raw_score: float, kb: float = KB_DEFAULT) -> float:
+    """米氏饱和函数：s = b / (b + kb)，把 b>=0 映射到 [0, 1)。
+
+    性质（这是它优于 Min-Max 的关键）：
+      - b=0 时 s=0，绝不会把微弱噪音放大到 1.0
+      - b 单调递增、有上界，批次内无「相对拉伸」语义
+      - 不需要知道整批候选的分布，因此天然支持单条打分与增量更新
+    """
+    if raw_score <= 0.0:
+        return 0.0
+    return raw_score / (raw_score + kb)
+
+
+def bm25_to_positive(bm25_value: float) -> float:
+    """FTS5 的 bm25() 返回负数且越负越相关，转成非负原始分。"""
+    v = -float(bm25_value)
+    return v if v > 0.0 else 0.0
+
+
+def calibrated_fusion(
+    s_vec: float,
+    s_fts: float,
+    slot_hit: bool = False,
+    alpha: float = ALPHA_DEFAULT,
+    beta_slot: float = BETA_SLOT_DEFAULT,
+) -> float:
+    """有界校准融合，返回 rel(q, v) ∈ [0, 1]。
+
+    公式（终审钦定闭式解）：
+        blended = alpha * s_vec + (1 - alpha) * s_fts
+        floored = max(blended, 0.85 * s_fts)        # FTS 保底，防专名被稀释
+        rel     = min(1.0, floored + beta_slot * I(slot_hit))
+
+    为什么不用 RRF：标准 RRF 的第 1 名与第 10 名分差仅 1.14 倍，
+    而生命力门控 [F]^0.3 的动态范围可达 5.5 倍，相乘会把相关性差异抹平。
+    有界校准融合保持绝对可比性，且有硬上界 1.0。
+    """
+    a = alpha if 0.0 <= alpha <= 1.0 else ALPHA_DEFAULT
+    sv = s_vec if s_vec > 0.0 else 0.0
+    sf = s_fts if s_fts > 0.0 else 0.0
+    blended = a * sv + (1.0 - a) * sf
+    floored = blended if blended > FTS_FLOOR_RATIO * sf else FTS_FLOOR_RATIO * sf
+    rel = floored + (beta_slot if slot_hit else 0.0)
+    return 1.0 if rel > 1.0 else rel
 
 
 def rank_by_score(
