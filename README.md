@@ -89,6 +89,11 @@ gated-mem export-html -o memory_graph.html
 an exported graph looks like — 15 nodes, drag to pan, scroll to zoom, click any node, and use
 the Step slider at the bottom to scrub back through time.
 
+![Gated-Mem exported graph](docs/demo_screenshot.png)
+
+*Real output from `gated-mem export-html`. Green = active, red = superseded, purple = pinned,
+yellow ring = stale ancestor. The side panel shows the `[Replaced: webpack]` evolution trace.*
+
 ---
 
 ## DeepSeek Harness (`dsh`) is a First-Class Citizen
