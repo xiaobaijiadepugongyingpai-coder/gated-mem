@@ -365,10 +365,39 @@ def _doc_text(node: MemoryNode) -> str:
 
 
 def _fts_query(query: str) -> str:
-    """把自然语言 query 转成 FTS5 安全查询串（去掉 FTS 语法字符）。"""
+    """把自然语言 query 转成 FTS5 安全查询串。
+
+    确定性铁律：tokenize() 返回 frozenset，直接切片会受 PYTHONHASHSEED 影响，
+    导致同一个 query 在不同进程里丢掉不同的 token（实测 ERR_PG_42P01 会随机消失）。
+    因此这里必须先 sorted()，再按「信息量」排序，优先保留高价值的专有名词：
+
+      1. 含下划线/数字/驼峰的长 ASCII 复合词（ERR_PG_42P01、max_wal_size）
+      2. 其他 ASCII 词
+      3. 中文二元组（长度 2）
+      4. 中文单字（长度 1）
+
+    排序键完全相同的情况下再按字典序，保证跨进程逐字节一致。
+    """
     tokens = [t for t in tokenize(query) if t.isalnum() or len(t) > 1]
     safe = [t for t in tokens if not any(ch in t for ch in '"\':*^()-')]
-    return " OR ".join(safe[:20])
+
+    def rank(tok):
+        """信息量降序：复合 ASCII > 普通 ASCII > 中文二元组 > 中文单字。"""
+        has_special = any(ch in tok for ch in "_-0123456789")
+        is_ascii = tok.isascii()
+        if is_ascii and has_special:
+            tier = 0
+        elif is_ascii:
+            tier = 1
+        elif len(tok) >= 2:
+            tier = 2
+        else:
+            tier = 3
+        # 同 tier 内：更长的更值钱；最后用字典序兜底保证确定性
+        return (tier, -len(tok), tok)
+
+    ordered = sorted(safe, key=rank)
+    return " OR ".join(ordered[:20])
 
 
 def _approx_tokens(text: str) -> int:

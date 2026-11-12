@@ -198,12 +198,50 @@ def cmd_remember(args) -> int:
         created_step=step,
         last_cited_step=step,
     )
+    # 必须走两阶段槽位裁决，否则 CLI 写入永远不会触发覆盖，
+    # 导致旧决策一直 active（命令行与 MCP 两条写入路径行为不一致）。
+    from . import conflicts
+
+    decision, olds = conflicts.decide(
+        store,
+        {"content": node.content},
+        node.subject,
+        node.predicate,
+        node.scope,
+    )
+
+    if decision == conflicts.CANDIDATE_CONFLICT:
+        conflicted = conflicts.mark_candidate_conflict(store, node, olds, step)
+        print(p("⚠ 已挂起为候选冲突", "yellow"))
+        print("  memory_id: %s" % conflicted.memory_id)
+        print("  与 %s 槽位相同但内容不明确，待人工裁决"
+              % ",".join(o.memory_id for o in olds))
+        print("  用 gated-mem resolve %s --keep-new|--keep-old" % conflicted.memory_id)
+        store.close()
+        return 0
+
     eid = store.insert_memory(node)
+    action = "CREATED"
+    if decision == conflicts.SUPERSEDES and olds:
+        updated = conflicts.apply_supersede(
+            store, node, olds, step, reason=args.residual_diff
+        )
+        store.conn.execute(
+            "UPDATE memories SET residual_diff=? WHERE memory_id=?",
+            (updated.residual_diff, node.memory_id),
+        )
+        action = "SUPERSEDED"
+
     p = Paint()
     print(p("✓ 已写入", "green"))
     print("  memory_id: %s" % node.memory_id)
     print("  event_id : %s" % eid)
-    if args.residual_diff:
+    print("  action   : %s" % action)
+    if action == "SUPERSEDED":
+        for o in olds:
+            print("  覆盖    : %s -> superseded" % o.memory_id)
+        print("  residual : %s" % (updated.residual_diff or ""))
+    elif args.residual_diff:
         print("  residual : %s" % node.residual_diff)
     store.close()
     return 0
@@ -214,7 +252,9 @@ def cmd_query(args) -> int:
     store = open_store(args)
     provider = get_default_provider(os.environ.get("GATED_MEM_EMBEDDING", "builtin"))
     r = Retriever(store, topk=args.top_k, provider=provider)
-    receipt = r.recall(args.text, topk=args.top_k, write_event=False)
+    # 默认落盘 RECALL_DELIVERED，否则用户跑完 query 再 explain 必然查不到。
+    # --dry-run 可显式关闭（不写事件、不刷新引用）。
+    receipt = r.recall(args.text, topk=args.top_k, write_event=not args.dry_run)
     p = Paint()
     print(p("当前有效记忆", "bold", "green"))
     if not receipt.injected_items:
@@ -227,6 +267,9 @@ def cmd_query(args) -> int:
         print(p("\n演进轨迹", "bold", "magenta"))
         for tr in receipt.evolution_traces:
             print("  ↳ %s" % tr.residual_diff)
+    if receipt.recall_event_id and not args.dry_run:
+        print(p("\n回执事件: %s" % receipt.recall_event_id, "gray"))
+        print(p("  用 gated-mem explain 查看完整回执", "gray"))
     store.close()
     return 0
 
@@ -300,6 +343,20 @@ def cmd_explain(args) -> int:
         print(p("\n  ⚠ 祖先废弃告警", "yellow"))
         for w in warns:
             print("    %s -> %s" % (w.get("memory_id"), ",".join(w.get("stale_ancestor_ids", []))))
+
+    # 演进轨迹：payload 里只存了 id，这里回表取 residual_diff 渲染出来
+    trace_ids = payload.get("evolution_trace_ids") or []
+    rendered = []
+    for mid in trace_ids:
+        node = store.get_memory(mid)
+        if node is not None and node.residual_diff:
+            rendered.append((mid, node.residual_diff))
+    if rendered:
+        print(p("\n  演进轨迹（[Replaced: ...]）", "magenta"))
+        for mid, diff in rendered:
+            print("    %s  %s" % (p(mid, "cyan"), diff))
+    else:
+        print(p("\n  演进轨迹: 无", "gray"))
     store.close()
     return 0
 
@@ -447,6 +504,8 @@ def build_parser() -> argparse.ArgumentParser:
     q = sub.add_parser("query", help="检索记忆")
     q.add_argument("text")
     q.add_argument("--top-k", dest="top_k", type=int, default=5)
+    q.add_argument("--dry-run", dest="dry_run", action="store_true",
+                   help="不写入 RECALL_DELIVERED 事件（评测用）")
     q.set_defaults(func=cmd_query)
 
     lg = sub.add_parser("log", help="演进历史")

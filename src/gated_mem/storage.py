@@ -250,7 +250,9 @@ class Store(object):
                 " source_event_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
                     node.memory_id,
-                    node.project_id,
+                    # 以 store 的 project_id 为准：调用方构造 MemoryNode 时常不传 project_id，
+                    # 若用 node.project_id 会把节点写进 'default' 库，导致跨实例读不到。
+                    self.project_id,
                     node.content,
                     node.memory_type.value,
                     node.subject,
@@ -367,11 +369,15 @@ class Store(object):
         return eid
 
     def touch_citation(self, memory_id: str, step: int) -> None:
-        """刷新 last_cited_step 与 citation_count。"""
+        """刷新 last_cited_step 与 citation_count。
+
+        连接是 isolation_level=None（自动提交），因此不需要显式 commit；
+        但必须带 project_id 约束，避免跨项目误改同名节点。
+        """
         self.conn.execute(
             "UPDATE memories SET last_cited_step = ?, citation_count = citation_count + 1"
-            " WHERE memory_id = ?",
-            (step, memory_id),
+            " WHERE memory_id = ? AND project_id = ?",
+            (step, memory_id, self.project_id),
         )
 
     # -- 边 -------------------------------------------------------------

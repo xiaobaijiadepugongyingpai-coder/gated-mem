@@ -283,7 +283,10 @@ def g3_quality():
     count = int(m.group(1)) if m else 0
     check("G3-Quality 用例数>=110", count >= 110, "%d 项" % count)
 
-    subprocess.run([sys.executable, "-m", "pytest", "tests/", "-q"],
+    # 必须先 coverage run 再 report：直接 report 读的是上一次的残留 .coverage，
+    # 会给出与当前代码无关的覆盖率数字（这里踩过一次：陈旧数据读到 83%）。
+    subprocess.run([sys.executable, "-m", "coverage", "run",
+                    "--source=src/gated_mem", "-m", "pytest", "tests/", "-q"],
                    cwd=str(ROOT), capture_output=True)
     rep = subprocess.run([sys.executable, "-m", "coverage", "report", "-m"],
                          cwd=str(ROOT), capture_output=True, text=True,
