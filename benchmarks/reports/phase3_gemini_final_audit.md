@@ -287,3 +287,28 @@
 
 **监察官签名**：`Gemini-3.8-Flash (Auditor)`  
 **签署时间戳**：`2026-11-12T17:25:00+08:00`
+
+
+---
+
+## 七、 缺陷修复终审复核（Recheck 附录）
+
+> 详细评测与实测数据见独立报告：[phase3_audit_recheck.md](benchmarks/reports/phase3_audit_recheck.md)
+
+1. **P1-1 `_fts_query` 无序 Set 切片**：**【CLOSED】**
+   - 在 7 组哈希种子下跨进程实测 100% 逐字符全等；
+   - 专有 Token `ERR_PG_42P01`、`max_wal_size`、`pghost_addr` 经信息量分层算法排序稳居前列；
+   - E2E 评测集 lexical 组命中率从 6/10 稳定拉升至 10/10。
+2. **P1-2 `touch_citation` 约束与隔离**：**【CLOSED / NOT_A_BUG】**
+   - 连接为 `isolation_level=None`（自动提交），commit 质疑定性为 NOT_A_BUG；
+   - 追加 `AND project_id = ?`，`insert_memory` 归一化为 `store.project_id`；
+   - 双实例读写与跨项目隔离实测通过。
+3. **P2-1 CLI `query` 事件落盘与 `explain`**：**【CLOSED】**
+   - 默认落盘 `RECALL_DELIVERED`，回显事件 ID，`explain` 解析成功；
+   - `--dry-run` 严格 0 增长。
+4. **P2-2 `explain` 展示 `evolution_traces`**：**【CLOSED】**
+   - 终端成功高亮打印 `演进轨迹（[Replaced: ...]）`。
+5. **额外项 CLI `remember` 裁决链路**：**【STILL_BROKEN (新引入阻塞缺陷)】**
+   - `SUPERSEDES` 覆盖路径工作正常；
+   - 但在 `CANDIDATE_CONFLICT` 挂起路径中（`src/gated_mem/cli.py:215`），因 `p = Paint()` 被写在第 235 行，直接触发 `UnboundLocalError: local variable 'p' referenced before assignment` 导致命令行崩溃。
+   - **整改建议**：将 `p = Paint()` 提升至 `cmd_remember` 函数开头（第 182 行）即可。

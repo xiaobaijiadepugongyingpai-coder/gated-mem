@@ -179,6 +179,7 @@ def cmd_doctor(args) -> int:
 def cmd_remember(args) -> int:
     """写入一条记忆。"""
     store = open_store(args)
+    p = Paint()
     provider = get_default_provider(os.environ.get("GATED_MEM_EMBEDDING", "builtin"))
     step = int(
         (store.conn.execute("SELECT MAX(step) AS s FROM memory_events").fetchone()["s"] or 0)
@@ -232,7 +233,6 @@ def cmd_remember(args) -> int:
         )
         action = "SUPERSEDED"
 
-    p = Paint()
     print(p("✓ 已写入", "green"))
     print("  memory_id: %s" % node.memory_id)
     print("  event_id : %s" % eid)
