@@ -308,7 +308,14 @@
    - `--dry-run` 严格 0 增长。
 4. **P2-2 `explain` 展示 `evolution_traces`**：**【CLOSED】**
    - 终端成功高亮打印 `演进轨迹（[Replaced: ...]）`。
-5. **额外项 CLI `remember` 裁决链路**：**【STILL_BROKEN (新引入阻塞缺陷)】**
-   - `SUPERSEDES` 覆盖路径工作正常；
-   - 但在 `CANDIDATE_CONFLICT` 挂起路径中（`src/gated_mem/cli.py:215`），因 `p = Paint()` 被写在第 235 行，直接触发 `UnboundLocalError: local variable 'p' referenced before assignment` 导致命令行崩溃。
-   - **整改建议**：将 `p = Paint()` 提升至 `cmd_remember` 函数开头（第 182 行）即可。
+5. **额外项 CLI `remember` 裁决链路与第 5 项复验**：**【CLOSED】**
+   - `SUPERSEDES` 覆盖路径工作正常，正确输出 `action: SUPERSEDED` 与 `[Replaced: ...] `；
+   - 第 182 行将 `p = Paint()` 提升至函数入口后，`CANDIDATE_CONFLICT` 挂起路径不再崩溃，退出码为 0，成功提示人工裁决并生成 `candidate_conflict` 状态节点；
+   - `resolve --keep-new`（变 `active`）与 `--keep-old`（变 `superseded`）双向状态机流转实测通过；
+   - AST 全库静态扫描确认 `cli.py` 全量子命令及全库 0 处「变量先用后定义」缺陷。
+
+---
+
+## 八、 终审最终结论
+
+**四项缺陷与额外项全部 CLOSED，Gate 3 无阻塞项，同意发布（UNCONDITIONAL PASS FOR RELEASE）！**

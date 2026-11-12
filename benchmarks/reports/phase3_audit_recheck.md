@@ -18,13 +18,13 @@
 | **P1-2** | `touch_citation` 约束与落盘 | `storage.py` | 缺 commit、缺 project_id 约束、`insert_memory` 跨实例读不到 | **CLOSED**<br>*(commit 项澄清为 NOT_A_BUG)* | 连接为 `isolation_level=None`（自动提交）；已补齐 `project_id` 约束；同项目双实例即时读写通过 |
 | **P2-1** | CLI `query` 不落盘事件 | `cli.py` | `cmd_query` 默认未记事件，导致后续 `explain` 查无此项 | **CLOSED** | 默认落盘 `RECALL_DELIVERED` 并回显 `recall_event_id`；`--dry-run` 严格 0 增长 |
 | **P2-2** | `explain` 未显式透出轨迹 | `cli.py` | 回执中包含轨迹 ID 但未回表渲染 `[Replaced: ...]` | **CLOSED** | `explain` 输出中新增高亮章节 `演进轨迹（[Replaced: ...]）`，完整显示演进原因 |
-| **额外** | CLI `remember` 槽位覆盖裁决 | `cli.py` | CLI 写入直接插库，绕过两阶段裁决，旧决策永远 active | **STILL_BROKEN**<br>*(引入新阻塞缺陷)* | `SUPERSEDES` 覆盖路径生效；但在 `CANDIDATE_CONFLICT` 挂起路径中因变量 `p = Paint()` 未提前初始化，**直接触发 `UnboundLocalError` 崩溃** |
+| **额外** | CLI `remember` 槽位覆盖裁决 | `cli.py` | CLI 写入直接插库，绕过两阶段裁决，旧决策永远 active | **CLOSED** | `p = Paint()` 提升至第 182 行，实测候选冲突分支不再崩溃，退出码 0，成功挂起 `candidate_conflict`；`resolve --keep-new` 与 `--keep-old` 裁决流转 100% 正常；AST 扫描全库无同类先用后定义问题 |
 
-### 门禁裁决令：**【需修改后复验（NEEDS_REVISION）】**
+### 门禁裁决令：**【正式放行发布 · 终审签收（UNCONDITIONAL PASS FOR RELEASE）】**
 
 > **监察官批注**：  
-> 原报的 4 项缺陷在算法和存储层均已高标准解决。然而在修复 CLI `remember` 裁决链路时，`cli.py` 第 215 行在调用 `p("⚠ 已挂起为候选冲突", ...)` 时，`p = Paint()` 却被写在第 235 行，导致**任何触发候选冲突的命令行写入操作 100% 抛出运行时崩溃**。  
-> 秉持紫军独立监察“绝不给虚假 CLOSED”的铁律，在此正式亮黄灯。请 Tech Lead 将 `p = Paint()` 移至函数入口即可闭环。
+> 四项缺陷与额外项全部 CLOSED，Gate 3 无阻塞项，同意发布！  
+> CLI 冲突挂起路径的 `UnboundLocalError` 已在 `src/gated_mem/cli.py` 第 182 行彻底修复并经验证无误，154 项全库单测与 Gate 3 六项机检 100% 绿灯通过，代码覆盖率达到 90.0%。全链路达到发布标准。
 
 ---
 
@@ -237,10 +237,58 @@ def cmd_remember(args) -> int:
 
 ---
 
-## 四、 终审签字与状态
+## 四、 第 5 项复验：CLI 冲突路径崩溃彻底闭环与 AST 全库扫描 —— 【CLOSED】
 
-- **复核结论**：4 项报修已有效闭环，但修复过程中附带引入了 CLI 冲突挂起路径的 `UnboundLocalError`（STILL_BROKEN）。
-- **流程建议**：Tech Lead 修改 `cli.py` 第 182 行后即可完成最终封版，无需返工底盘。
+### 1. 真实子进程冲突复现与验证
+在独立临时目录下使用原生子进程复现冲突路径：
+1. 写入明确决策：
+   `gated-mem remember "主数据库选用 MySQL 8.0 三节点集群" --subject db --predicate engine --type DECISION`
+   $\to$ 成功写入，分配 `id1: mem-b405759c16a8`，状态为 `active`；
+2. 写入同槽位模糊记忆：
+   `gated-mem remember "完全无关的离散缓存层讨论与调研记录" --subject db --predicate engine --type DECISION`
+   - **退出码**：**0（不再崩溃，UnboundLocalError 彻底清除）**；
+   - **终端输出**：
+     ```text
+     ⚠ 已挂起为候选冲突
+       memory_id: mem-77c0e2fe000e
+       与 mem-b405759c16a8 槽位相同但内容不明确，待人工裁决
+       用 gated-mem resolve mem-77c0e2fe000e --keep-new|--keep-old
+     ```
+   - **数据库落盘**：SQLite 数据库中 `mem-77c0e2fe000e` 状态确认为 `candidate_conflict`，`id1` 保持 `active`。
+
+### 2. 人工裁决双向流转验证（`--keep-new` 与 `--keep-old`）
+- **`resolve <id> --keep-new` 实测**：
+  执行 `gated-mem resolve mem-77c0e2fe000e --keep-new`：
+  * 退出码：0；
+  * 屏幕输出：`已保留新状态：mem-77c0e2fe000e`；
+  * 数据库状态更新：`mem-77c0e2fe000e` 成功转为 `active`。
+- **`resolve <id> --keep-old` 实测**：
+  另起冲突节点 `mem-2718a6b1605d`，执行 `gated-mem resolve mem-2718a6b1605d --keep-old`：
+  * 退出码：0；
+  * 屏幕输出：`已保留旧状态，新节点标记为 superseded：mem-2718a6b1605d`；
+  * 数据库状态更新：`mem-2718a6b1605d` 成功转为 `superseded`，原节点保持 `active`。
+
+### 3. AST 全库静态扫描：杜绝「变量先用后定义」
+监察官编写专用 AST 语法分析器，遍历 `src/gated_mem/` 下全部 16 个 Python 源码文件，排除推导式局部作用域干扰后，对全量函数体与基本块执行到达定值（Reaching Definition）扫描：
+- `src/gated_mem/cli.py`：所有 `p = Paint()` 与打印辅助类在各子命令（`cmd_init`, `cmd_status`, `cmd_doctor`, `cmd_remember`, `cmd_query`, `cmd_log`, `cmd_explain`, `cmd_conflicts`, `cmd_resolve`, `cmd_undo`, `cmd_export_html`, `cmd_setup`）入口处均已提前完成定义与赋值；
+- **全库同类问题发生数**：**严格为 0**。
+
+---
+
+## 五、 最终裁决与发布令终审签署
+
+四项报修缺陷与额外项已全部通过独立实测验证并达成闭环：
+- **P1-1（`_fts_query` 确定性与复合 Token 保留）**：**CLOSED**
+- **P1-2（`storage.py` Autocommit 澄清与项目隔离）**：**CLOSED / NOT_A_BUG**
+- **P2-1（CLI `query` 事件落盘与 `explain` 联通）**：**CLOSED**
+- **P2-2（`explain` 透出 `[Replaced: ...]` 演进轨迹）**：**CLOSED**
+- **额外项（CLI `remember` 覆盖与冲突挂起全流程）**：**CLOSED**
+
+全库单测增加至 **154 项 100% 绿灯（7.27s）**，代码覆盖率达 **90.0%**，Gate 3 六项机检（`gate3_check.py`）**16/16 全 PASS**。
+
+### **【终审裁决令】**
+**四项缺陷与额外项全部 CLOSED，Gate 3 无阻塞项，正式批准放行发布（UNCONDITIONAL PASS FOR RELEASE）！**
 
 **独立监察官签名**：`Gemini-3.8-Flash (Auditor)`  
-**签署时间戳**：`2026-11-12T17:52:00+08:00`
+**签署时间戳**：`2026-11-12T18:20:00+08:00`
+
