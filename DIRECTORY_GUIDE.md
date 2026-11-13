@@ -63,7 +63,8 @@
 │   ├── 📄 phase3_executive_adjudication_dossier.md# 阶段 3：阶段三综合执行审计与开源发布裁决案卷
 │   ├── 📄 phase4_execution_directive.md           # 阶段 4：v1.0.0 开源发布令与阶段四执行指令 (GM-DIRECTIVE-P4-v3.0.0)
 │   ├── 📄 phase4_executive_adjudication_dossier.md# 阶段 4：阶段四发版终审与全项目结项总案卷 (GM-DOSSIER-P4-v4.0.0)
-│   └── 📄 phase5_release_and_supplementary_experiments.md # 阶段 5：【最新统筹】v1.0.0 发版、E3 破局实验与 v1.1 基准集成蓝图 (GM-DIRECTIVE-P5-v5.0.0)
+│   ├── 📄 phase5_release_and_supplementary_experiments.md # 阶段 5：v1.0.0 发版、E3 破局实验与 v1.1 基准集成蓝图 (GM-DIRECTIVE-P5-v5.0.0)
+│   └── 📄 phase5_executive_adjudication_verdict.md# 阶段 5：【终审裁决】战地对账终审裁决书与正式上线令 (GM-VERDICT-P5-FINAL-v1.0.1)
 │
 ├── 📂 benchmarks/                    # 【基准】阶段一/二/三/四基准测试体系与报告
 │   ├── 📜 CONTRACT.md                             # 阶段一冻结契约 (12 节严格技术规范)
