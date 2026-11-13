@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import os
 import shutil
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -98,6 +99,14 @@ class DshAdapter(BaseAgentAdapter):
             )
             return candidates[0].name
         except (PermissionError, OSError):
+            # 审计发现（P2）：静默回退会让 install() 把配置写进一个用户根本不存在的
+            # "desktop" profile —— 用户看到"安装成功"，但 DSH 永远不会加载它。
+            # 这里在 stderr 明确警示，让不可靠的推断至少是可见的。
+            sys.stderr.write(
+                "[gated-mem] 警告：无法枚举 %s 下的 profile（权限受限），"
+                "已回退到 'desktop'。若该 profile 实际不存在，本次安装写入的配置不会生效；"
+                "请用 --profile 显式指定，或修复目录权限后重试。\n" % (self.dsh_home() / "profiles",)
+            )
             return "desktop"
 
     # -- 配置生成 -------------------------------------------------------

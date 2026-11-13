@@ -5,7 +5,7 @@
 
 <p align="center">
 
-![Tests](https://img.shields.io/badge/Tests-176%20Passed-brightgreen)
+![Tests](https://img.shields.io/badge/Tests-181%20Passed-brightgreen)
 ![Coverage](https://img.shields.io/badge/Coverage-90%25-brightgreen)
 ![Python](https://img.shields.io/badge/Python-%3E%3D3.9-blue)
 ![Dependencies](https://img.shields.io/badge/Core%20Dependencies-Zero-success)
@@ -46,10 +46,23 @@ version symbol. Neither single channel can finish the job:
 | :--- | ---: | ---: | :--- |
 | **A1 pure vector** | 50.00% | 95.00% | Finds the right *module* (90%), can't separate `.37/.38/.39` (55%) |
 | **A2 pure FTS5** | 50.00% | 100.00% | Locks the exact version, but A and B score **identically** — no module signal at all |
-| **A3 pure slot** | 20.00% | 50.00% | Subject/predicate substring only |
+| **A3 pure slot** | 20.00% | 50.00% | ⚠️ See note — degenerates to "always answer M01" (20%) |
 | **A4 fused** | **90.00%** | **100.00%** | Locks *both* dimensions simultaneously |
 
 **Net gain over the strongest single channel: +40.00pp** (vs **+0.00pp** in Phase 4).
+
+> ⚠️ **A3 is a degenerate baseline, and we are flagging it rather than hiding it.**
+> In this benchmark every query refers to its module by paraphrase, so `subject`/`predicate`
+> never appear as substrings — `slot_hit` is 0 for all 20 cases. A3 therefore always ranks
+> `M01` first, and its 20.00% is exactly the "always answer M01" constant baseline.
+> The slot mechanism contributes **zero** on this task. The table's honest reading is:
+> **two real baselines (A1, A2) and one degenerate one (A3)**, not three real baselines.
+> We keep it visible because removing it would look like we only show the comparisons we win.
+
+> **Scope of this claim.** This result is about *cross-module symbol collision* specifically.
+> On the Phase-4 general hard-negative set, fusion's net gain over pure FTS5 was
+> **+0.00pp** — both already at 100%. The correct statement is "fusion is necessary when
+> symbols collide across modules", **not** "fusion always beats FTS5".
 
 ### The part most benchmarks hide
 
@@ -292,7 +305,7 @@ try. Semantic mode is opt-in, and `doctor` tells you which tier is active.
 ## Verifying the Claims
 
 ```bash
-python -m pytest tests/ -q                       # 176 tests
+python -m pytest tests/ -q                       # 181 tests
 python -m coverage run --source=src/gated_mem -m pytest tests/ -q
 python -m coverage report -m                     # 90%
 python benchmarks/gate3_check.py                 # 16/16 release gates
