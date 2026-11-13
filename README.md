@@ -66,7 +66,11 @@ We instrumented the tie-breaks:
 **Every single FTS5 win is a coin flip.** BM25 gives the two colliding versions
 *identical* scores, so the channel carries no module information and falls back to
 sort order. Fusion's 90%, by contrast, is earned entirely from genuine score
-separation — it also rescues 3 of the 5 cases where *all three* single channels fail.
+separation — it also rescues **4** of the 5 cases where *all three* single channels fail.
+
+Split by dimension it is equally clean: the vector channel identifies the right **module**
+90% of the time but the right **version** only 55%; FTS5 gets the module **50%** (pure coin
+flip) and the version **100%**. Only fusion reaches the ceiling on **both**, 90% / 100%.
 
 ### Where we did not hit our own target
 
