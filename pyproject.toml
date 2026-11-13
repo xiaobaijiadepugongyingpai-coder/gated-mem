@@ -71,10 +71,10 @@ dev = [
 gated-mem = "gated_mem.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/gated-mem/gated-mem"
-Repository = "https://github.com/gated-mem/gated-mem"
-Issues = "https://github.com/gated-mem/gated-mem/issues"
-Documentation = "https://github.com/gated-mem/gated-mem#readme"
+Homepage = "https://github.com/xiaobaijiadepugongyingpai-coder/gated-mem"
+Repository = "https://github.com/xiaobaijiadepugongyingpai-coder/gated-mem"
+Issues = "https://github.com/xiaobaijiadepugongyingpai-coder/gated-mem/issues"
+Documentation = "https://github.com/xiaobaijiadepugongyingpai-coder/gated-mem#readme"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
