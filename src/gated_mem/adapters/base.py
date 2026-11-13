@@ -24,6 +24,20 @@ class AdapterError(RuntimeError):
     """适配器安装/配置错误。"""
 
 
+def _safe_path_exists(p: Path) -> bool:
+    """在受限沙箱或无权限目录中安全探测路径是否存在，绝不向上抛出 OS 权限异常。
+
+    背景（GM-VERDICT-P5-FINAL-v1.0.1）：阶段五只给子类 dsh.py 打了权限补丁，
+    漏掉了父类这里直接调用 path.exists() 的几处，导致 Windows 受限目录下
+    doctor / uninstall 会抛 PermissionError。探测类操作必须永远可降级：
+    无法确认存在时一律当作"不存在"，而不是把异常抛给调用方。
+    """
+    try:
+        return p.exists()
+    except (PermissionError, OSError):
+        return False
+
+
 class BaseAgentAdapter(object):
     """宿主 Agent 适配器基类。"""
 
@@ -98,7 +112,7 @@ class BaseAgentAdapter(object):
     def _write_json(self, path: Path, obj: Any) -> None:
         """JSON 写入，保留已有文件的其他键（幂等合并）。"""
         merged = obj
-        if path.exists():
+        if _safe_path_exists(path):
             try:
                 existing = json.loads(path.read_text(encoding="utf-8"))
                 if isinstance(existing, dict) and isinstance(obj, dict):
@@ -111,7 +125,7 @@ class BaseAgentAdapter(object):
 
     def is_installed_at(self, project_dir: Path) -> bool:
         """Gated-Mem 是否已在该项目里挂载过。"""
-        return any(p.exists() for p in self.config_paths(project_dir))
+        return any(_safe_path_exists(p) for p in self.config_paths(project_dir))
 
     # -- 卸载（P4 §3.3：来去无痕）---------------------------------------
     def uninstall(self, project_dir: Path, dry_run: bool = False) -> List[str]:
@@ -124,7 +138,7 @@ class BaseAgentAdapter(object):
         removed: List[str] = []
         for path in self.config_paths(project_dir):
             removed.append(str(path))
-            if dry_run or not path.exists():
+            if dry_run or not _safe_path_exists(path):
                 continue
             try:
                 path.unlink()

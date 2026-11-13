@@ -242,3 +242,61 @@ def test_project_id_is_stable_and_path_based(tmp_path):
 def test_all_adapters_have_prompt_snippet():
     for ad in adapter_base.all_adapters():
         assert len(ad.get_system_prompt_snippet()) > 50
+
+# -- 基类权限防御（GM-VERDICT-P5-FINAL-v1.0.1 §3.1）-------------------------
+# 异构黑盒审计发现：只给子类 dsh.py 打补丁会漏掉父类的探测路径，
+# 受限沙箱下 is_installed_at() / uninstall() / _write_json() 会抛 PermissionError。
+def test_safe_path_exists_swallows_permission_error(monkeypatch):
+    """_safe_path_exists 对被拒路径返回 False，绝不向上抛异常。"""
+    def deny(self):
+        raise PermissionError("denied by ACL")
+
+    monkeypatch.setattr(Path, "exists", deny)
+    assert adapter_base._safe_path_exists(Path("whatever")) is False
+
+
+def test_safe_path_exists_swallows_oserror(monkeypatch):
+    """OSError 同样必须被吞掉。"""
+    def deny(self):
+        raise OSError("boom")
+
+    monkeypatch.setattr(Path, "exists", deny)
+    assert adapter_base._safe_path_exists(Path("whatever")) is False
+
+
+def test_is_installed_at_survives_permission_error(monkeypatch):
+    """受限目录下 is_installed_at 降级为 False，不崩溃。"""
+    def deny(self):
+        raise PermissionError("denied by ACL")
+
+    monkeypatch.setattr(Path, "exists", deny)
+    assert ClaudeCodeAdapter().is_installed_at(Path(".")) is False
+
+
+def test_uninstall_survives_permission_error(monkeypatch):
+    """受限目录下 uninstall 仍返回路径清单，不崩溃、不误删。"""
+    def deny(self):
+        raise PermissionError("denied by ACL")
+
+    monkeypatch.setattr(Path, "exists", deny)
+    removed = ClaudeCodeAdapter().uninstall(Path("."))
+    assert isinstance(removed, list) and removed
+
+
+def test_write_json_survives_permission_error_on_probe(monkeypatch, tmp_path):
+    """_write_json 探测已有文件被拒时，退化为直接写入而不是崩溃。"""
+    calls = {"n": 0}
+    real_exists = Path.exists
+
+    def flaky(self):
+        # 第一次探测（合并已有配置）被拒，之后恢复正常
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise PermissionError("denied by ACL")
+        return real_exists(self)
+
+    monkeypatch.setattr(Path, "exists", flaky)
+    target = tmp_path / "cfg.json"
+    ClaudeCodeAdapter()._write_json(target, {"mcpServers": {"gated-mem": {}}})
+    assert target.exists()
+    assert "gated-mem" in json.loads(target.read_text(encoding="utf-8"))["mcpServers"]
