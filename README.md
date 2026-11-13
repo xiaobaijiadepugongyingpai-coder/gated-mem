@@ -13,6 +13,17 @@
 
 </p>
 
+<p align="center">
+  <img src="docs/demo.gif" alt="Gated-Mem Interactive Time-Travel & Causal Undo Demo" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://xiaobaijiadepugongyingpai-coder.github.io/gated-mem/demo_memory_graph.html"><b>🎮 Live Interactive Graph Demo</b></a> ·
+  <a href="#30-second-setup"><b>⚡ 30-Second Setup</b></a> ·
+  <a href="#the-benchmark-that-answers-why-not-just-use-fts5"><b>📊 Benchmark (+40pp)</b></a> ·
+  <a href="#-中文简介"><b>🇨🇳 中文说明</b></a>
+</p>
+
 **Your agent forgets that you migrated off MySQL three weeks ago.** It then helpfully
 writes `mysql://` into the new service. Gated-Mem is the layer that remembers what is
 *currently true* about your architecture — and keeps a receipt for why the old thing died.

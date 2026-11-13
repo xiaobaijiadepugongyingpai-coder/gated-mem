@@ -36,3 +36,8 @@ build/
 # --- 临时脚本（队友调试遗留）---
 .tmp_*.py
 .tmp_*/
+
+# --- 本地开发过程与探索案卷（仅本地留存，不发布到 GitHub，保持开源仓库整洁）---
+新建文件夹/
+total_plan/
+Preliminary_Exploration/
