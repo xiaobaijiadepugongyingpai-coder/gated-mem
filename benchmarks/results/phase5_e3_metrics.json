@@ -1,0 +1,1019 @@
+{
+  "dataset": "phase5_e3_collision_disambiguation.json",
+  "provider": "fastembed-BAAI/bge-small-zh-v1.5",
+  "cases": 20,
+  "by_mode": {
+    "A1_vec": {
+      "top1_passed": 10,
+      "top3_passed": 19,
+      "total": 20,
+      "top1_rate": 0.5,
+      "top3_rate": 0.95
+    },
+    "A2_fts": {
+      "top1_passed": 10,
+      "top3_passed": 20,
+      "total": 20,
+      "top1_rate": 0.5,
+      "top3_rate": 1.0
+    },
+    "A3_slot": {
+      "top1_passed": 4,
+      "top3_passed": 10,
+      "total": 20,
+      "top1_rate": 0.2,
+      "top3_rate": 0.5
+    },
+    "A4_fusion": {
+      "top1_passed": 18,
+      "top3_passed": 20,
+      "total": 20,
+      "top1_rate": 0.9,
+      "top3_rate": 1.0
+    }
+  },
+  "by_target_module": {
+    "A": {
+      "A1_vec": {
+        "top1_passed": 4,
+        "total": 10
+      },
+      "A2_fts": {
+        "top1_passed": 5,
+        "total": 10
+      },
+      "A3_slot": {
+        "top1_passed": 2,
+        "total": 10
+      },
+      "A4_fusion": {
+        "top1_passed": 8,
+        "total": 10
+      }
+    },
+    "B": {
+      "A1_vec": {
+        "top1_passed": 6,
+        "total": 10
+      },
+      "A2_fts": {
+        "top1_passed": 5,
+        "total": 10
+      },
+      "A3_slot": {
+        "top1_passed": 2,
+        "total": 10
+      },
+      "A4_fusion": {
+        "top1_passed": 10,
+        "total": 10
+      }
+    }
+  },
+  "best_single_channel": "A1_vec",
+  "best_single_top1_rate": 0.5,
+  "fusion_top1_rate": 0.9,
+  "net_gain_pp": 40.0,
+  "rows": [
+    {
+      "case_id": "E3_01",
+      "target_module": "A",
+      "expected_id": "M01",
+      "collision_twin": null,
+      "query": "当支付对账系统升级到 v2.14.37 时，超时参数应该配成多少？",
+      "A1_vec": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M04"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M04",
+          "M02"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A4_fusion": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M04",
+          "M02"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_02",
+      "target_module": "B",
+      "expected_id": "M05",
+      "collision_twin": null,
+      "query": "API 流量网关 这次要升到 v2.14.38，请确认那时的超时配置。",
+      "A1_vec": {
+        "top1": "M05",
+        "top3": [
+          "M05",
+          "M04",
+          "M06"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M05",
+          "M01"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "A4_fusion": {
+        "top1": "M05",
+        "top3": [
+          "M05",
+          "M02",
+          "M04"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_03",
+      "target_module": "A",
+      "expected_id": "M06",
+      "collision_twin": null,
+      "query": "v2.14.39 版本的清结算后台，超时到底该取哪个值？",
+      "A1_vec": {
+        "top1": "M04",
+        "top3": [
+          "M04",
+          "M06",
+          "M05"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M03",
+        "top3": [
+          "M03",
+          "M06",
+          "M01"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "A4_fusion": {
+        "top1": "M06",
+        "top3": [
+          "M06",
+          "M03",
+          "M04"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_04",
+      "target_module": "B",
+      "expected_id": "M01",
+      "collision_twin": null,
+      "query": "我们要把网关限流层的版本钉到 v2.14.37，超时参数随之改成多少？",
+      "A1_vec": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M05"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M04",
+          "M02"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A4_fusion": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M04",
+          "M02"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_05",
+      "target_module": "A",
+      "expected_id": "M02",
+      "collision_twin": null,
+      "query": "关于交易对账平台在 v2.14.38 下的超时设置，最终结论是什么？",
+      "A1_vec": {
+        "top1": "M04",
+        "top3": [
+          "M04",
+          "M06",
+          "M05"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "A2_fts": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M05",
+          "M01"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A4_fusion": {
+        "top1": "M05",
+        "top3": [
+          "M05",
+          "M02",
+          "M04"
+        ],
+        "hit1": false,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_06",
+      "target_module": "B",
+      "expected_id": "M06",
+      "collision_twin": null,
+      "query": "当边缘接入代理升级到 v2.14.39 时，超时参数应该配成多少？",
+      "A1_vec": {
+        "top1": "M05",
+        "top3": [
+          "M05",
+          "M04",
+          "M06"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M03",
+        "top3": [
+          "M03",
+          "M06",
+          "M01"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "A4_fusion": {
+        "top1": "M06",
+        "top3": [
+          "M06",
+          "M03",
+          "M05"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_07",
+      "target_module": "A",
+      "expected_id": "M04",
+      "collision_twin": null,
+      "query": "支付对账系统 这次要升到 v2.14.37，请确认那时的超时配置。",
+      "A1_vec": {
+        "top1": "M05",
+        "top3": [
+          "M05",
+          "M04",
+          "M06"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M04",
+          "M02"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "A4_fusion": {
+        "top1": "M04",
+        "top3": [
+          "M04",
+          "M01",
+          "M05"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_08",
+      "target_module": "B",
+      "expected_id": "M02",
+      "collision_twin": null,
+      "query": "v2.14.38 版本的API 流量网关，超时到底该取哪个值？",
+      "A1_vec": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M03",
+          "M02"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M05",
+          "M01"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A4_fusion": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M05",
+          "M01"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_09",
+      "target_module": "A",
+      "expected_id": "M03",
+      "collision_twin": null,
+      "query": "我们要把清结算后台的版本钉到 v2.14.39，超时参数随之改成多少？",
+      "A1_vec": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M03",
+          "M01"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M03",
+        "top3": [
+          "M03",
+          "M06",
+          "M01"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A4_fusion": {
+        "top1": "M03",
+        "top3": [
+          "M03",
+          "M06",
+          "M02"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_10",
+      "target_module": "B",
+      "expected_id": "M04",
+      "collision_twin": null,
+      "query": "关于网关限流层在 v2.14.37 下的超时设置，最终结论是什么？",
+      "A1_vec": {
+        "top1": "M04",
+        "top3": [
+          "M04",
+          "M05",
+          "M06"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M04",
+          "M02"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "A4_fusion": {
+        "top1": "M04",
+        "top3": [
+          "M04",
+          "M01",
+          "M05"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_11",
+      "target_module": "A",
+      "expected_id": "M05",
+      "collision_twin": null,
+      "query": "当交易对账平台升级到 v2.14.38 时，超时参数应该配成多少？",
+      "A1_vec": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M05",
+          "M04"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M05",
+          "M01"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "A4_fusion": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M05",
+          "M04"
+        ],
+        "hit1": false,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_12",
+      "target_module": "B",
+      "expected_id": "M03",
+      "collision_twin": null,
+      "query": "边缘接入代理 这次要升到 v2.14.39，请确认那时的超时配置。",
+      "A1_vec": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M01",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M03",
+        "top3": [
+          "M03",
+          "M06",
+          "M01"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A4_fusion": {
+        "top1": "M03",
+        "top3": [
+          "M03",
+          "M06",
+          "M02"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_13",
+      "target_module": "A",
+      "expected_id": "M01",
+      "collision_twin": null,
+      "query": "v2.14.37 版本的支付对账系统，超时到底该取哪个值？",
+      "A1_vec": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M04",
+          "M02"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M04",
+          "M02"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A4_fusion": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M04",
+          "M02"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_14",
+      "target_module": "B",
+      "expected_id": "M05",
+      "collision_twin": null,
+      "query": "我们要把API 流量网关的版本钉到 v2.14.38，超时参数随之改成多少？",
+      "A1_vec": {
+        "top1": "M05",
+        "top3": [
+          "M05",
+          "M04",
+          "M06"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M05",
+          "M01"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "A4_fusion": {
+        "top1": "M05",
+        "top3": [
+          "M05",
+          "M02",
+          "M04"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_15",
+      "target_module": "A",
+      "expected_id": "M06",
+      "collision_twin": null,
+      "query": "关于清结算后台在 v2.14.39 下的超时设置，最终结论是什么？",
+      "A1_vec": {
+        "top1": "M05",
+        "top3": [
+          "M05",
+          "M04",
+          "M06"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M03",
+        "top3": [
+          "M03",
+          "M06",
+          "M01"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "A4_fusion": {
+        "top1": "M06",
+        "top3": [
+          "M06",
+          "M03",
+          "M05"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_16",
+      "target_module": "B",
+      "expected_id": "M01",
+      "collision_twin": null,
+      "query": "当网关限流层升级到 v2.14.37 时，超时参数应该配成多少？",
+      "A1_vec": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M03",
+          "M02"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M04",
+          "M02"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A4_fusion": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M04",
+          "M03"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_17",
+      "target_module": "A",
+      "expected_id": "M02",
+      "collision_twin": null,
+      "query": "交易对账平台 这次要升到 v2.14.38，请确认那时的超时配置。",
+      "A1_vec": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M03",
+          "M01"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M05",
+          "M01"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A4_fusion": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M05",
+          "M03"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_18",
+      "target_module": "B",
+      "expected_id": "M06",
+      "collision_twin": null,
+      "query": "v2.14.39 版本的边缘接入代理，超时到底该取哪个值？",
+      "A1_vec": {
+        "top1": "M06",
+        "top3": [
+          "M06",
+          "M05",
+          "M04"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M03",
+        "top3": [
+          "M03",
+          "M06",
+          "M01"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "A4_fusion": {
+        "top1": "M06",
+        "top3": [
+          "M06",
+          "M03",
+          "M05"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_19",
+      "target_module": "A",
+      "expected_id": "M04",
+      "collision_twin": null,
+      "query": "我们要把支付对账系统的版本钉到 v2.14.37，超时参数随之改成多少？",
+      "A1_vec": {
+        "top1": "M04",
+        "top3": [
+          "M04",
+          "M05",
+          "M06"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M04",
+          "M02"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": false
+      },
+      "A4_fusion": {
+        "top1": "M04",
+        "top3": [
+          "M04",
+          "M01",
+          "M05"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    },
+    {
+      "case_id": "E3_20",
+      "target_module": "B",
+      "expected_id": "M02",
+      "collision_twin": null,
+      "query": "关于API 流量网关在 v2.14.38 下的超时设置，最终结论是什么？",
+      "A1_vec": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A2_fts": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M05",
+          "M01"
+        ],
+        "hit1": true,
+        "hit3": true
+      },
+      "A3_slot": {
+        "top1": "M01",
+        "top3": [
+          "M01",
+          "M02",
+          "M03"
+        ],
+        "hit1": false,
+        "hit3": true
+      },
+      "A4_fusion": {
+        "top1": "M02",
+        "top3": [
+          "M02",
+          "M05",
+          "M01"
+        ],
+        "hit1": true,
+        "hit3": true
+      }
+    }
+  ]
+}

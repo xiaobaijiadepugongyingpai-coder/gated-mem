@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -133,6 +134,79 @@ def test_dsh_dry_run_writes_nothing(monkeypatch, tmp_path):
     paths = ad.install(tmp_path / "proj", dry_run=True)
     assert paths
     assert not (home / "skills").exists()
+
+
+# -- 权限防御：探测/推断在 (PermissionError, OSError) 下平滑降级 ---------------
+def test_dsh_detect_installed_false_on_home_oserror(monkeypatch, tmp_path):
+    """访问 Path.home()/.dsh 本身被拒（OSError）时，探测降级为 False。"""
+    monkeypatch.setenv("DSH_HOME", str(tmp_path / "dsh"))
+
+    def deny(self):
+        raise OSError("permission denied")
+
+    monkeypatch.setattr(Path, "is_dir", deny)
+    assert DshAdapter().detect_installed() is False
+
+
+def test_dsh_detect_installed_false_on_iterdir_permission_error(monkeypatch, tmp_path):
+    """主目录存在但遍历目录被拒（PermissionError）时，探测降级为 False。"""
+    home = tmp_path / "dsh"
+    home.mkdir()
+    monkeypatch.setenv("DSH_HOME", str(home))
+
+    def deny(self):
+        raise PermissionError("permission denied")
+
+    monkeypatch.setattr(Path, "iterdir", deny)
+    assert DshAdapter().detect_installed() is False
+
+
+def test_dsh_active_profile_desktop_on_profiles_oserror(monkeypatch, tmp_path):
+    """profiles 目录不可读（PermissionError）时，推断回退 'desktop'。"""
+    home = tmp_path / "dsh"
+    home.mkdir()
+    monkeypatch.setenv("DSH_HOME", str(home))
+
+    def deny(self):
+        raise PermissionError("permission denied")
+
+    monkeypatch.setattr(Path, "is_dir", deny)
+    assert DshAdapter().active_profile() == "desktop"
+
+
+def test_dsh_active_profile_desktop_on_profiles_iterdir_permission_error(
+    monkeypatch, tmp_path
+):
+    """遍历 profiles 被拒（PermissionError）时，推断回退 'desktop'。"""
+    home = tmp_path / "dsh"
+    (home / "profiles").mkdir(parents=True)
+    monkeypatch.setenv("DSH_HOME", str(home))
+
+    def deny(self):
+        raise PermissionError("permission denied")
+
+    monkeypatch.setattr(Path, "iterdir", deny)
+    assert DshAdapter().active_profile() == "desktop"
+
+
+def test_dsh_active_profile_desktop_on_stat_oserror(monkeypatch, tmp_path):
+    """读取 profile 的 cordis.patch.yml 元数据（mtime）被拒（OSError）时回退 'desktop'。"""
+    home = tmp_path / "dsh"
+    (home / "profiles" / "work").mkdir(parents=True)
+    (home / "profiles" / "work" / "cordis.patch.yml").write_text("[]", encoding="utf-8")
+    monkeypatch.setenv("DSH_HOME", str(home))
+
+    real_stat = Path.stat
+
+    def deny(self):
+        if self.name == "cordis.patch.yml":
+            raise OSError("stat denied")
+        return real_stat(self)
+
+    # exists() 内部会用 stat()，先放行存在性检查，让异常精确落在排序的 stat 上
+    monkeypatch.setattr(Path, "exists", lambda self: True)
+    monkeypatch.setattr(Path, "stat", deny)
+    assert DshAdapter().active_profile() == "desktop"
 
 
 def test_claude_code_generates_mcp_json(tmp_path):

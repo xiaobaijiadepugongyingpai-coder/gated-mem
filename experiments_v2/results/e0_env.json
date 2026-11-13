@@ -1,0 +1,29 @@
+{
+  "python": {
+    "python": "3.9.13",
+    "executable": "<base-python>",
+    "cwd": "<repo-root>"
+  },
+  "deps": {
+    "datasets": null,
+    "sqlite3": "3.39.3",
+    "numpy": "1.26.4"
+  },
+  "src": {
+    "importable": true,
+    "version": "1.0.0",
+    "path": "src\\gated_mem\\__init__.py",
+    "gates.compute_retention": true,
+    "gates.compute_vitality": true,
+    "gates.compute_retrieval_score": true,
+    "retrieval.Retriever": true,
+    "storage.Store": true
+  },
+  "dataset": {},
+  "models": {
+    "deepseek": [],
+    "glm": [],
+    "gemini": [],
+    "openai": []
+  }
+}

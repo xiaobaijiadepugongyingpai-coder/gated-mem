@@ -20,3 +20,19 @@ htmlcov/
 # --- 构建产物（release 时由 CI 重建）---
 dist/
 build/
+
+# --- 阶段五调试临时产物（不入发布包）---
+.hf_cache/
+.fastembed_cache/
+.spike_out.txt
+.probe_*.py
+.proto_*.py
+.diag_*.py
+.spike_*.py
+.audit_t7/
+.pytmp*/
+.pytest_tmp/
+
+# --- 临时脚本（队友调试遗留）---
+.tmp_*.py
+.tmp_*/

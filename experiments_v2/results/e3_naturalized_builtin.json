@@ -1,0 +1,71 @@
+{
+  "provider": "builtin",
+  "results": {
+    "A1_vector": {
+      "q0_original": {
+        "n": 20,
+        "top1": 0.65,
+        "top3": 0.9
+      },
+      "q1_synonym": {
+        "n": 20,
+        "top1": 0.25,
+        "top3": 0.65
+      },
+      "q2_pronoun": {
+        "n": 20,
+        "top1": 0.25,
+        "top3": 0.65
+      },
+      "q3_colloquial": {
+        "n": 20,
+        "top1": 0.15,
+        "top3": 0.55
+      }
+    },
+    "A2_fts": {
+      "q0_original": {
+        "n": 20,
+        "top1": 1.0,
+        "top3": 1.0
+      },
+      "q1_synonym": {
+        "n": 20,
+        "top1": 0.25,
+        "top3": 0.65
+      },
+      "q2_pronoun": {
+        "n": 20,
+        "top1": 0.25,
+        "top3": 0.65
+      },
+      "q3_colloquial": {
+        "n": 20,
+        "top1": 0.15,
+        "top3": 0.55
+      }
+    },
+    "A4_slot_fusion": {
+      "q0_original": {
+        "n": 20,
+        "top1": 1.0,
+        "top3": 1.0
+      },
+      "q1_synonym": {
+        "n": 20,
+        "top1": 0.25,
+        "top3": 0.6
+      },
+      "q2_pronoun": {
+        "n": 20,
+        "top1": 0.25,
+        "top3": 0.6
+      },
+      "q3_colloquial": {
+        "n": 20,
+        "top1": 0.15,
+        "top3": 0.55
+      }
+    }
+  }
+}

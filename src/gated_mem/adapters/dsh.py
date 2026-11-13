@@ -58,31 +58,47 @@ class DshAdapter(BaseAgentAdapter):
         return Path.home() / ".dsh"
 
     def detect_installed(self) -> bool:
-        """检测 DSH 是否安装：主目录存在，或存在任一 profile。"""
-        home = self.dsh_home()
-        if not home.is_dir():
+        """检测 DSH 是否安装：主目录存在，或存在任一 profile。
+
+        权限防御：访问 Path.home()/.dsh 或遍历目录遭遇 (PermissionError, OSError)
+        时无法确认安装，平滑降级为 False（视为未安装），不向调用方抛异常。
+        """
+        try:
+            home = self.dsh_home()
+            if not home.is_dir():
+                return False
+            if (home / "profiles").is_dir():
+                return True
+            return any(home.iterdir())
+        except (PermissionError, OSError):
             return False
-        if (home / "profiles").is_dir():
-            return True
-        return any(home.iterdir())
 
     def active_profile(self) -> str:
         """推断当前使用的 profile 名。
 
         策略：优先取 profiles 下拥有 cordis.patch.yml 且最近被修改的那个；
         都没有则回退 "desktop"。
+
+        权限防御：访问 Path.home()/.dsh、遍历 profiles 或读取 profile 元数据
+        遭遇 (PermissionError, OSError) 时无法可靠推断，回退 "desktop"。
         """
-        home = self.dsh_home()
-        profiles = home / "profiles"
-        if not profiles.is_dir():
+        try:
+            home = self.dsh_home()
+            profiles = home / "profiles"
+            if not profiles.is_dir():
+                return "desktop"
+            candidates = [
+                p for p in profiles.iterdir()
+                if p.is_dir() and (p / "cordis.patch.yml").exists()
+            ]
+            if not candidates:
+                return "desktop"
+            candidates.sort(
+                key=lambda p: (p / "cordis.patch.yml").stat().st_mtime, reverse=True
+            )
+            return candidates[0].name
+        except (PermissionError, OSError):
             return "desktop"
-        candidates = [
-            p for p in profiles.iterdir() if p.is_dir() and (p / "cordis.patch.yml").exists()
-        ]
-        if not candidates:
-            return "desktop"
-        candidates.sort(key=lambda p: (p / "cordis.patch.yml").stat().st_mtime, reverse=True)
-        return candidates[0].name
 
     # -- 配置生成 -------------------------------------------------------
     def profile_dir(self, profile: Optional[str] = None) -> Path:

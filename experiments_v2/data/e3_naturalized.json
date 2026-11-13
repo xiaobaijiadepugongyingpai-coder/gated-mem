@@ -1,0 +1,1125 @@
+{
+  "rows": [
+    {
+      "case_id": "H01",
+      "form": "q0_original",
+      "query": "高并发压测之后，分布式事务重试模块里错误码 ERR_XA_PROTO_08 的退避参数应按哪条记录调整？",
+      "has_identifier": true,
+      "expected_id": "H01_M5",
+      "memory_ids": [
+        "H01_M1",
+        "H01_M2",
+        "H01_M3",
+        "H01_M4",
+        "H01_M5"
+      ]
+    },
+    {
+      "case_id": "H01",
+      "form": "q1_synonym",
+      "query": "高并发压测之后，分布式事务重试模块里那次报错的退避参数应按哪条记录调整？",
+      "has_identifier": false,
+      "expected_id": "H01_M5",
+      "memory_ids": [
+        "H01_M1",
+        "H01_M2",
+        "H01_M3",
+        "H01_M4",
+        "H01_M5"
+      ]
+    },
+    {
+      "case_id": "H01",
+      "form": "q2_pronoun",
+      "query": "高并发压测之后，分布式事务重试模块里那个错误码的退避参数应按哪条记录调整？",
+      "has_identifier": false,
+      "expected_id": "H01_M5",
+      "memory_ids": [
+        "H01_M1",
+        "H01_M2",
+        "H01_M3",
+        "H01_M4",
+        "H01_M5"
+      ]
+    },
+    {
+      "case_id": "H01",
+      "form": "q3_colloquial",
+      "query": "分布式事务重试模块那块儿，上次那个报错码定成多少来着？",
+      "has_identifier": false,
+      "expected_id": "H01_M5",
+      "memory_ids": [
+        "H01_M1",
+        "H01_M2",
+        "H01_M3",
+        "H01_M4",
+        "H01_M5"
+      ]
+    },
+    {
+      "case_id": "H02",
+      "form": "q0_original",
+      "query": "存储网关巡检模块的看板里，错误码 PG_ERR_42704 对应的处置参数记录在哪一条？",
+      "has_identifier": true,
+      "expected_id": "H02_M3",
+      "memory_ids": [
+        "H02_M1",
+        "H02_M2",
+        "H02_M3",
+        "H02_M4",
+        "H02_M5"
+      ]
+    },
+    {
+      "case_id": "H02",
+      "form": "q1_synonym",
+      "query": "存储网关巡检模块的看板里，那次报错对应的处置参数记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H02_M3",
+      "memory_ids": [
+        "H02_M1",
+        "H02_M2",
+        "H02_M3",
+        "H02_M4",
+        "H02_M5"
+      ]
+    },
+    {
+      "case_id": "H02",
+      "form": "q2_pronoun",
+      "query": "存储网关巡检模块的看板里，那个错误码对应的处置参数记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H02_M3",
+      "memory_ids": [
+        "H02_M1",
+        "H02_M2",
+        "H02_M3",
+        "H02_M4",
+        "H02_M5"
+      ]
+    },
+    {
+      "case_id": "H02",
+      "form": "q3_colloquial",
+      "query": "存储网关巡检模块里那个报错码的取值，帮忙查一下记录。",
+      "has_identifier": false,
+      "expected_id": "H02_M3",
+      "memory_ids": [
+        "H02_M1",
+        "H02_M2",
+        "H02_M3",
+        "H02_M4",
+        "H02_M5"
+      ]
+    },
+    {
+      "case_id": "H03",
+      "form": "q0_original",
+      "query": "消息队列接入模块的早班复盘里，告警 MQ_SEQ_GAP_11 对应的回补参数记录在哪一条？",
+      "has_identifier": true,
+      "expected_id": "H03_M1",
+      "memory_ids": [
+        "H03_M1",
+        "H03_M2",
+        "H03_M3",
+        "H03_M4",
+        "H03_M5"
+      ]
+    },
+    {
+      "case_id": "H03",
+      "form": "q1_synonym",
+      "query": "消息队列接入模块的早班复盘里，告警对应的回补参数记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H03_M1",
+      "memory_ids": [
+        "H03_M1",
+        "H03_M2",
+        "H03_M3",
+        "H03_M4",
+        "H03_M5"
+      ]
+    },
+    {
+      "case_id": "H03",
+      "form": "q2_pronoun",
+      "query": "消息队列接入模块的早班复盘里，告警 MQ_SEQ_GAP_11 对应的回补参数记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H03_M1",
+      "memory_ids": [
+        "H03_M1",
+        "H03_M2",
+        "H03_M3",
+        "H03_M4",
+        "H03_M5"
+      ]
+    },
+    {
+      "case_id": "H03",
+      "form": "q3_colloquial",
+      "query": "消息队列接入模块里那个报错码的取值，帮忙查一下记录。",
+      "has_identifier": false,
+      "expected_id": "H03_M1",
+      "memory_ids": [
+        "H03_M1",
+        "H03_M2",
+        "H03_M3",
+        "H03_M4",
+        "H03_M5"
+      ]
+    },
+    {
+      "case_id": "H04",
+      "form": "q0_original",
+      "query": "配置中心热更新模块的审计簿里，错误码 CFG_HOT_SYNC_FAIL_34 的对账参数记录在哪一条？",
+      "has_identifier": true,
+      "expected_id": "H04_M4",
+      "memory_ids": [
+        "H04_M1",
+        "H04_M2",
+        "H04_M3",
+        "H04_M4",
+        "H04_M5"
+      ]
+    },
+    {
+      "case_id": "H04",
+      "form": "q1_synonym",
+      "query": "配置中心热更新模块的审计簿里，那次报错的对账参数记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H04_M4",
+      "memory_ids": [
+        "H04_M1",
+        "H04_M2",
+        "H04_M3",
+        "H04_M4",
+        "H04_M5"
+      ]
+    },
+    {
+      "case_id": "H04",
+      "form": "q2_pronoun",
+      "query": "配置中心热更新模块的审计簿里，那个错误码的对账参数记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H04_M4",
+      "memory_ids": [
+        "H04_M1",
+        "H04_M2",
+        "H04_M3",
+        "H04_M4",
+        "H04_M5"
+      ]
+    },
+    {
+      "case_id": "H04",
+      "form": "q3_colloquial",
+      "query": "配置中心热更新模块那块儿，上次那个报错码定成多少来着？",
+      "has_identifier": false,
+      "expected_id": "H04_M4",
+      "memory_ids": [
+        "H04_M1",
+        "H04_M2",
+        "H04_M3",
+        "H04_M4",
+        "H04_M5"
+      ]
+    },
+    {
+      "case_id": "H05",
+      "form": "q0_original",
+      "query": "幂等去重模块的复盘记录里，错误码 IDEM_DUP_WIN_72 的窗口参数对应哪一条？",
+      "has_identifier": true,
+      "expected_id": "H05_M2",
+      "memory_ids": [
+        "H05_M1",
+        "H05_M2",
+        "H05_M3",
+        "H05_M4",
+        "H05_M5"
+      ]
+    },
+    {
+      "case_id": "H05",
+      "form": "q1_synonym",
+      "query": "幂等去重模块的复盘记录里，那次报错的窗口参数对应哪一条？",
+      "has_identifier": false,
+      "expected_id": "H05_M2",
+      "memory_ids": [
+        "H05_M1",
+        "H05_M2",
+        "H05_M3",
+        "H05_M4",
+        "H05_M5"
+      ]
+    },
+    {
+      "case_id": "H05",
+      "form": "q2_pronoun",
+      "query": "幂等去重模块的复盘记录里，那个错误码的窗口参数对应哪一条？",
+      "has_identifier": false,
+      "expected_id": "H05_M2",
+      "memory_ids": [
+        "H05_M1",
+        "H05_M2",
+        "H05_M3",
+        "H05_M4",
+        "H05_M5"
+      ]
+    },
+    {
+      "case_id": "H05",
+      "form": "q3_colloquial",
+      "query": "幂等去重模块那块儿，上次那个报错码定成多少来着？",
+      "has_identifier": false,
+      "expected_id": "H05_M2",
+      "memory_ids": [
+        "H05_M1",
+        "H05_M2",
+        "H05_M3",
+        "H05_M4",
+        "H05_M5"
+      ]
+    },
+    {
+      "case_id": "H06",
+      "form": "q0_original",
+      "query": "网关读缓冲调优模块的评审记录里，配置项 read_buffer_size_mb 的推荐取值是哪一条？",
+      "has_identifier": true,
+      "expected_id": "H06_M2",
+      "memory_ids": [
+        "H06_M1",
+        "H06_M2",
+        "H06_M3",
+        "H06_M4",
+        "H06_M5"
+      ]
+    },
+    {
+      "case_id": "H06",
+      "form": "q1_synonym",
+      "query": "网关读缓冲调优模块的评审记录里，那个配置的推荐取值是哪一条？",
+      "has_identifier": false,
+      "expected_id": "H06_M2",
+      "memory_ids": [
+        "H06_M1",
+        "H06_M2",
+        "H06_M3",
+        "H06_M4",
+        "H06_M5"
+      ]
+    },
+    {
+      "case_id": "H06",
+      "form": "q2_pronoun",
+      "query": "网关读缓冲调优模块的评审记录里，那个配置项的推荐取值是哪一条？",
+      "has_identifier": false,
+      "expected_id": "H06_M2",
+      "memory_ids": [
+        "H06_M1",
+        "H06_M2",
+        "H06_M3",
+        "H06_M4",
+        "H06_M5"
+      ]
+    },
+    {
+      "case_id": "H06",
+      "form": "q3_colloquial",
+      "query": "网关读缓冲调优模块里那个配置值的取值，帮忙查一下记录。",
+      "has_identifier": false,
+      "expected_id": "H06_M2",
+      "memory_ids": [
+        "H06_M1",
+        "H06_M2",
+        "H06_M3",
+        "H06_M4",
+        "H06_M5"
+      ]
+    },
+    {
+      "case_id": "H07",
+      "form": "q0_original",
+      "query": "会话过期调度模块的复盘里，配置项 session_gc_interval_hr 的基线取值是哪一条？",
+      "has_identifier": true,
+      "expected_id": "H07_M3",
+      "memory_ids": [
+        "H07_M1",
+        "H07_M2",
+        "H07_M3",
+        "H07_M4",
+        "H07_M5"
+      ]
+    },
+    {
+      "case_id": "H07",
+      "form": "q1_synonym",
+      "query": "会话过期调度模块的复盘里，那个配置的基线取值是哪一条？",
+      "has_identifier": false,
+      "expected_id": "H07_M3",
+      "memory_ids": [
+        "H07_M1",
+        "H07_M2",
+        "H07_M3",
+        "H07_M4",
+        "H07_M5"
+      ]
+    },
+    {
+      "case_id": "H07",
+      "form": "q2_pronoun",
+      "query": "会话过期调度模块的复盘里，那个配置项的基线取值是哪一条？",
+      "has_identifier": false,
+      "expected_id": "H07_M3",
+      "memory_ids": [
+        "H07_M1",
+        "H07_M2",
+        "H07_M3",
+        "H07_M4",
+        "H07_M5"
+      ]
+    },
+    {
+      "case_id": "H07",
+      "form": "q3_colloquial",
+      "query": "会话过期调度模块里那个配置值的取值，帮忙查一下记录。",
+      "has_identifier": false,
+      "expected_id": "H07_M3",
+      "memory_ids": [
+        "H07_M1",
+        "H07_M2",
+        "H07_M3",
+        "H07_M4",
+        "H07_M5"
+      ]
+    },
+    {
+      "case_id": "H08",
+      "form": "q0_original",
+      "query": "TLS 握手压测模块的纪要里，配置项 tls_handshake_timeout_ms 的推荐取值是哪一条？",
+      "has_identifier": true,
+      "expected_id": "H08_M1",
+      "memory_ids": [
+        "H08_M1",
+        "H08_M2",
+        "H08_M3",
+        "H08_M4",
+        "H08_M5"
+      ]
+    },
+    {
+      "case_id": "H08",
+      "form": "q1_synonym",
+      "query": "TLS 握手压测模块的纪要里，那个配置的推荐取值是哪一条？",
+      "has_identifier": false,
+      "expected_id": "H08_M1",
+      "memory_ids": [
+        "H08_M1",
+        "H08_M2",
+        "H08_M3",
+        "H08_M4",
+        "H08_M5"
+      ]
+    },
+    {
+      "case_id": "H08",
+      "form": "q2_pronoun",
+      "query": "TLS 握手压测模块的纪要里，那个配置项的推荐取值是哪一条？",
+      "has_identifier": false,
+      "expected_id": "H08_M1",
+      "memory_ids": [
+        "H08_M1",
+        "H08_M2",
+        "H08_M3",
+        "H08_M4",
+        "H08_M5"
+      ]
+    },
+    {
+      "case_id": "H08",
+      "form": "q3_colloquial",
+      "query": "TLS 握手压测模块里那个配置值的取值，帮忙查一下记录。",
+      "has_identifier": false,
+      "expected_id": "H08_M1",
+      "memory_ids": [
+        "H08_M1",
+        "H08_M2",
+        "H08_M3",
+        "H08_M4",
+        "H08_M5"
+      ]
+    },
+    {
+      "case_id": "H09",
+      "form": "q0_original",
+      "query": "日志轮转模块的巡检纪要里，配置项 log_rotate_max_size_tb 的基线取值是哪一条？",
+      "has_identifier": true,
+      "expected_id": "H09_M4",
+      "memory_ids": [
+        "H09_M1",
+        "H09_M2",
+        "H09_M3",
+        "H09_M4",
+        "H09_M5"
+      ]
+    },
+    {
+      "case_id": "H09",
+      "form": "q1_synonym",
+      "query": "日志轮转模块的巡检纪要里，那个配置的基线取值是哪一条？",
+      "has_identifier": false,
+      "expected_id": "H09_M4",
+      "memory_ids": [
+        "H09_M1",
+        "H09_M2",
+        "H09_M3",
+        "H09_M4",
+        "H09_M5"
+      ]
+    },
+    {
+      "case_id": "H09",
+      "form": "q2_pronoun",
+      "query": "日志轮转模块的巡检纪要里，那个配置项的基线取值是哪一条？",
+      "has_identifier": false,
+      "expected_id": "H09_M4",
+      "memory_ids": [
+        "H09_M1",
+        "H09_M2",
+        "H09_M3",
+        "H09_M4",
+        "H09_M5"
+      ]
+    },
+    {
+      "case_id": "H09",
+      "form": "q3_colloquial",
+      "query": "日志轮转模块里那个配置值的取值，帮忙查一下记录。",
+      "has_identifier": false,
+      "expected_id": "H09_M4",
+      "memory_ids": [
+        "H09_M1",
+        "H09_M2",
+        "H09_M3",
+        "H09_M4",
+        "H09_M5"
+      ]
+    },
+    {
+      "case_id": "H10",
+      "form": "q0_original",
+      "query": "限流器调参模块的演练纪要里，配置项 rate_limit_burst_512 的冷却参数记录在哪一条？",
+      "has_identifier": true,
+      "expected_id": "H10_M4",
+      "memory_ids": [
+        "H10_M1",
+        "H10_M2",
+        "H10_M3",
+        "H10_M4",
+        "H10_M5"
+      ]
+    },
+    {
+      "case_id": "H10",
+      "form": "q1_synonym",
+      "query": "限流器调参模块的演练纪要里，那个配置的冷却参数记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H10_M4",
+      "memory_ids": [
+        "H10_M1",
+        "H10_M2",
+        "H10_M3",
+        "H10_M4",
+        "H10_M5"
+      ]
+    },
+    {
+      "case_id": "H10",
+      "form": "q2_pronoun",
+      "query": "限流器调参模块的演练纪要里，那个配置项的冷却参数记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H10_M4",
+      "memory_ids": [
+        "H10_M1",
+        "H10_M2",
+        "H10_M3",
+        "H10_M4",
+        "H10_M5"
+      ]
+    },
+    {
+      "case_id": "H10",
+      "form": "q3_colloquial",
+      "query": "限流器调参模块里那个配置值的取值，帮忙查一下记录。",
+      "has_identifier": false,
+      "expected_id": "H10_M4",
+      "memory_ids": [
+        "H10_M1",
+        "H10_M2",
+        "H10_M3",
+        "H10_M4",
+        "H10_M5"
+      ]
+    },
+    {
+      "case_id": "H11",
+      "form": "q0_original",
+      "query": "网关灰度发布模块的演练档案里，版本 v2.14.37-rc1 的放量比例记录在哪一条？",
+      "has_identifier": true,
+      "expected_id": "H11_M1",
+      "memory_ids": [
+        "H11_M1",
+        "H11_M2",
+        "H11_M3",
+        "H11_M4",
+        "H11_M5"
+      ]
+    },
+    {
+      "case_id": "H11",
+      "form": "q1_synonym",
+      "query": "网关灰度发布模块的演练档案里，那个版本的放量比例记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H11_M1",
+      "memory_ids": [
+        "H11_M1",
+        "H11_M2",
+        "H11_M3",
+        "H11_M4",
+        "H11_M5"
+      ]
+    },
+    {
+      "case_id": "H11",
+      "form": "q2_pronoun",
+      "query": "网关灰度发布模块的演练档案里，那个版本号的放量比例记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H11_M1",
+      "memory_ids": [
+        "H11_M1",
+        "H11_M2",
+        "H11_M3",
+        "H11_M4",
+        "H11_M5"
+      ]
+    },
+    {
+      "case_id": "H11",
+      "form": "q3_colloquial",
+      "query": "网关灰度发布模块当时那个版本，是配的多少？",
+      "has_identifier": false,
+      "expected_id": "H11_M1",
+      "memory_ids": [
+        "H11_M1",
+        "H11_M2",
+        "H11_M3",
+        "H11_M4",
+        "H11_M5"
+      ]
+    },
+    {
+      "case_id": "H12",
+      "form": "q0_original",
+      "query": "网卡固件升级模块的机房纪要里，固件版本 fw_1.8.55-hotfix 的刷写间隔记录在哪一条？",
+      "has_identifier": true,
+      "expected_id": "H12_M4",
+      "memory_ids": [
+        "H12_M1",
+        "H12_M2",
+        "H12_M3",
+        "H12_M4",
+        "H12_M5"
+      ]
+    },
+    {
+      "case_id": "H12",
+      "form": "q1_synonym",
+      "query": "网卡固件升级模块的机房纪要里，固件那个版本的刷写间隔记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H12_M4",
+      "memory_ids": [
+        "H12_M1",
+        "H12_M2",
+        "H12_M3",
+        "H12_M4",
+        "H12_M5"
+      ]
+    },
+    {
+      "case_id": "H12",
+      "form": "q2_pronoun",
+      "query": "网卡固件升级模块的机房纪要里，固件那个版本号的刷写间隔记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H12_M4",
+      "memory_ids": [
+        "H12_M1",
+        "H12_M2",
+        "H12_M3",
+        "H12_M4",
+        "H12_M5"
+      ]
+    },
+    {
+      "case_id": "H12",
+      "form": "q3_colloquial",
+      "query": "网卡固件升级模块里那个版本的取值，帮忙查一下记录。",
+      "has_identifier": false,
+      "expected_id": "H12_M4",
+      "memory_ids": [
+        "H12_M1",
+        "H12_M2",
+        "H12_M3",
+        "H12_M4",
+        "H12_M5"
+      ]
+    },
+    {
+      "case_id": "H13",
+      "form": "q0_original",
+      "query": "客户端 SDK 发布模块的评审里，SDK 版本 sdk_3.4.22-beta 的预热比例记录在哪一条？",
+      "has_identifier": true,
+      "expected_id": "H13_M2",
+      "memory_ids": [
+        "H13_M1",
+        "H13_M2",
+        "H13_M3",
+        "H13_M4",
+        "H13_M5"
+      ]
+    },
+    {
+      "case_id": "H13",
+      "form": "q1_synonym",
+      "query": "客户端 SDK 发布模块的评审里，SDK 那个版本的预热比例记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H13_M2",
+      "memory_ids": [
+        "H13_M1",
+        "H13_M2",
+        "H13_M3",
+        "H13_M4",
+        "H13_M5"
+      ]
+    },
+    {
+      "case_id": "H13",
+      "form": "q2_pronoun",
+      "query": "客户端 SDK 发布模块的评审里，SDK 那个版本号的预热比例记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H13_M2",
+      "memory_ids": [
+        "H13_M1",
+        "H13_M2",
+        "H13_M3",
+        "H13_M4",
+        "H13_M5"
+      ]
+    },
+    {
+      "case_id": "H13",
+      "form": "q3_colloquial",
+      "query": "客户端 SDK 发布模块那块儿，上次那个版本定成多少来着？",
+      "has_identifier": false,
+      "expected_id": "H13_M2",
+      "memory_ids": [
+        "H13_M1",
+        "H13_M2",
+        "H13_M3",
+        "H13_M4",
+        "H13_M5"
+      ]
+    },
+    {
+      "case_id": "H14",
+      "form": "q0_original",
+      "query": "容器镜像发布模块的值守纪要里，镜像版本 img_1.21.48-stable 的滚动窗口记录在哪一条？",
+      "has_identifier": true,
+      "expected_id": "H14_M5",
+      "memory_ids": [
+        "H14_M1",
+        "H14_M2",
+        "H14_M3",
+        "H14_M4",
+        "H14_M5"
+      ]
+    },
+    {
+      "case_id": "H14",
+      "form": "q1_synonym",
+      "query": "容器镜像发布模块的值守纪要里，镜像那个版本的滚动窗口记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H14_M5",
+      "memory_ids": [
+        "H14_M1",
+        "H14_M2",
+        "H14_M3",
+        "H14_M4",
+        "H14_M5"
+      ]
+    },
+    {
+      "case_id": "H14",
+      "form": "q2_pronoun",
+      "query": "容器镜像发布模块的值守纪要里，镜像那个版本号的滚动窗口记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H14_M5",
+      "memory_ids": [
+        "H14_M1",
+        "H14_M2",
+        "H14_M3",
+        "H14_M4",
+        "H14_M5"
+      ]
+    },
+    {
+      "case_id": "H14",
+      "form": "q3_colloquial",
+      "query": "容器镜像发布模块当时那个版本，是配的多少？",
+      "has_identifier": false,
+      "expected_id": "H14_M5",
+      "memory_ids": [
+        "H14_M1",
+        "H14_M2",
+        "H14_M3",
+        "H14_M4",
+        "H14_M5"
+      ]
+    },
+    {
+      "case_id": "H15",
+      "form": "q0_original",
+      "query": "内核模块兼容性模块的回归纪要里，版本 kmod_6.2.19-lts 的回归并发记录在哪一条？",
+      "has_identifier": true,
+      "expected_id": "H15_M3",
+      "memory_ids": [
+        "H15_M1",
+        "H15_M2",
+        "H15_M3",
+        "H15_M4",
+        "H15_M5"
+      ]
+    },
+    {
+      "case_id": "H15",
+      "form": "q1_synonym",
+      "query": "内核模块兼容性模块的回归纪要里，那个版本的回归并发记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H15_M3",
+      "memory_ids": [
+        "H15_M1",
+        "H15_M2",
+        "H15_M3",
+        "H15_M4",
+        "H15_M5"
+      ]
+    },
+    {
+      "case_id": "H15",
+      "form": "q2_pronoun",
+      "query": "内核模块兼容性模块的回归纪要里，那个版本号的回归并发记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H15_M3",
+      "memory_ids": [
+        "H15_M1",
+        "H15_M2",
+        "H15_M3",
+        "H15_M4",
+        "H15_M5"
+      ]
+    },
+    {
+      "case_id": "H15",
+      "form": "q3_colloquial",
+      "query": "内核模块兼容性模块里那个版本的取值，帮忙查一下记录。",
+      "has_identifier": false,
+      "expected_id": "H15_M3",
+      "memory_ids": [
+        "H15_M1",
+        "H15_M2",
+        "H15_M3",
+        "H15_M4",
+        "H15_M5"
+      ]
+    },
+    {
+      "case_id": "H16",
+      "form": "q0_original",
+      "query": "账务对账服务模块的值班纪要里，函数 reconcile_ledger_entries 的分片大小记录在哪一条？",
+      "has_identifier": true,
+      "expected_id": "H16_M1",
+      "memory_ids": [
+        "H16_M1",
+        "H16_M2",
+        "H16_M3",
+        "H16_M4",
+        "H16_M5"
+      ]
+    },
+    {
+      "case_id": "H16",
+      "form": "q1_synonym",
+      "query": "账务对账服务模块的值班纪要里，那个函数的分片大小记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H16_M1",
+      "memory_ids": [
+        "H16_M1",
+        "H16_M2",
+        "H16_M3",
+        "H16_M4",
+        "H16_M5"
+      ]
+    },
+    {
+      "case_id": "H16",
+      "form": "q2_pronoun",
+      "query": "账务对账服务模块的值班纪要里，那个函数的分片大小记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H16_M1",
+      "memory_ids": [
+        "H16_M1",
+        "H16_M2",
+        "H16_M3",
+        "H16_M4",
+        "H16_M5"
+      ]
+    },
+    {
+      "case_id": "H16",
+      "form": "q3_colloquial",
+      "query": "账务对账服务模块那块儿，上次那个函数定成多少来着？",
+      "has_identifier": false,
+      "expected_id": "H16_M1",
+      "memory_ids": [
+        "H16_M1",
+        "H16_M2",
+        "H16_M3",
+        "H16_M4",
+        "H16_M5"
+      ]
+    },
+    {
+      "case_id": "H17",
+      "form": "q0_original",
+      "query": "流解析服务模块的复盘里，函数 parse_wire_trailer 的缓冲区参数记录在哪一条？",
+      "has_identifier": true,
+      "expected_id": "H17_M3",
+      "memory_ids": [
+        "H17_M1",
+        "H17_M2",
+        "H17_M3",
+        "H17_M4",
+        "H17_M5"
+      ]
+    },
+    {
+      "case_id": "H17",
+      "form": "q1_synonym",
+      "query": "流解析服务模块的复盘里，那个函数的缓冲区参数记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H17_M3",
+      "memory_ids": [
+        "H17_M1",
+        "H17_M2",
+        "H17_M3",
+        "H17_M4",
+        "H17_M5"
+      ]
+    },
+    {
+      "case_id": "H17",
+      "form": "q2_pronoun",
+      "query": "流解析服务模块的复盘里，那个函数的缓冲区参数记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H17_M3",
+      "memory_ids": [
+        "H17_M1",
+        "H17_M2",
+        "H17_M3",
+        "H17_M4",
+        "H17_M5"
+      ]
+    },
+    {
+      "case_id": "H17",
+      "form": "q3_colloquial",
+      "query": "流解析服务模块当时那个函数，是配的多少？",
+      "has_identifier": false,
+      "expected_id": "H17_M3",
+      "memory_ids": [
+        "H17_M1",
+        "H17_M2",
+        "H17_M3",
+        "H17_M4",
+        "H17_M5"
+      ]
+    },
+    {
+      "case_id": "H18",
+      "form": "q0_original",
+      "query": "刷写队列服务模块的巡检纪要里，函数 drain_flush_queues 的单轮配额记录在哪一条？",
+      "has_identifier": true,
+      "expected_id": "H18_M2",
+      "memory_ids": [
+        "H18_M1",
+        "H18_M2",
+        "H18_M3",
+        "H18_M4",
+        "H18_M5"
+      ]
+    },
+    {
+      "case_id": "H18",
+      "form": "q1_synonym",
+      "query": "刷写队列服务模块的巡检纪要里，那个函数的单轮配额记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H18_M2",
+      "memory_ids": [
+        "H18_M1",
+        "H18_M2",
+        "H18_M3",
+        "H18_M4",
+        "H18_M5"
+      ]
+    },
+    {
+      "case_id": "H18",
+      "form": "q2_pronoun",
+      "query": "刷写队列服务模块的巡检纪要里，那个函数的单轮配额记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H18_M2",
+      "memory_ids": [
+        "H18_M1",
+        "H18_M2",
+        "H18_M3",
+        "H18_M4",
+        "H18_M5"
+      ]
+    },
+    {
+      "case_id": "H18",
+      "form": "q3_colloquial",
+      "query": "刷写队列服务模块当时那个函数，是配的多少？",
+      "has_identifier": false,
+      "expected_id": "H18_M2",
+      "memory_ids": [
+        "H18_M1",
+        "H18_M2",
+        "H18_M3",
+        "H18_M4",
+        "H18_M5"
+      ]
+    },
+    {
+      "case_id": "H19",
+      "form": "q0_original",
+      "query": "指标抓取服务模块的观测纪要里，函数 scrape_targat_refresh 的抓取超时记录在哪一条？",
+      "has_identifier": true,
+      "expected_id": "H19_M1",
+      "memory_ids": [
+        "H19_M1",
+        "H19_M2",
+        "H19_M3",
+        "H19_M4",
+        "H19_M5"
+      ]
+    },
+    {
+      "case_id": "H19",
+      "form": "q1_synonym",
+      "query": "指标抓取服务模块的观测纪要里，那个函数的抓取超时记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H19_M1",
+      "memory_ids": [
+        "H19_M1",
+        "H19_M2",
+        "H19_M3",
+        "H19_M4",
+        "H19_M5"
+      ]
+    },
+    {
+      "case_id": "H19",
+      "form": "q2_pronoun",
+      "query": "指标抓取服务模块的观测纪要里，那个函数的抓取超时记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H19_M1",
+      "memory_ids": [
+        "H19_M1",
+        "H19_M2",
+        "H19_M3",
+        "H19_M4",
+        "H19_M5"
+      ]
+    },
+    {
+      "case_id": "H19",
+      "form": "q3_colloquial",
+      "query": "指标抓取服务模块当时那个函数，是配的多少？",
+      "has_identifier": false,
+      "expected_id": "H19_M1",
+      "memory_ids": [
+        "H19_M1",
+        "H19_M2",
+        "H19_M3",
+        "H19_M4",
+        "H19_M5"
+      ]
+    },
+    {
+      "case_id": "H20",
+      "form": "q0_original",
+      "query": "SST 压实服务模块的巡检纪要里，函数 compact_sst_tables 的单批页数记录在哪一条？",
+      "has_identifier": true,
+      "expected_id": "H20_M5",
+      "memory_ids": [
+        "H20_M1",
+        "H20_M2",
+        "H20_M3",
+        "H20_M4",
+        "H20_M5"
+      ]
+    },
+    {
+      "case_id": "H20",
+      "form": "q1_synonym",
+      "query": "SST 压实服务模块的巡检纪要里，那个函数的单批页数记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H20_M5",
+      "memory_ids": [
+        "H20_M1",
+        "H20_M2",
+        "H20_M3",
+        "H20_M4",
+        "H20_M5"
+      ]
+    },
+    {
+      "case_id": "H20",
+      "form": "q2_pronoun",
+      "query": "SST 压实服务模块的巡检纪要里，那个函数的单批页数记录在哪一条？",
+      "has_identifier": false,
+      "expected_id": "H20_M5",
+      "memory_ids": [
+        "H20_M1",
+        "H20_M2",
+        "H20_M3",
+        "H20_M4",
+        "H20_M5"
+      ]
+    },
+    {
+      "case_id": "H20",
+      "form": "q3_colloquial",
+      "query": "SST 压实服务模块里那个函数的取值，帮忙查一下记录。",
+      "has_identifier": false,
+      "expected_id": "H20_M5",
+      "memory_ids": [
+        "H20_M1",
+        "H20_M2",
+        "H20_M3",
+        "H20_M4",
+        "H20_M5"
+      ]
+    }
+  ],
+  "sha256": "e1d0d96ad278330fc4fda9fa7ee2c211dd56cc10a06131da88304210fb449254"
+}

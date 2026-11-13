@@ -61,9 +61,11 @@
 │   ├── 📄 phase2_executive_adjudication_dossier.md# 阶段 2：阶段二综合执行审计与大模型裁决案卷
 │   ├── 📄 phase3_execution_directive.md           # 阶段 3：大模型终审指令书 (GM-DIRECTIVE-P3-v2.2.0 阶段三执行指令)
 │   ├── 📄 phase3_executive_adjudication_dossier.md# 阶段 3：阶段三综合执行审计与开源发布裁决案卷
-│   └── 📄 phase4_execution_directive.md           # 阶段 4：【最新终审指令】v1.0.0 开源发布令与阶段四执行指令 (GM-DIRECTIVE-P4-v3.0.0)
+│   ├── 📄 phase4_execution_directive.md           # 阶段 4：v1.0.0 开源发布令与阶段四执行指令 (GM-DIRECTIVE-P4-v3.0.0)
+│   ├── 📄 phase4_executive_adjudication_dossier.md# 阶段 4：阶段四发版终审与全项目结项总案卷 (GM-DOSSIER-P4-v4.0.0)
+│   └── 📄 phase5_release_and_supplementary_experiments.md # 阶段 5：【最新统筹】v1.0.0 发版、E3 破局实验与 v1.1 基准集成蓝图 (GM-DIRECTIVE-P5-v5.0.0)
 │
-├── 📂 benchmarks/                    # 【基准】阶段一/二/三基准测试体系与报告
+├── 📂 benchmarks/                    # 【基准】阶段一/二/三/四基准测试体系与报告
 │   ├── 📜 CONTRACT.md                             # 阶段一冻结契约 (12 节严格技术规范)
 │   ├── 📜 CONTRACT_P2_STRESS.md                   # 阶段二高压压测数据集契约
 │   ├── 📜 CONTRACT_P3_E2E.md                      # 阶段三端到端混合检索评测集契约
@@ -74,12 +76,18 @@
 │   ├── 🐍 build_phase3_hybrid_e2e.py              # 阶段三混合检索与端到端评测集生成脚本 (GLM-5.3-Flash)
 │   ├── 🐍 eval_phase3_hybrid.py                   # 阶段三混合检索评测驱动 (支持 fastembed / builtin)
 │   ├── 🐍 gate3_check.py                          # 阶段三 Gate 3 六项发布级硬指标一键机检器 (16/16 PASS)
+│   ├── 🐍 build_phase4_hard_negatives.py          # 阶段四难负例对抗基准生成脚本 (GLM-5.3-Flash)
+│   ├── 🐍 build_demo_graph.py                     # 阶段四离线图谱生成脚本
 │   ├── 📂 data/                                   # 评测与压测数据集
 │   │   ├── 📄 eval_cases_40.json                  # 阶段一 40 组全栈演进与 Anti-trap 陷阱测试集 (171 KB)
 │   │   ├── 📄 phase2_dense_stress_15.json         # 阶段二 15 组高密度多跳高压场景压测集 (599 KB)
-│   │   └── 📄 phase3_hybrid_e2e_20.json           # 阶段三 20 组端到端混合检索与 XSS 评测集 (115 KB)
+│   │   ├── 📄 phase3_hybrid_e2e_20.json           # 阶段三 20 组端到端混合检索与 XSS 评测集 (115 KB)
+│   │   └── 📄 phase4_hard_negatives_20.json       # 阶段四 20 组同语境高碰撞难负例基准集 (85 KB)
 │   └── 📂 reports/                                # 全阶段报告
-│       ├── 📄 phase3_gemini_final_audit.md        # 阶段三 Gemini 异构终审报告 (UNCONDITIONAL PASS 签署)
+│       ├── 📄 phase4_release_audit.md             # 阶段四 Gemini 发版终审报告 (APPROVED 放行签署)
+│       ├── 📄 phase4_hard_negatives_report.md     # 阶段四难负例三通道实测报告 (+40pp 净增益)
+│       ├── 📄 phase4_executive_adjudication_dossier.md # 阶段四发版与全项目结项案卷 (镜像)
+│       ├── 📄 phase3_gemini_final_audit.md        # 阶段三 Gemini 异构终审报告 (UNCONDITIONAL PASS)
 │       ├── 📄 phase3_audit_recheck.md             # 阶段三 Gemini 5 项缺陷闭环复核报告
 │       ├── 📄 phase3_executive_adjudication_dossier.md # 阶段三开源发布终审案卷 (镜像)
 │       ├── 📄 phase2_report.md                    # 阶段二主程交付报告 (DeepSeek-V4.1F 签发)
@@ -87,11 +95,14 @@
 │       ├── 📄 phase2_executive_adjudication_dossier.md # 阶段二门禁 2 终审案卷 (镜像)
 │       └── 📄 phase1_executive_adjudication_dossier.md # 阶段一门禁 1 终审案卷 (镜像)
 │
-├── 📂 docs/                          # 【运维】团队协作、技术交接与环境规范
+├── 📂 docs/                          # 【运维】团队协作、技术交接、离线 Demo 与环境规范
 │   ├── 📄 ENVIRONMENT.md                          # 专用 Conda 环境规范与 Base 踩坑避坑指南
+│   ├── 🌐 demo_memory_graph.html                  # 阶段四离线单文件 HTML5 力导向演示图谱 (Zero-CDN)
+│   ├── 🖼️ demo_screenshot.png                     # 演示图谱交互界面静态截图
 │   ├── 📄 phase1_handoff.md                       # 阶段一 → 阶段二工程技术交接与避坑指南
 │   ├── 📄 phase2_handoff.md                       # 阶段二 → 阶段三工程技术交接与接口规约
 │   ├── 📄 phase3_handoff.md                       # 阶段三 → 阶段四工程交付与开源发布交接
+│   ├── 📄 phase4_release_report.md                # 阶段四主程发版交付报告 (v1.0.0 零依赖攻关)
 │   ├── 📂 team_operations/                        # Agent Team 角色编排与指令书
 │   │   ├── 📄 AGENT_TEAM_SETUP.md                 # Agent Team 阵型设定与通道规则
 │   │   ├── 📄 PHASE1_PROMPT.md                    # 阶段一执行用 Prompt 任务卡包
@@ -123,8 +134,9 @@
 ### 2.1 `total_plan/` —— 顶层战略规划与大模型终审案卷
 * **定位**：整个项目的顶层指导委员会，存放所有交付给前沿大模型进行顶层决策的**裁决案卷（Dossiers）**与**工程实施方案（Plans）**。
 * **核心资产**：
-  - [phase4_execution_directive.md](total_plan/phase4_execution_directive.md)：**【当前最高执行指令】v1.0.0 开源发布终审裁决令与阶段四执行指令书（GM-DIRECTIVE-P4-v3.0.0）**，包含 v1.0.0 正式发布令、MIT 协议与 PyPI 分层依赖打包规范、难负例对抗基准集设计与 WBS。
-  - [phase3_executive_adjudication_dossier.md](total_plan/phase3_executive_adjudication_dossier.md)：阶段三综合执行审计与开源发布裁决案卷（Gate 3 16/16 PASS 穿透依据）。
+  - [phase4_executive_adjudication_dossier.md](total_plan/phase4_executive_adjudication_dossier.md)：**【当前最高终审案卷】阶段四发版终审与全项目结项总案卷（GM-DOSSIER-P4-v4.0.0）**，穿透 Wheel 净室实装、pydantic 零依赖彻底解耦、难负例 +40pp 严格增益实证、setup 可逆性与 README 真实性。
+  - [phase4_execution_directive.md](total_plan/phase4_execution_directive.md)：v1.0.0 开源发布令与阶段四执行指令书（GM-DIRECTIVE-P4-v3.0.0）。
+  - [phase3_executive_adjudication_dossier.md](total_plan/phase3_executive_adjudication_dossier.md)：阶段三综合执行审计与开源发布裁决案卷。
   - [phase3_execution_directive.md](total_plan/phase3_execution_directive.md)：阶段三执行指令书（GM-DIRECTIVE-P3-v2.2.0）。
   - [phase2_executive_adjudication_dossier.md](total_plan/phase2_executive_adjudication_dossier.md)：阶段二综合执行审计与大模型裁决案卷。
   - [phase2_execution_directive.md](total_plan/phase2_execution_directive.md)：二阶段终审执行指令（GM-DIRECTIVE-P2-v2.1.2）。
@@ -137,8 +149,8 @@
 ### 2.2 `src/gated_mem/` 与 `tests/` —— 生产代码与单元测试
 * **定位**：Gated-Mem 核心产品代码与自动化单测资产（由 Tech Lead `DeepSeek-V4.1F` 独占开发维护）。
 * **核心资产**：
-  - `src/gated_mem/`：包含 6 大核心模块与多 Agent 适配层（`adapters/`）、向量引擎（`embeddings.py`）、MCP 服务端（`server.py`）、命令行工具（`cli.py`）、HTML 导出器（`exporter.py`）。
-  - `tests/`：12 个测试套件，**154 项单测全绿通过**，覆盖率稳达 **90.0%**，包含 AST 语法级纯净度、MCP 零杂音与 Paint 作用域回归扫描。
+  - `src/gated_mem/`：包含 6 大核心模块与多 Agent 适配层（`adapters/`）、向量引擎（`embeddings.py`）、MCP 服务端（`server.py`）、命令行工具（`cli.py`）、HTML 导出器（`exporter.py`），核心内核 100% 仅依赖 Python 标准库。
+  - `tests/`：13 个测试套件，**176 项单测全绿通过**，覆盖率稳达 **90.0%**，包含 AST 语法级纯净度、零依赖结构性守卫与安装可逆性回归测试。
 
 ---
 
