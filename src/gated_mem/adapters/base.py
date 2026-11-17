@@ -38,6 +38,14 @@ def _safe_path_exists(p: Path) -> bool:
         return False
 
 
+def _safe_home() -> Optional[Path]:
+    """在受限沙箱或无 HOME 环境变量的容器中安全获取主目录，绝不抛出 RuntimeError/OSError。"""
+    try:
+        return Path.home()
+    except (RuntimeError, PermissionError, OSError):
+        return None
+
+
 class BaseAgentAdapter(object):
     """宿主 Agent 适配器基类。"""
 
@@ -187,7 +195,14 @@ def all_adapters() -> List[BaseAgentAdapter]:
 
 def detect_available() -> List[BaseAgentAdapter]:
     """探测本机已安装的 Agent，按 priority 排序。"""
-    return [a for a in all_adapters() if a.detect_installed()]
+    out: List[BaseAgentAdapter] = []
+    for a in all_adapters():
+        try:
+            if a.detect_installed():
+                out.append(a)
+        except (PermissionError, OSError, RuntimeError):
+            continue
+    return out
 
 
 def reset_registry() -> None:

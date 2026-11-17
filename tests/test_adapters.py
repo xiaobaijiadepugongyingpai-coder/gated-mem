@@ -300,3 +300,59 @@ def test_write_json_survives_permission_error_on_probe(monkeypatch, tmp_path):
     ClaudeCodeAdapter()._write_json(target, {"mcpServers": {"gated-mem": {}}})
     assert target.exists()
     assert "gated-mem" in json.loads(target.read_text(encoding="utf-8"))["mcpServers"]
+
+
+def test_safe_home_swallows_runtime_error(monkeypatch):
+    """无 HOME/USERPROFILE 时 Path.home() 抛 RuntimeError，_safe_home() 返回 None。"""
+    def no_home():
+        raise RuntimeError("Can't determine home directory")
+
+    monkeypatch.setattr(Path, "home", staticmethod(no_home))
+    assert adapter_base._safe_home() is None
+
+
+def test_dsh_detect_and_active_profile_survive_home_runtime_error(monkeypatch, capsys):
+    """DSH_HOME 未设置且 Path.home() 抛 RuntimeError 时，探测与推断不二次抛错。"""
+    monkeypatch.delenv("DSH_HOME", raising=False)
+
+    def no_home():
+        raise RuntimeError("Can't determine home directory")
+
+    monkeypatch.setattr(Path, "home", staticmethod(no_home))
+    ad = DshAdapter()
+    assert ad.detect_installed() is False
+    assert ad.active_profile() == "desktop"
+    err = capsys.readouterr().err
+    assert "~/.dsh/profiles" in err
+
+
+def test_claude_and_cursor_detect_installed_survive_permission_and_runtime_error(monkeypatch):
+    """ClaudeCodeAdapter 与 CursorAdapter 在 Path.home()/目录访问抛异常时降级为 False。"""
+    def no_home():
+        raise RuntimeError("Can't determine home directory")
+
+    monkeypatch.setattr(Path, "home", staticmethod(no_home))
+    assert ClaudeCodeAdapter().detect_installed() is False
+    assert CursorAdapter().detect_installed() is False
+
+    monkeypatch.undo()
+
+    def deny_dir(self):
+        raise PermissionError("denied by ACL")
+
+    monkeypatch.setattr(Path, "is_dir", deny_dir)
+    assert ClaudeCodeAdapter().detect_installed() is False
+    assert CursorAdapter().detect_installed() is False
+
+
+def test_detect_available_survives_adapter_exceptions(monkeypatch):
+    """某个适配器 detect_installed 抛异常时，detect_available() 跳过它并继续探测其余适配器。"""
+    def boom(self):
+        raise RuntimeError("probe failed")
+
+    monkeypatch.setattr(DshAdapter, "detect_installed", boom)
+    monkeypatch.setattr(ClaudeCodeAdapter, "detect_installed", lambda self: True)
+    monkeypatch.setattr(CursorAdapter, "detect_installed", lambda self: False)
+
+    avail = adapter_base.detect_available()
+    assert [a.agent_name for a in avail] == ["claude_code"]

@@ -22,7 +22,10 @@ class CursorAdapter(BaseAgentAdapter):
 
     def detect_installed(self) -> bool:
         """检测 Cursor：存在 ~/.cursor 目录。"""
-        return (Path.home() / ".cursor").is_dir()
+        try:
+            return (Path.home() / ".cursor").is_dir()
+        except (PermissionError, OSError, RuntimeError):
+            return False
 
     def generate_config(self, project_dir: Path) -> Dict[str, Any]:
         """生成 .cursor/mcp.json 内容。"""

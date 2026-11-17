@@ -1,5 +1,7 @@
 {
   "dataset": "phase5_e3_collision_disambiguation.json",
+  "dataset_md5": "6e6a966b349f26cf31409c3ff2635118",
+  "dataset_sha256": "fc728a78064cebc7714f6214effdf862cf86bf8257936563c947ea04d1b4f508",
   "provider": "fastembed-BAAI/bge-small-zh-v1.5",
   "cases": 20,
   "by_mode": {

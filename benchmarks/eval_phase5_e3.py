@@ -26,6 +26,7 @@
 from __future__ import print_function
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -108,7 +109,18 @@ def score_case(case, provider):
     return rankings, rows
 
 
+def _dataset_digests(path):
+    """计算数据集摘要（将 CRLF 归一化为 LF，消除跨平台换行差异）。"""
+    with open(path, "rb") as f:
+        raw = f.read().replace(b"\r\n", b"\n")
+    return {
+        "md5": hashlib.md5(raw).hexdigest(),
+        "sha256": hashlib.sha256(raw).hexdigest(),
+    }
+
+
 def run(dataset=DEFAULT_DATASET, provider_name="fastembed", verbose=True):
+    digests = _dataset_digests(dataset)
     with open(dataset, "r", encoding="utf-8") as f:
         data = json.load(f)
 
@@ -171,6 +183,8 @@ def run(dataset=DEFAULT_DATASET, provider_name="fastembed", verbose=True):
 
     out = {
         "dataset": os.path.basename(dataset),
+        "dataset_md5": digests["md5"],
+        "dataset_sha256": digests["sha256"],
         "provider": provider.model_id,
         "cases": len(per_case),
         "by_mode": summary,

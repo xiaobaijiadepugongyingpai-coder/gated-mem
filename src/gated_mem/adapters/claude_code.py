@@ -22,8 +22,11 @@ class ClaudeCodeAdapter(BaseAgentAdapter):
 
     def detect_installed(self) -> bool:
         """检测 Claude Code：存在 ~/.claude 或 ~/.claude.json。"""
-        home = Path.home()
-        return (home / ".claude").is_dir() or (home / ".claude.json").exists()
+        try:
+            home = Path.home()
+            return (home / ".claude").is_dir() or (home / ".claude.json").exists()
+        except (PermissionError, OSError, RuntimeError):
+            return False
 
     def generate_config(self, project_dir: Path) -> Dict[str, Any]:
         """生成 .mcp.json 内容。"""
