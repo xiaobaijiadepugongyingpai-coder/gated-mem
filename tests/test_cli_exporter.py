@@ -239,6 +239,52 @@ def test_build_snapshot_marks_stale(tmp_path):
 def test_render_html_contains_no_external_refs():
     html = render_html({"nodes": [], "edges": [], "max_step": 0})
     assert "http://" not in html.split("<script")[0].replace("https://www.w3.org", "")
+    assert "https://" not in html
+    assert "innerHTML" not in html
+
+
+def test_render_html_contains_studio_controls_and_escapes_xss():
+    snap = {
+        "nodes": [
+            {
+                "id": "M1",
+                "content": "</script><img src=x onerror=alert(1)>",
+                "memory_type": "DECISION",
+                "subject": "db",
+                "predicate": "engine",
+                "scope": "global",
+                "status": "active",
+                "pinned": True,
+                "created_step": 1,
+                "last_cited_step": 1,
+                "residual_diff": "",
+                "stale": False,
+                "stale_ancestors": [],
+            }
+        ],
+        "edges": [],
+        "max_step": 1,
+    }
+    html = render_html(snap)
+    for required in (
+        'id="searchInput"',
+        'id="filterBar"',
+        'id="timebar"',
+        'id="btnPlay"',
+        'id="slider"',
+        'id="stepLabel"',
+        'id="stTotal"',
+        'id="stStale"',
+        'id="nodeList"',
+        'id="detail"',
+        'id="empty"',
+        'id="btnResetView"',
+        'id="btnPhysics"',
+    ):
+        assert required in html, "缺少前端控件: %s" % required
+    data_block = html.split('<script id="data" type="application/json">')[1].split("</script>")[0]
+    assert "</script>" not in data_block
+    assert "<\\/script>" in data_block
     assert "innerHTML" not in html
 
 

@@ -85,9 +85,20 @@ def build_demo() -> Store:
         MemoryType.DECISION, "告警", "通道", 340,
         residual="[Replaced: PagerDuty] 分级策略无法自定义，值班同学半夜被无意义告警吵醒。")
 
-    # --- 执行覆盖：把 M1 / M9 / M11 标为 superseded ---
-    for mid, step in (("M1", 141), ("M9", 211), ("M11", 261)):
-        s.set_status(mid, MemoryStatus.SUPERSEDED, step)
+    # --- 执行覆盖：把 M1 / M9 / M11 标为 superseded，并记录 SUPERSEDES 演进边 ---
+    for new_id, old_id, edge_step, status_step in (
+        ("M5", "M1", 140, 141),
+        ("M10", "M9", 210, 211),
+        ("M12", "M11", 260, 261),
+    ):
+        s.insert_edge(MemoryEdge(
+            edge_id="E_SUP_%s_%s" % (new_id, old_id),
+            source_id=new_id,
+            target_id=old_id,
+            edge_type=EdgeType.SUPERSEDES,
+            created_step=edge_step,
+        ))
+        s.set_status(old_id, MemoryStatus.SUPERSEDED, status_step)
 
     return s
 
