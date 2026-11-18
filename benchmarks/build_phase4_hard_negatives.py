@@ -19,7 +19,7 @@
   3. 评测结果浮点统一 round 到 6 位。
 
 用法（在 gated-mem 专用 conda 环境内）：
-  <conda-env>/python benchmarks/build_phase4_hard_negatives.py
+  python benchmarks/build_phase4_hard_negatives.py
 选项：
   --skip-build   不重建 JSON（读现有文件做评测）
   --skip-eval    只生成数据，不做评测
@@ -877,10 +877,10 @@ def render_report(result: Dict[str, Any], dataset_path: str, sha256: str) -> str
     ap("")
     ap("~~~")
     ap("# 专用 conda 环境（含 fastembed，禁止污染 base）")
-    ap("<conda-env>/python benchmarks/build_phase4_hard_negatives.py")
+    ap("python benchmarks/build_phase4_hard_negatives.py")
     ap("")
     ap("# 确定性自检：连跑两次数据文件 sha256 必须一致")
-    ap("<conda-env>/python benchmarks/build_phase4_hard_negatives.py --skip-eval --skip-report")
+    ap("python benchmarks/build_phase4_hard_negatives.py --skip-eval --skip-report")
     ap("~~~")
     ap("")
     ap("- 数据文件：benchmarks/data/phase4_hard_negatives_20.json，sha256 " + sha256 + "。")

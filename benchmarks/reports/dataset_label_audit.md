@@ -103,7 +103,7 @@
 
 ```console
 $ python benchmarks/tools/validate_dataset.py --dataset benchmarks/data/eval_cases_40.json
-[validate] 数据集: benchmarks\data\eval_cases_40.json
+[validate] 数据集: benchmarks/data/eval_cases_40.json
 [validate] ===== CONTRACT.md §3.5 九条硬约束 =====
   [OK]   约束 1: case_count=len(cases)=40，scenario_id=S01..S40 连续唯一零填充
   [OK]   约束 2: 全部 40 组 session_events 长度均在 [6,8]

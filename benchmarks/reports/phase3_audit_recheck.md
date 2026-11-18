@@ -3,7 +3,7 @@
 > **审计者**：Gemini-3.8-Flash（独立监察官，紫军异构终审位）  
 > **复核任务**：`t3 — auditor: 复核自己报的 4 项缺陷是否已闭环`（Attempt ID: `01ec4ff4-9f30-4b11-ba87-9d5bdf8cdd45`）  
 > **执行环境**：专用 Conda 环境 `<conda-env>/python`（Python 3.9.25，禁动 base）  
-> **前序报告**：[phase3_gemini_final_audit.md](benchmarks/reports/phase3_gemini_final_audit.md)  
+> **前序报告**：[phase3_gemini_final_audit.md](phase3_gemini_final_audit.md)  
 > **复核日期**：2026-11-12  
 
 ---
@@ -172,11 +172,11 @@ Traceback (most recent call last):
     return _run_code(code, main_globals, None,
   File "<conda-env>/lib/runpy.py", line 87, in _run_code
     exec(code, run_globals)
-  File "src\gated_mem\cli.py", line 565, in <module>
+  File "<repo-root>/src/gated_mem/cli.py", line 565, in <module>
     sys.exit(main())
-  File "src\gated_mem\cli.py", line 556, in main
+  File "<repo-root>/src/gated_mem/cli.py", line 556, in main
     return int(args.func(args))
-  File "src\gated_mem\cli.py", line 215, in cmd_remember
+  File "<repo-root>/src/gated_mem/cli.py", line 215, in cmd_remember
     print(p("⚠ 已挂起为候选冲突", "yellow"))
 UnboundLocalError: local variable 'p' referenced before assignment
 ```

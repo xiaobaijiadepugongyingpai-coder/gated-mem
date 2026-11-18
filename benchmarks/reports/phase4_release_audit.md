@@ -42,7 +42,7 @@ conda create -y -n gmclean_audit python=3.9
 
 | 验证项 | 执行命令 | 实际输出 / 行为 | 判定 |
 | :--- | :--- | :--- | :---: |
-| **模块导入路径** | `python -c "import gated_mem; print(gated_mem.__file__)"` | `<clean-venv>/lib/site-packages\gated_mem\__init__.py` (严格指向 site-packages，绝非仓库 src/) | **PASS** |
+| **模块导入路径** | `python -c "import gated_mem; print(gated_mem.__file__)"` | `<clean-venv>/lib/site-packages/gated_mem/__init__.py` (严格指向 site-packages，绝非仓库 src/) | **PASS** |
 | **版本号** | `python -m gated_mem.cli --version` | `gated-mem 1.0.0` | **PASS** |
 | **环境诊断** | `python -m gated_mem.cli doctor` | 完整输出 WAL/FTS5/内置哈希 Embedder 384 维正常运行，退出码 0 | **PASS** |
 

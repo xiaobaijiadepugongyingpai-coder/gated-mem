@@ -376,10 +376,10 @@ Provider：FastEmbedProvider（BAAI/bge-small-zh-v1.5，384 维，fastembed 本�
 
 ~~~
 # 专用 conda 环境（含 fastembed，禁止污染 base）
-<conda-env>/python benchmarks/build_phase4_hard_negatives.py
+python benchmarks/build_phase4_hard_negatives.py
 
 # 确定性自检：连跑两次数据文件 sha256 必须一致
-<conda-env>/python benchmarks/build_phase4_hard_negatives.py --skip-eval --skip-report
+python benchmarks/build_phase4_hard_negatives.py --skip-eval --skip-report
 ~~~
 
 - 数据文件：benchmarks/data/phase4_hard_negatives_20.json，sha256 e679a18066f225fecad0a01b86ec3501d6dfce7ab74b28388d2981c83758bf26。

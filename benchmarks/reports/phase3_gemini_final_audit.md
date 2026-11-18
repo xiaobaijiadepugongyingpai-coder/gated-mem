@@ -293,7 +293,7 @@
 
 ## 七、 缺陷修复终审复核（Recheck 附录）
 
-> 详细评测与实测数据见独立报告：[phase3_audit_recheck.md](benchmarks/reports/phase3_audit_recheck.md)
+> 详细评测与实测数据见独立报告：[phase3_audit_recheck.md](phase3_audit_recheck.md)
 
 1. **P1-1 `_fts_query` 无序 Set 切片**：**【CLOSED】**
    - 在 7 组哈希种子下跨进程实测 100% 逐字符全等；

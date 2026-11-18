@@ -1,7 +1,7 @@
 {
   "python": {
     "python": "3.9.13",
-    "executable": "<base-python>",
+    "executable": "<python-exe>",
     "cwd": "<repo-root>"
   },
   "deps": {
@@ -12,7 +12,7 @@
   "src": {
     "importable": true,
     "version": "1.0.0",
-    "path": "src\\gated_mem\\__init__.py",
+    "path": "src/gated_mem/__init__.py",
     "gates.compute_retention": true,
     "gates.compute_vitality": true,
     "gates.compute_retrieval_score": true,

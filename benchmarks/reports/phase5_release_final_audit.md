@@ -2,7 +2,7 @@
 
 **审计员**：auditor-x（独立复核，只读；未修改任何他人产物）
 **审计时间**：2026-11-13 13:49 – 14:05（Asia/Shanghai）
-**环境**：Windows 10.0.26200 / Python 3.9.25（`<conda-env>`）/ git master @ `7739f5a`
+**环境**：Windows 10.0.26200 / Python 3.9.25（`<conda-env:gated-mem>`）/ git master @ `7739f5a`
 **审计原则**：不采信任何现成结论，所有数字由本审计员独立重写脚本复算；不 import 被审脚本的函数。
 
 ---

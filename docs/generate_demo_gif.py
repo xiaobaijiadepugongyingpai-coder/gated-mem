@@ -7,7 +7,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 WIDTH = 880
 HEIGHT = 500
-FONT_PATH = "consola.ttf"
+FONT_DIR = os.path.join(os.environ.get("SystemRoot", ""), "Fonts")
+FONT_PATH = os.path.join(FONT_DIR, "consola.ttf") if FONT_DIR else "consola.ttf"
 FONT_SIZE = 15
 LINE_HEIGHT = 22
 
@@ -26,7 +27,8 @@ PURPLE = (188, 140, 255)       # #BC8CFF
 
 def get_font(size=FONT_SIZE, bold=False):
     try:
-        path = "consolab.ttf" if bold else FONT_PATH
+        bold_path = os.path.join(FONT_DIR, "consolab.ttf") if FONT_DIR else "consolab.ttf"
+        path = bold_path if bold else FONT_PATH
         return ImageFont.truetype(path, size)
     except Exception:
         return ImageFont.load_default()
