@@ -5,7 +5,7 @@
 
 <p align="center">
 
-![Tests](https://img.shields.io/badge/Tests-190%20Passed-brightgreen)
+![Tests](https://img.shields.io/badge/Tests-191%20Passed-brightgreen)
 ![Coverage](https://img.shields.io/badge/Coverage-90%25-brightgreen)
 ![Python](https://img.shields.io/badge/Python-%3E%3D3.9-blue)
 ![Dependencies](https://img.shields.io/badge/Core%20Dependencies-Zero-success)
@@ -165,8 +165,9 @@ gated-mem export-html -o memory_graph.html
 ```
 
 **Then double-click [`docs/demo_memory_graph.html`](docs/demo_memory_graph.html)** to see what
-an exported graph looks like — 15 nodes, drag to pan, scroll to zoom, click any node, and use
-the Step slider at the bottom to scrub back through time.
+an exported graph looks like — 15 nodes, 9 causal edges (`BELONGS_TO` + `SUPERSEDES`), drag
+individual nodes, hover 1-hop chains, filter/search memories, and use the bottom Time-Travel
+playback dock to watch superseded nodes and stale-ancestor warnings evolve across steps.
 
 ![Gated-Mem exported graph](docs/demo_screenshot.png)
 
@@ -259,10 +260,11 @@ not a Min-Max-stretched `1.0`. All-noise candidate pools cannot fake relevance.
 | `BuiltinHashEmbedder` (default, zero-dep) | 50% | 45% | **65%** (+15pp over best single) |
 | `FastEmbedProvider` (bge-small-zh-v1.5) | 45% | 95% | **95%** |
 
-> **Honest caveat:** with a strong semantic model, fusion *equals* the vector channel on our
-> Phase-3 set (95%) — it never loses, but it does not strictly beat it either, because no case
-> in that set was won by BM25 alone (`fts_only = 0`). Establishing strict complementarity
-> requires hard-negative identifier collisions; that benchmark is Phase 4 work.
+> **Honest caveat:** on the 20-case Phase-3 general set (where no query had cross-module
+> symbol collision, `fts_only = 0`), fusion equals the strong vector channel (95%). Strict
+> complementarity (+40.00pp over the best single channel) emerges specifically when exact
+> symbols collide across modules under semantic paraphrase — see the Phase-5 E3 benchmark
+> at the top of this README.
 
 ---
 
@@ -316,7 +318,7 @@ try. Semantic mode is opt-in, and `doctor` tells you which tier is active.
 ## Verifying the Claims
 
 ```bash
-python -m pytest tests/ -q                       # 190 tests
+python -m pytest tests/ -q                       # 191 tests
 python -m coverage run --source=src/gated_mem -m pytest tests/ -q
 python -m coverage report -m                     # 90%
 python benchmarks/gate3_check.py                 # 16/16 release gates
@@ -334,7 +336,9 @@ Every number in this README traces back to a file under `benchmarks/results/` or
 1. **`BuiltinHashEmbedder` is purely lexical.** Zero character overlap ⇒ cosine `0.0`. It has
    a hand-maintained concept lexicon for limited bridging, but it is **not** a semantic model.
    Install `[onnx]` if you need real semantics.
-2. **Hybrid complementarity is not yet proven under a strong embedder** (see above).
+2. **Hybrid complementarity is regime-specific.** Under a strong semantic embedder, fusion's
+   +40.00pp gain is specific to cross-module symbol collisions (Phase 5 E3); on general
+   queries without colliding identifiers, a single channel already saturates.
 3. **Token counting is an estimate** (CJK by character, Latin by word/punctuation).
 4. **MCP implements the core subset** — `initialize`, `tools/list`, `tools/call`, `ping`.
    `resources` / `prompts` / `sampling` are not implemented yet.
@@ -346,6 +350,8 @@ Every number in this README traces back to a file under `benchmarks/results/` or
 
 | Doc | Contents |
 | :--- | :--- |
+| [docs/phase5_handoff.md](docs/phase5_handoff.md) | Latest project state, Phase 5 summary & AI handover guide |
+| [docs/PHASE5_V11_EXTERNAL_EVAL_PLAN.md](docs/PHASE5_V11_EXTERNAL_EVAL_PLAN.md) | v1.1 external benchmark plan (MemoryAgentBench CR & Memora) |
 | [docs/phase3_handoff.md](docs/phase3_handoff.md) | Architecture, adapters, known gaps, Phase 4 checklist |
 | [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) | Dedicated env setup + the base-env pitfalls we hit |
 | [benchmarks/CONTRACT.md](benchmarks/CONTRACT.md) | Frozen Phase-1 measurement contract |

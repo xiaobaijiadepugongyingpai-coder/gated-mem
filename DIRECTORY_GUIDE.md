@@ -44,7 +44,7 @@ gated-mem/
 │           ├── 🐍 claude_code.py     # Claude Code 适配器 (.mcp.json 深合并)
 │           └── 🐍 cursor.py          # Cursor 适配器 (.cursor/mcp.json)
 │
-├── 📂 tests/                         # 【单元测试】自动化单测套件 (14 个测试文件，190 项用例全绿)
+├── 📂 tests/                         # 【单元测试】自动化单测套件 (14 个测试文件，191 项用例全绿)
 │   ├── 🐍 test_adapters.py           # DSH / Claude Code / Cursor 适配器、权限及 Path.home() RuntimeError 防御测试
 │   ├── 🐍 test_audit_fixes.py        # 多阶段审计发现问题回归测试
 │   ├── 🐍 test_cli_conflict_regression.py # CLI 冲突处理与交互作用域回归测试
@@ -71,7 +71,7 @@ gated-mem/
 │   ├── 🐍 eval_phase3_hybrid.py                   # 阶段三混合检索评测驱动 (支持 fastembed / builtin)
 │   ├── 🐍 gate3_check.py                          # 阶段三 Gate 3 六项发布级硬指标一键机检器 (16 项检查)
 │   ├── 🐍 build_phase4_hard_negatives.py          # 阶段四难负例对抗基准生成脚本
-│   ├── 🐍 build_demo_graph.py                     # 阶段四离线图谱生成脚本 (生成 docs/demo_memory_graph.html)
+│   ├── 🐍 build_demo_graph.py                     # 离线图谱剧本生成脚本 (15 节点 / 9 条边，生成 docs/demo_memory_graph.html)
 │   ├── 🐍 build_phase5_e3_collision.py            # 阶段五 E3 数据集生成器（注：含早先泄漏版本对比，冻结数据以防泄漏版为准）
 │   ├── 🐍 eval_phase5_e3.py                       # 阶段五 E3 跨模块同符号碰撞四通道评测驱动（含数据集哈希绑定）
 │   ├── 📂 audit/                                  # 独立评分器
@@ -106,9 +106,10 @@ gated-mem/
 │       └── 📄 audit_phase1.md / audit_crosscheck_gemini.md / dataset_label_audit.md / spike_cut1_report.md
 │
 ├── 📂 docs/                          # 【运维】环境规范、演示资产、阶段交接与 v1.1 外部评测规划
-│   ├── 📄 ENVIRONMENT.md                          # 专用虚拟环境规范与 Base 环境避坑指南
+│   ├── 📄 phase5_handoff.md                       # 【最新交接】阶段五暨当前工程进展与 AI 接手总交接文档
+│   ├── 📄 ENVIRONMENT.md                          # 专用虚拟环境规范、本机路径说明与 Base 环境避坑指南
 │   ├── 📄 PHASE5_V11_EXTERNAL_EVAL_PLAN.md        # v1.1 外部学术基准评测计划 (GM-PLAN-P5-V11-v1.0，上限 ¥50)
-│   ├── 🌐 demo_memory_graph.html                  # 离线单文件 HTML5 力导向演示图谱 (Zero-CDN)
+│   ├── 🌐 demo_memory_graph.html                  # 离线单文件 HTML5 记忆图谱工作台 (Zero-CDN，15 节点 / 9 条边，含时光机回放与搜索过滤)
 │   ├── 🎞️ demo.gif                                # README 交互式时光机与因果撤销动态演示图
 │   ├── 🖼️ demo_screenshot.png                     # 演示图谱交互界面静态截图
 │   ├── 🐍 generate_demo_gif.py                    # demo.gif 录制/生成脚本
@@ -140,7 +141,7 @@ gated-mem/
 * **定位**：Gated-Mem 核心引擎与自动化单测资产，核心运行时 **100% 仅依赖 Python 标准库**（`pyproject.toml` 中 `dependencies = []`）。
 * **核心资产**：
   - `src/gated_mem/`：包含核心状态机/存储/门控/事件/冲突/检索/向量引擎、MCP stdio 服务端（`server.py`）、命令行工具（`cli.py`）、零 CDN HTML 导出器（`exporter.py`）与多 Agent 适配层（`adapters/`）。
-  - `tests/`：14 个测试套件，当前共 **190 项单元测试**，包含 AST 语法级纯净度、零依赖 `-S` 导入守卫、安装可逆性与适配器权限/Home 异常防御测试。
+  - `tests/`：14 个测试套件，当前共 **191 项单元测试**，包含 AST 语法级纯净度、零依赖 `-S` 导入守卫、离线导出器工作台/XSS 防御、安装可逆性与适配器权限/Home 异常防御测试。
 
 ### 2.2 `benchmarks/` —— 基准测试体系、数据与裁决报告
 * **定位**：全阶段实证验证、对抗评测与终审归档目录。
@@ -153,7 +154,8 @@ gated-mem/
 ### 2.3 `docs/` 与 `experiments_v2/` —— 运维规范、演示与外部基准演进
 * **定位**：环境配置、交互式离线演示及面向 `v1.1-external-eval` 分支的外部基准（MemoryAgentBench CR / Memora）筹备区。
 * **核心资产**：
-  - [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md)：隔离虚拟环境配置指南与多版本 numpy 冲突避坑记录。
+  - [docs/phase5_handoff.md](docs/phase5_handoff.md)：**【最新】阶段五暨当前工程进展与 AI 接手总交接文档**（含双轨分支基线、本机环境路径、前端重构记录与待办清单）。
+  - [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md)：隔离虚拟环境配置指南、本机路径与多版本 numpy 冲突避坑记录。
   - [docs/PHASE5_V11_EXTERNAL_EVAL_PLAN.md](docs/PHASE5_V11_EXTERNAL_EVAL_PLAN.md)：v1.1 外部学术基准执行规划（`GM-PLAN-P5-V11-v1.0`）。
   - [experiments_v2/HANDOFF.md](experiments_v2/HANDOFF.md)：`experiments_v2` 交接说明与已跑通的 E0/E3（builtin 模式）实测记录。
 
@@ -164,7 +166,7 @@ gated-mem/
 ### 🚀 路径 A：运行全量验证套件
 在仓库根目录下执行：
 ```bash
-# 1. 运行 190 项单元测试
+# 1. 运行 191 项单元测试
 python -m pytest tests/ -q
 
 # 2. 验证核心包零第三方依赖 (-S 隔离 site-packages)

@@ -13,7 +13,9 @@ pip install pydantic pytest coverage
 pip install fastembed          # 可选：语义向量引擎
 ```
 
-解释器绝对路径：`<conda-env>/python`
+专用环境解释器占位符：`<conda-env>/python`
+
+> **当前工作区说明**：跑零依赖全量 `191` 项单测与 `python -S` 检查可直接使用当前环境中的 `python`（仅需 `pytest`）；严禁向 conda `base` 环境直接 `pip install fastembed`。若运行 GitNexus（`.gitnexus/run.cjs`）时 `node` 不在默认 `PATH` 中，需先将本机 Node.js 安装目录与 `$env:APPDATA\npm` 加入 `PATH`。
 
 | 组件 | 版本 | 说明 |
 | :--- | :--- | :--- |
@@ -48,13 +50,28 @@ get_default_provider("fastembed") # 本地 ONNX：bge-small-zh-v1.5，512 维，
 ## 3. 常用命令
 
 ```bash
+# 专用环境（含 fastembed 与 coverage）
 PY="<conda-env>/python"
 
-$PY -m pytest tests/ -q                                    # 141 项
+$PY -m pytest tests/ -q                                    # 191 项
 $PY -m coverage run --source=src/gated_mem -m pytest tests/ -q
 $PY -m coverage report -m                                  # 90%
 $PY benchmarks/gate3_check.py                              # Gate 3 六项
 $PY benchmarks/eval_phase3_hybrid.py --provider fastembed  # 混合检索评测
+```
+
+零依赖验证与 GitNexus 常用命令：
+
+```powershell
+# 1. 运行全量 191 项零依赖单测
+python -m pytest tests/ -q
+
+# 2. 验证核心包零第三方依赖 (-S 隔离 site-packages)
+python -S -c "import sys; sys.path.insert(0, 'src'); import gated_mem, gated_mem.cli, gated_mem.server, gated_mem.adapters"
+
+# 3. GitNexus（若 node 不在 PATH，先追加本机 Node.js 安装目录）
+$env:Path = "<nodejs-bin-dir>;$env:APPDATA\npm;" + $env:Path
+node .gitnexus/run.cjs analyze --index-only
 ```
 
 ## 4. 踩过的坑（务必避开）
