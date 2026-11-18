@@ -26,7 +26,7 @@ gated-mem/
 │
 ├── 📂 .github/                       # 【CI/Pages 自动化】GitHub Actions 工作流
 │   └── 📂 workflows/
-│       ├── 📄 ci.yml                 # Python 3.9/3.11/3.12 全量单测、覆盖率、-S 零依赖与 Gate3 导出门禁
+│       ├── 📄 ci.yml                 # Python 3.10/3.11/3.12 全量单测、覆盖率、-S 零依赖与 Gate3 导出门禁
 │       └── 📄 pages.yml              # 将 docs/ 自动部署至 GitHub Pages 交互式演示站
 │
 ├── 📂 src/                           # 【核心源码】Gated-Mem 生产级 Python 模块库 (纯标准库)

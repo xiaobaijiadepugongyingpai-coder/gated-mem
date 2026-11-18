@@ -102,7 +102,7 @@ f6e5a7 feat(exporter): redesign interactive HTML graph studio with time-aware pl
 ## 5. 下一棒 AI 接手待办清单（按优先级）
 
 1. **方向 A · 开源门面与推广推流收口（`master` 分支）**：
-   - [x] 新增 `.github/workflows/ci.yml`（Python 3.9 / 3.11 / 3.12 矩阵自动运行 `pytest` 覆盖率门禁、`python -S` 零依赖导入检查、`g3_exporter()` 与 E3 builtin 基准）。
+   - [x] 新增 `.github/workflows/ci.yml`（Python 3.10 / 3.11 / 3.12 矩阵自动运行 `pytest` 覆盖率门禁、`python -S` 零依赖导入检查、`g3_exporter()` 与 E3 builtin 基准）。
    - [x] 新增 `.github/workflows/pages.yml` 与 [docs/index.html](index.html)（修复原 README 顶部 `Live Interactive Graph Demo` 404 问题，推送后并在 GitHub Settings → Pages 选择 `GitHub Actions` 即可上线）。
    - [x] 更新新版前端工作台的 [demo_screenshot.png](demo_screenshot.png)、双幕式交互动图 [demo.gif](demo.gif)（Terminal CLI + 真实 Graph Studio 时光机帧）与 GitHub 社交分享预览卡 [social_preview.png](social_preview.png)。
    - [x] 重构 [README.md](../README.md) 首屏转化漏斗（修复未发 PyPI 前 `pip install gated-mem` 404 报错，前置可用安装命令与 30 秒本地沙盒体验，保留全部诚实边界与 E3 +40pp 审计数）。
