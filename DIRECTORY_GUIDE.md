@@ -24,6 +24,11 @@ gated-mem/
 ├── 📂 .claude/                       # GitNexus 代码分析技能卡目录
 │   └── 📂 skills/gitnexus-*          # exploring / impact-analysis / debugging / refactoring / guide / cli
 │
+├── 📂 .github/                       # 【CI/Pages 自动化】GitHub Actions 工作流
+│   └── 📂 workflows/
+│       ├── 📄 ci.yml                 # Python 3.9/3.11/3.12 全量单测、覆盖率、-S 零依赖与 Gate3 导出门禁
+│       └── 📄 pages.yml              # 将 docs/ 自动部署至 GitHub Pages 交互式演示站
+│
 ├── 📂 src/                           # 【核心源码】Gated-Mem 生产级 Python 模块库 (纯标准库)
 │   └── 📂 gated_mem/                 # 核心内核实现包 (零第三方运行时依赖)
 │       ├── 🐍 __init__.py            # 纯净包定义 (零副作用，导出 __version__)
@@ -107,12 +112,14 @@ gated-mem/
 │
 ├── 📂 docs/                          # 【运维】环境规范、演示资产、阶段交接与 v1.1 外部评测规划
 │   ├── 📄 phase5_handoff.md                       # 【最新交接】阶段五暨当前工程进展与 AI 接手总交接文档
-│   ├── 📄 ENVIRONMENT.md                          # 专用虚拟环境规范、本机路径说明与 Base 环境避坑指南
+│   ├── 📄 ENVIRONMENT.md                          # 专用虚拟环境规范 (py3.11)、本机路径说明与 Base 环境避坑指南
 │   ├── 📄 PHASE5_V11_EXTERNAL_EVAL_PLAN.md        # v1.1 外部学术基准评测计划 (GM-PLAN-P5-V11-v1.0，上限 ¥50)
+│   ├── 🌐 index.html                              # GitHub Pages 演示门户页 (内嵌图谱工作台 + 一键复制安装命令)
 │   ├── 🌐 demo_memory_graph.html                  # 离线单文件 HTML5 记忆图谱工作台 (Zero-CDN，15 节点 / 9 条边，含时光机回放与搜索过滤)
-│   ├── 🎞️ demo.gif                                # README 交互式时光机与因果撤销动态演示图
-│   ├── 🖼️ demo_screenshot.png                     # 演示图谱交互界面静态截图
-│   ├── 🐍 generate_demo_gif.py                    # demo.gif 录制/生成脚本
+│   ├── 🎞️ demo.gif                                # README 双幕动图 (CLI 演进流 + 真实图谱工作台时光机回放)
+│   ├── 🖼️ demo_screenshot.png                     # 新版图谱工作台高分交互截图
+│   ├── 🖼️ social_preview.png                      # 1280×640 GitHub Social Preview 分享预览卡片
+│   ├── 🐍 generate_demo_gif.py                    # demo.gif / demo_screenshot.png / social_preview.png 一键生成脚本
 │   ├── 📄 CONTRACT_P2_STRESS.md                   # 阶段二压测数据集契约
 │   ├── 📄 CONTRACT_P3_E2E.md                      # 阶段三端到端混合检索评测集契约
 │   ├── 📄 phase1_handoff.md / phase2_handoff.md / phase3_handoff.md / phase4_release_report.md
