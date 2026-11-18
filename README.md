@@ -5,7 +5,7 @@
 
 <p align="center">
 
-![Tests](https://img.shields.io/badge/Tests-186%20Passed-brightgreen)
+![Tests](https://img.shields.io/badge/Tests-190%20Passed-brightgreen)
 ![Coverage](https://img.shields.io/badge/Coverage-90%25-brightgreen)
 ![Python](https://img.shields.io/badge/Python-%3E%3D3.9-blue)
 ![Dependencies](https://img.shields.io/badge/Core%20Dependencies-Zero-success)
@@ -316,7 +316,7 @@ try. Semantic mode is opt-in, and `doctor` tells you which tier is active.
 ## Verifying the Claims
 
 ```bash
-python -m pytest tests/ -q                       # 186 tests
+python -m pytest tests/ -q                       # 190 tests
 python -m coverage run --source=src/gated_mem -m pytest tests/ -q
 python -m coverage report -m                     # 90%
 python benchmarks/gate3_check.py                 # 16/16 release gates

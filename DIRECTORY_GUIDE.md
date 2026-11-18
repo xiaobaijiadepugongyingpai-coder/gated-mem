@@ -1,201 +1,184 @@
 # Gated-Mem 工作区目录全景导航指南
 # (Workspace Directory Guide & Architecture Map)
 
-> **更新时间**：2026-11-12  
+> **更新时间**：2026-11-18  
 > **项目定位**：*Git for Agent Memory —— 面向超长开发周期的本地可审计、可回滚架构状态引擎*  
-> **使用说明**：本文档为当前工作区（`<repo-root>`）的统一入口导航指南，对所有整理归类的模块、文档、脚本及数据资产提供系统性索引与快速访问通道。
+> **使用说明**：本文档为当前仓库根目录（`gated-mem/`）的统一入口导航指南，同步当前 `master` 分支真实文件布局，对所有模块、测试、基准资产、运维文档及异步实验脚手架提供索引。  
+> **历史归档说明**：早期方案探索（`Preliminary_Exploration/`）与过程性计划草稿（`total_plan/`）已于发版清理阶段（commit `1f36668`）移出主目录并保存在 Git 历史中；各阶段终审裁决案卷已统一镜像归档于 `benchmarks/reports/`。
 
 ---
 
 ## 1. 工作区全景架构树 (Directory Tree)
 
 ```text
-<repo-root>/
+gated-mem/
 │
-├── 📜 README.md                      # 项目入口说明与核心导航
+├── 📜 README.md                      # 项目入口说明、核心基准与 30 秒上手指南
 ├── 📜 DIRECTORY_GUIDE.md             # [当前文件] 完整工作区目录指南与索引
-├── 📜 AGENTS.md                      # GitNexus 代码情报规则与 Agent 行为铁律
+├── 📜 pyproject.toml                 # 零核心依赖打包清单 (dependencies = []，extras: onnx/cli/all/dev)
+├── 📜 LICENSE                        # MIT 开源协议
+├── 📜 AGENTS.md                      # GitNexus 代码情报规则与 Agent 行为约束
 ├── 📜 CLAUDE.md                      # Claude Code 适配规范与会话约束
 ├── 📜 .gitignore                     # Git 忽略配置
 │
-├── 📂 src/                           # 【核心源码】Gated-Mem 生产级 Python 模块库
-│   └── 📂 gated_mem/                 # 核心内核实现包 (独占主程 DeepSeek-V4.1F)
-│       ├── 🐍 __init__.py            # 纯净包定义 (零副作用)
+├── 📂 .claude/                       # GitNexus 代码分析技能卡目录
+│   └── 📂 skills/gitnexus-*          # exploring / impact-analysis / debugging / refactoring / guide / cli
+│
+├── 📂 src/                           # 【核心源码】Gated-Mem 生产级 Python 模块库 (纯标准库)
+│   └── 📂 gated_mem/                 # 核心内核实现包 (零第三方运行时依赖)
+│       ├── 🐍 __init__.py            # 纯净包定义 (零副作用，导出 __version__)
 │       ├── 🐍 schema.py              # 五状态枚举、四类型衰减参数、5×5 状态矩阵、双通道回执契约
 │       ├── 🐍 gates.py               # 无状态纯数学门控函数、零连坐扣分设计、有界校准混合融合计算
 │       ├── 🐍 storage.py             # WAL 模式 SQLite、BLOB 向量、FTS5 虚表、递归 CTE、原子 Undo
 │       ├── 🐍 events.py              # 事件溯源批次链（causation_id）、投影重建（消费 EVENT_UNDONE）
 │       ├── 🐍 conflicts.py           # 槽位两阶段裁决、别名归一化、[Replaced: X] 残差装配、覆盖零误杀
 │       ├── 🐍 retrieval.py           # 混合检索饱和校准融合、多跳失效追溯、TOPK 强截断、双通道 XML 生成
-│       ├── 🐍 embeddings.py          # 向量引擎抽象、384维内置哈希兜底(BuiltinHashEmbedder)、本地ONNX(FastEmbed)
-│       ├── 🐍 server.py              # 标准 MCP JSON-RPC over stdio 服务端 (4大标准工具，零杂音字节)
-│       ├── 🐍 cli.py                 # 终端命令行工具集 (init/status/doctor/setup/remember/query/log/explain/conflicts/undo)
+│       ├── 🐍 embeddings.py          # 向量引擎抽象、384 维内置哈希兜底(BuiltinHashEmbedder)、本地 ONNX(FastEmbed)
+│       ├── 🐍 server.py              # 标准 MCP JSON-RPC over stdio 服务端 (4 大标准工具，零杂音字节)
+│       ├── 🐍 cli.py                 # 终端命令行工具集 (init/status/doctor/setup/remember/query/log/explain/conflicts/undo/export-html)
 │       ├── 🐍 exporter.py            # 零 CDN 离线单文件 HTML 力导向图与时间轴时光机导出器 (XSS 绝对防御)
-│       └── 📂 adapters/              # 多 Agent 适配器矩阵 (统一 BaseAgentAdapter 抽象)
+│       └── 📂 adapters/              # 多 Agent 适配器矩阵 (统一 BaseAgentAdapter 抽象 + 权限/Home 异常防御)
 │           ├── 🐍 __init__.py        # 适配器自动注册与优先级调度
-│           ├── 🐍 base.py            # 统一适配器抽象基类
+│           ├── 🐍 base.py            # 统一适配器抽象基类（含 _safe_path_exists / _safe_home）
 │           ├── 🐍 dsh.py             # 【P0 第一公民】DeepSeek Harness 专属适配器 (cordis.patch.yml + SKILL.md)
 │           ├── 🐍 claude_code.py     # Claude Code 适配器 (.mcp.json 深合并)
 │           └── 🐍 cursor.py          # Cursor 适配器 (.cursor/mcp.json)
 │
-├── 📂 tests/                         # 【单元测试】自动化单测套件 (154 个用例全绿，90% 覆盖率)
-│   ├── 🐍 test_schema.py             # 状态机迁移合法性、Pydantic 序列化与 XML 格式测试
-│   ├── 🐍 test_gates.py              # 幂律闭式解精度、生命力纯函数、有界校准融合测试
-│   ├── 🐍 test_storage.py            # SQLite 增删改查、FTS5 触发器同步、递归 CTE 多跳查询测试
-│   ├── 🐍 test_events.py             # 事件日志批次、causation 链追溯、投影重建测试
+├── 📂 tests/                         # 【单元测试】自动化单测套件 (14 个测试文件，190 项用例全绿)
+│   ├── 🐍 test_adapters.py           # DSH / Claude Code / Cursor 适配器、权限及 Path.home() RuntimeError 防御测试
+│   ├── 🐍 test_audit_fixes.py        # 多阶段审计发现问题回归测试
+│   ├── 🐍 test_cli_conflict_regression.py # CLI 冲突处理与交互作用域回归测试
+│   ├── 🐍 test_cli_exporter.py       # CLI 全命令端到端与离线 HTML 导出器 XSS/零 CDN 一致性测试
 │   ├── 🐍 test_conflicts.py          # 槽位冲突裁决、SUPERSEDES 关系标记、别名归一化测试
+│   ├── 🐍 test_events.py             # 事件日志批次、causation 链追溯、投影重建测试
+│   ├── 🐍 test_events_coverage.py    # 事件溯源边界与投影回放覆盖率补充测试
+│   ├── 🐍 test_gates.py              # 幂律闭式解精度、生命力纯函数、有界校准融合测试
+│   ├── 🐍 test_phase4.py             # 阶段四难负例、安装可逆性与结构守卫回归测试
+│   ├── 🐍 test_purity.py             # AST 语法级扫描 (禁 print/sys.stdout、禁 TODO、零连坐、Python 3.9 兼容)
 │   ├── 🐍 test_retrieval.py          # 混合检索、TOPK 淘汰观测、多跳失效告警、双通道隔离测试
-│   ├── 🐍 test_embeddings.py         # 内置哈希向量器、FastEmbed 探测、模型一致性测试
-│   ├── 🐍 test_mcp_server.py         # MCP JSON-RPC 协议解析、4 大工具调用与 stdio 零污染测试
-│   ├── 🐍 test_cli.py                # CLI 子命令端到端、Paint 变量作用域回归测试
-│   ├── 🐍 test_exporter.py           # HTML 导出器零外部 CDN、XSS 载荷转义、快照一致性测试
-│   ├── 🐍 test_adapters.py           # DSH / Claude Code / Cursor 适配器与 cordis.patch.yml 测试
-│   └── 🐍 test_purity.py             # AST 语法级扫描 (禁 print/stdout、禁 TODO、零连坐 psi 扫描)
+│   ├── 🐍 test_server.py             # MCP JSON-RPC 协议解析、4 大工具调用与 stdio 管道零污染测试
+│   ├── 🐍 test_storage_coverage.py   # SQLite 增删改查、FTS5 触发器同步、递归 CTE、原子 Undo 测试
+│   └── 🐍 test_zero_dependency.py    # 核心包零第三方运行时依赖结构性守卫测试
 │
-├── 📂 total_plan/                    # 【核心】顶层战略蓝图与大模型终审案卷
-│   ├── 📄 gated_mem_decision_dossier.md           # 阶段 0：多 AI 方案综合归纳与大模型拍板案卷
-│   ├── 📄 gated_mem_implementation_plan.md        # Plan One：水平切分多模型协同实施方案 (v2.1.1 增补版)
-│   ├── 📄 gated_mem_plan_two_maker_checker.md     # Plan Two：Maker-Checker 红蓝对抗推荐实施方案 (v2.2)
-│   ├── 📄 phase1_executive_adjudication_dossier.md# 阶段 1：首刀消融综合执行审计与门禁 1 大模型裁决案卷
-│   ├── 📄 phase2_execution_directive.md           # 阶段 2：大模型终审指令书 (GM-DIRECTIVE-P2-v2.1.2 阶段二执行指令)
-│   ├── 📄 phase2_executive_adjudication_dossier.md# 阶段 2：阶段二综合执行审计与大模型裁决案卷
-│   ├── 📄 phase3_execution_directive.md           # 阶段 3：大模型终审指令书 (GM-DIRECTIVE-P3-v2.2.0 阶段三执行指令)
-│   ├── 📄 phase3_executive_adjudication_dossier.md# 阶段 3：阶段三综合执行审计与开源发布裁决案卷
-│   ├── 📄 phase4_execution_directive.md           # 阶段 4：v1.0.0 开源发布令与阶段四执行指令 (GM-DIRECTIVE-P4-v3.0.0)
-│   ├── 📄 phase4_executive_adjudication_dossier.md# 阶段 4：阶段四发版终审与全项目结项总案卷 (GM-DOSSIER-P4-v4.0.0)
-│   └── 📄 phase5_release_and_supplementary_experiments.md # 阶段 5：【最新统筹】v1.0.0 发版、E3 破局实验与 v1.1 基准集成蓝图 (GM-DIRECTIVE-P5-v5.0.0)
-│
-├── 📂 benchmarks/                    # 【基准】阶段一/二/三/四基准测试体系与报告
+├── 📂 benchmarks/                    # 【基准】阶段一至阶段五基准测试体系、独立复核工具与报告
 │   ├── 📜 CONTRACT.md                             # 阶段一冻结契约 (12 节严格技术规范)
-│   ├── 📜 CONTRACT_P2_STRESS.md                   # 阶段二高压压测数据集契约
-│   ├── 📜 CONTRACT_P3_E2E.md                      # 阶段三端到端混合检索评测集契约
 │   ├── 🐍 spike_cut1.py                           # 阶段一三分支核心运行器与自检器 (纯标准库)
-│   ├── 🐍 build_phase2_stress.py                  # 阶段二高压数据集确定性生成脚本 (GLM-5.3-Flash)
+│   ├── 🐍 build_phase2_stress.py                  # 阶段二高压数据集确定性生成脚本
+│   ├── 🐍 pressure_phase2.py                      # 阶段二高压随机场景压力生成与运行器
 │   ├── 🐍 run_phase2_stress.py                    # 阶段二高压检索与生死对照运行器
-│   ├── 🐍 gate2_check.py                          # 阶段二 Gate 2 六项硬指标自动化验证器 (15/15 PASS)
-│   ├── 🐍 build_phase3_hybrid_e2e.py              # 阶段三混合检索与端到端评测集生成脚本 (GLM-5.3-Flash)
+│   ├── 🐍 gate2_check.py                          # 阶段二 Gate 2 六项硬指标自动化验证器 (15 项检查)
+│   ├── 🐍 build_phase3_hybrid_e2e.py              # 阶段三混合检索与端到端评测集生成脚本
 │   ├── 🐍 eval_phase3_hybrid.py                   # 阶段三混合检索评测驱动 (支持 fastembed / builtin)
-│   ├── 🐍 gate3_check.py                          # 阶段三 Gate 3 六项发布级硬指标一键机检器 (16/16 PASS)
-│   ├── 🐍 build_phase4_hard_negatives.py          # 阶段四难负例对抗基准生成脚本 (GLM-5.3-Flash)
-│   ├── 🐍 build_demo_graph.py                     # 阶段四离线图谱生成脚本
+│   ├── 🐍 gate3_check.py                          # 阶段三 Gate 3 六项发布级硬指标一键机检器 (16 项检查)
+│   ├── 🐍 build_phase4_hard_negatives.py          # 阶段四难负例对抗基准生成脚本
+│   ├── 🐍 build_demo_graph.py                     # 阶段四离线图谱生成脚本 (生成 docs/demo_memory_graph.html)
+│   ├── 🐍 build_phase5_e3_collision.py            # 阶段五 E3 数据集生成器（注：含早先泄漏版本对比，冻结数据以防泄漏版为准）
+│   ├── 🐍 eval_phase5_e3.py                       # 阶段五 E3 跨模块同符号碰撞四通道评测驱动（含数据集哈希绑定）
+│   ├── 📂 audit/                                  # 独立评分器
+│   │   └── 🐍 independent_scorer.py               # 独立黑盒打分器
 │   ├── 📂 data/                                   # 评测与压测数据集
-│   │   ├── 📄 eval_cases_40.json                  # 阶段一 40 组全栈演进与 Anti-trap 陷阱测试集 (171 KB)
-│   │   ├── 📄 phase2_dense_stress_15.json         # 阶段二 15 组高密度多跳高压场景压测集 (599 KB)
-│   │   ├── 📄 phase3_hybrid_e2e_20.json           # 阶段三 20 组端到端混合检索与 XSS 评测集 (115 KB)
-│   │   └── 📄 phase4_hard_negatives_20.json       # 阶段四 20 组同语境高碰撞难负例基准集 (85 KB)
-│   └── 📂 reports/                                # 全阶段报告
-│       ├── 📄 phase4_release_audit.md             # 阶段四 Gemini 发版终审报告 (APPROVED 放行签署)
-│       ├── 📄 phase4_hard_negatives_report.md     # 阶段四难负例三通道实测报告 (+40pp 净增益)
-│       ├── 📄 phase4_executive_adjudication_dossier.md # 阶段四发版与全项目结项案卷 (镜像)
-│       ├── 📄 phase3_gemini_final_audit.md        # 阶段三 Gemini 异构终审报告 (UNCONDITIONAL PASS)
-│       ├── 📄 phase3_audit_recheck.md             # 阶段三 Gemini 5 项缺陷闭环复核报告
-│       ├── 📄 phase3_executive_adjudication_dossier.md # 阶段三开源发布终审案卷 (镜像)
-│       ├── 📄 phase2_report.md                    # 阶段二主程交付报告 (DeepSeek-V4.1F 签发)
-│       ├── 📄 phase2_gemini_audit.md              # 阶段二异构黑盒审计报告 (Gemini 签署放行)
-│       ├── 📄 phase2_executive_adjudication_dossier.md # 阶段二门禁 2 终审案卷 (镜像)
-│       └── 📄 phase1_executive_adjudication_dossier.md # 阶段一门禁 1 终审案卷 (镜像)
+│   │   ├── 📄 eval_cases.schema.json              # 阶段一评测集 JSON Schema
+│   │   ├── 📄 eval_cases_40.json                  # 阶段一 40 组全栈演进与 Anti-trap 陷阱测试集
+│   │   ├── 📄 phase2_dense_stress_15.json         # 阶段二 15 组高密度多跳高压场景压测集
+│   │   ├── 📄 phase3_hybrid_e2e_20.json           # 阶段三 20 组端到端混合检索与 XSS 评测集
+│   │   ├── 📄 phase4_hard_negatives_20.json       # 阶段四 20 组同语境高碰撞难负例基准集
+│   │   └── 📄 phase5_e3_collision_disambiguation.json # 阶段五 E3 20 题防泄漏跨模块同符号碰撞基准集
+│   ├── 📂 tools/                                  # 数据构建校验与 E3 独立交叉复算脚本
+│   │   ├── 🐍 build_dataset.py / validate_dataset.py
+│   │   └── 🐍 build_phase5_e3.py / validate_phase5_e3.py / diag*_phase5_e3.py / verify*_phase5_e3.py
+│   ├── 📂 results/                                # 机器可读评测输出与汇总
+│   │   ├── 📄 RESULTS_SUMMARY.md / metrics.json / raw_runs.json / audit_scores.json
+│   │   └── 📄 phase5_e3_metrics.json / phase5_e3_metrics_verify.json
+│   └── 📂 reports/                                # 全阶段交付报告、异构审计与终审裁决案卷
+│       ├── 📄 phase5_executive_adjudication_verdict.md # 阶段五战地对账终审裁决书 (GM-VERDICT-P5-FINAL-v1.0.1)
+│       ├── 📄 phase5_release_final_audit.md       # 阶段五 v1.0.0 发布前独立复核报告
+│       ├── 📄 phase5_e3_report.md                 # 阶段五 E3 跨模块同符号碰撞消歧实测报告 (+40.00pp)
+│       ├── 📄 phase4_executive_adjudication_dossier.md # 阶段四发版终审与结项案卷 (GM-DOSSIER-P4-v4.0.0)
+│       ├── 📄 phase4_release_audit.md             # 阶段四 Gemini 发版终审报告
+│       ├── 📄 phase4_hard_negatives_report.md     # 阶段四难负例三通道实测报告
+│       ├── 📄 phase3_executive_adjudication_dossier.md # 阶段三开源发布终审案卷
+│       ├── 📄 phase3_gemini_final_audit.md        # 阶段三 Gemini 异构终审报告
+│       ├── 📄 phase3_audit_recheck.md             # 阶段三缺陷闭环复核报告
+│       ├── 📄 phase2_executive_adjudication_dossier.md # 阶段二门禁 2 终审案卷
+│       ├── 📄 phase2_gemini_audit.md              # 阶段二异构黑盒审计报告
+│       ├── 📄 phase2_report.md                    # 阶段二主程交付报告
+│       ├── 📄 phase1_executive_adjudication_dossier.md # 阶段一门禁 1 终审案卷
+│       └── 📄 audit_phase1.md / audit_crosscheck_gemini.md / dataset_label_audit.md / spike_cut1_report.md
 │
-├── 📂 docs/                          # 【运维】团队协作、技术交接、离线 Demo 与环境规范
-│   ├── 📄 ENVIRONMENT.md                          # 专用 Conda 环境规范与 Base 踩坑避坑指南
-│   ├── 🌐 demo_memory_graph.html                  # 阶段四离线单文件 HTML5 力导向演示图谱 (Zero-CDN)
+├── 📂 docs/                          # 【运维】环境规范、演示资产、阶段交接与 v1.1 外部评测规划
+│   ├── 📄 ENVIRONMENT.md                          # 专用虚拟环境规范与 Base 环境避坑指南
+│   ├── 📄 PHASE5_V11_EXTERNAL_EVAL_PLAN.md        # v1.1 外部学术基准评测计划 (GM-PLAN-P5-V11-v1.0，上限 ¥50)
+│   ├── 🌐 demo_memory_graph.html                  # 离线单文件 HTML5 力导向演示图谱 (Zero-CDN)
+│   ├── 🎞️ demo.gif                                # README 交互式时光机与因果撤销动态演示图
 │   ├── 🖼️ demo_screenshot.png                     # 演示图谱交互界面静态截图
-│   ├── 📄 phase1_handoff.md                       # 阶段一 → 阶段二工程技术交接与避坑指南
-│   ├── 📄 phase2_handoff.md                       # 阶段二 → 阶段三工程技术交接与接口规约
-│   ├── 📄 phase3_handoff.md                       # 阶段三 → 阶段四工程交付与开源发布交接
-│   ├── 📄 phase4_release_report.md                # 阶段四主程发版交付报告 (v1.0.0 零依赖攻关)
-│   ├── 📂 team_operations/                        # Agent Team 角色编排与指令书
-│   │   ├── 📄 AGENT_TEAM_SETUP.md                 # Agent Team 阵型设定与通道规则
-│   │   ├── 📄 PHASE1_PROMPT.md                    # 阶段一执行用 Prompt 任务卡包
-│   │   ├── 📄 PHASE2_DIRECTIVE.md                 # 阶段二团队执行指令书 (镜像)
-│   │   ├── 📄 PHASE3_DIRECTIVE.md                 # 阶段三团队执行指令书 (镜像)
-│   │   └── 📄 PHASE4_DIRECTIVE.md                 # 阶段四团队执行指令书 (镜像)
-│   └── 📂 llm_advisories/                         # 大模型原始终审指导文本归档
-│       ├── 📄 01_llm_adjudication_verdict.txt     # 初始大模型终审裁决书原文 (拍板.txt)
-│       └── 📄 02_llm_advice_maker_checker.txt     # 大模型关于 Plan Two 红蓝对抗架构的建议原文
+│   ├── 🐍 generate_demo_gif.py                    # demo.gif 录制/生成脚本
+│   ├── 📄 CONTRACT_P2_STRESS.md                   # 阶段二压测数据集契约
+│   ├── 📄 CONTRACT_P3_E2E.md                      # 阶段三端到端混合检索评测集契约
+│   ├── 📄 phase1_handoff.md / phase2_handoff.md / phase3_handoff.md / phase4_release_report.md
+│   ├── 📂 team_operations/                        # Agent Team 角色编排与各阶段执行指令书
+│   │   └── 📄 AGENT_TEAM_SETUP.md / PHASE1_PROMPT.md / PHASE2_DIRECTIVE.md / PHASE3_DIRECTIVE.md / PHASE4_DIRECTIVE.md
+│   └── 📂 llm_advisories/                         # 早期大模型原始终审指导文本归档
+│       └── 📄 01_llm_adjudication_verdict.txt / 02_llm_advice_maker_checker.txt
 │
-└── 📂 Preliminary_Exploration/       # 【归档】早期方案探索、学术争鸣与文献复核
-    ├── 📄 gated_mem.md                            # 总体方案 v2.0 初始设计文档
-    ├── 📄 memory_plugin.md                        # 初始探索备忘录 (LSTM 门控语义构想)
-    ├── 📄 project_plan.md                         # 早期学术级严格风控规划 (v1.0)
-    ├── 🌐 gated_mem_visualizer.html               # v2.0 力导向图原型与时间轴可视化网页
-    ├── 📂 artifacts/                              # 早期支撑材料与深度自检
-    │   ├── 📄 benchmark_guide.md                  # 早期公开基准与成本测算指南
-    │   ├── 📄 competitive_landscape_analysis.md   # 早期竞品全景对比分析
-    │   ├── 📄 gated_mem_workflow_guide.md         # 早期核心工作流全解指南
-    │   └── 📄 self_critique_and_landscape_enhancement.md # 早期深度自检与四痛点吸收报告
-    └── 📂 review/                                 # 早期学术与实证复核
-        └── 📄 gated_mem_review.md                 # 独立复核深度报告 (推翻 4 个过时前提)
+└── 📂 experiments_v2/                # 【外部评测骨架】只读调用 src/gated_mem/ 的外部基准实验区 (主实验在 v1.1-external-eval 分支推进)
+    ├── 📄 README.md / HANDOFF.md / PROVENANCE.md  # 实验设计、交接记录与数据溯源 (sha256)
+    ├── 🐍 run_env.py / selfcheck_e0.py            # E0 环境探测与适配层自检
+    ├── 📂 adapters/gated_store.py                 # 驱动 src/gated_mem/ 的只读适配层
+    ├── 📂 arms/{definitions.py, lenient_match.py} # 7 实验臂定义与宽松匹配器
+    ├── 📂 data/e3_naturalized.json                # 80 条自然语言改写检索集
+    ├── 📂 data_gen/build_naturalized.py           # 自然语言改写集生成器
+    ├── 📂 dl/fetch_mab.py                         # MemoryAgentBench 数据获取脚本
+    ├── 📂 runners/e3_naturalized.py               # E3 自然语言改写检索评测脚本
+    └── 📂 results/                                # e0_env.json / e3_naturalized_builtin.{json,md}
 ```
 
 ---
 
 ## 2. 核心目录分层与职责说明
 
-### 2.1 `total_plan/` —— 顶层战略规划与大模型终审案卷
-* **定位**：整个项目的顶层指导委员会，存放所有交付给前沿大模型进行顶层决策的**裁决案卷（Dossiers）**与**工程实施方案（Plans）**。
+### 2.1 `src/gated_mem/` 与 `tests/` —— 生产代码与单元测试
+* **定位**：Gated-Mem 核心引擎与自动化单测资产，核心运行时 **100% 仅依赖 Python 标准库**（`pyproject.toml` 中 `dependencies = []`）。
 * **核心资产**：
-  - [phase4_executive_adjudication_dossier.md](total_plan/phase4_executive_adjudication_dossier.md)：**【当前最高终审案卷】阶段四发版终审与全项目结项总案卷（GM-DOSSIER-P4-v4.0.0）**，穿透 Wheel 净室实装、pydantic 零依赖彻底解耦、难负例 +40pp 严格增益实证、setup 可逆性与 README 真实性。
-  - [phase4_execution_directive.md](total_plan/phase4_execution_directive.md)：v1.0.0 开源发布令与阶段四执行指令书（GM-DIRECTIVE-P4-v3.0.0）。
-  - [phase3_executive_adjudication_dossier.md](total_plan/phase3_executive_adjudication_dossier.md)：阶段三综合执行审计与开源发布裁决案卷。
-  - [phase3_execution_directive.md](total_plan/phase3_execution_directive.md)：阶段三执行指令书（GM-DIRECTIVE-P3-v2.2.0）。
-  - [phase2_executive_adjudication_dossier.md](total_plan/phase2_executive_adjudication_dossier.md)：阶段二综合执行审计与大模型裁决案卷。
-  - [phase2_execution_directive.md](total_plan/phase2_execution_directive.md)：二阶段终审执行指令（GM-DIRECTIVE-P2-v2.1.2）。
-  - [phase1_executive_adjudication_dossier.md](total_plan/phase1_executive_adjudication_dossier.md)：阶段一门禁 1 终审案卷。
-  - [gated_mem_plan_two_maker_checker.md](total_plan/gated_mem_plan_two_maker_checker.md)：Plan Two 实施方案（Maker-Checker 红蓝对抗阵型）。
-  - [gated_mem_decision_dossier.md](total_plan/gated_mem_decision_dossier.md)：阶段 0 决策案卷。
+  - `src/gated_mem/`：包含核心状态机/存储/门控/事件/冲突/检索/向量引擎、MCP stdio 服务端（`server.py`）、命令行工具（`cli.py`）、零 CDN HTML 导出器（`exporter.py`）与多 Agent 适配层（`adapters/`）。
+  - `tests/`：14 个测试套件，当前共 **190 项单元测试**，包含 AST 语法级纯净度、零依赖 `-S` 导入守卫、安装可逆性与适配器权限/Home 异常防御测试。
 
----
-
-### 2.2 `src/gated_mem/` 与 `tests/` —— 生产代码与单元测试
-* **定位**：Gated-Mem 核心产品代码与自动化单测资产（由 Tech Lead `DeepSeek-V4.1F` 独占开发维护）。
+### 2.2 `benchmarks/` —— 基准测试体系、数据与裁决报告
+* **定位**：全阶段实证验证、对抗评测与终审归档目录。
 * **核心资产**：
-  - `src/gated_mem/`：包含 6 大核心模块与多 Agent 适配层（`adapters/`）、向量引擎（`embeddings.py`）、MCP 服务端（`server.py`）、命令行工具（`cli.py`）、HTML 导出器（`exporter.py`），核心内核 100% 仅依赖 Python 标准库。
-  - `tests/`：13 个测试套件，**176 项单测全绿通过**，覆盖率稳达 **90.0%**，包含 AST 语法级纯净度、零依赖结构性守卫与安装可逆性回归测试。
+  - [reports/phase5_executive_adjudication_verdict.md](benchmarks/reports/phase5_executive_adjudication_verdict.md)：**阶段五终审裁决书（`GM-VERDICT-P5-FINAL-v1.0.1`）**，核准 `v1.0.0` 上线并确立 `v1.1-external-eval` 异步评测双轨制。
+  - [reports/phase5_release_final_audit.md](benchmarks/reports/phase5_release_final_audit.md)：v1.0.0 发布前独立黑盒复核报告。
+  - [reports/phase5_e3_report.md](benchmarks/reports/phase5_e3_report.md)：阶段五 E3 跨模块同符号碰撞消歧实测报告（Fusion 90% vs 最强单通道 50%，净增益 +40.00pp）。
+  - [eval_phase5_e3.py](benchmarks/eval_phase5_e3.py) / [gate2_check.py](benchmarks/gate2_check.py) / [gate3_check.py](benchmarks/gate3_check.py)：自动化评测与发布门禁机检脚本。
 
----
-
-### 2.3 `benchmarks/` —— 基准测试体系、数据与报告
-* **定位**：实证验证与对抗评测大本营。
+### 2.3 `docs/` 与 `experiments_v2/` —— 运维规范、演示与外部基准演进
+* **定位**：环境配置、交互式离线演示及面向 `v1.1-external-eval` 分支的外部基准（MemoryAgentBench CR / Memora）筹备区。
 * **核心资产**：
-  - [reports/phase2_report.md](benchmarks/reports/phase2_report.md)：主程提交的阶段二交付报告。
-  - [reports/phase2_gemini_audit.md](benchmarks/reports/phase2_gemini_audit.md)：Gemini-3.8-Flash 异构黑盒审计报告与放行签署。
-  - [gate2_check.py](benchmarks/gate2_check.py)：Gate 2 六项硬指标一键机检脚本。
-  - [data/phase2_dense_stress_15.json](benchmarks/data/phase2_dense_stress_15.json)：15 组高密度多跳压测数据集（599 KB）。
-
----
-
-### 2.4 `docs/` —— 团队运维、交接与大模型原始指示
-* **定位**：工程落地期团队协同、技术交接与历史对话原始凭证。
-* **核心资产**：
-  - [phase2_handoff.md](docs/phase2_handoff.md)：阶段二至阶段三技术交接文档（接口签名、已知边界、MCP 与 CLI 规约）。
-  - [CONTRACT_P2_STRESS.md](docs/CONTRACT_P2_STRESS.md)：阶段二压测数据集契约。
-  - [phase1_handoff.md](docs/phase1_handoff.md)：阶段一至阶段二技术交接文档。
+  - [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md)：隔离虚拟环境配置指南与多版本 numpy 冲突避坑记录。
+  - [docs/PHASE5_V11_EXTERNAL_EVAL_PLAN.md](docs/PHASE5_V11_EXTERNAL_EVAL_PLAN.md)：v1.1 外部学术基准执行规划（`GM-PLAN-P5-V11-v1.0`）。
+  - [experiments_v2/HANDOFF.md](experiments_v2/HANDOFF.md)：`experiments_v2` 交接说明与已跑通的 E0/E3（builtin 模式）实测记录。
 
 ---
 
 ## 3. 常见工作流快速跳转 (Fast-Tracks)
 
-### 🚀 路径 A：交付大模型进行阶段二终审裁决与阶段三放行
-1. 打开 [total_plan/phase2_executive_adjudication_dossier.md](total_plan/phase2_executive_adjudication_dossier.md)；
-2. 复制整篇内容发送给大模型（Argon / Arbiter），由大模型根据案卷第七节的【终审裁决选票】做出阶段三放行与算法技术选型决策。
-
-### 🚀 路径 B：运行阶段二完整验证套件 (一键复现)
-在工作区根目录下执行：
+### 🚀 路径 A：运行全量验证套件
+在仓库根目录下执行：
 ```bash
-# 1. 运行 79 项单元测试
+# 1. 运行 190 项单元测试
 python -m pytest tests/ -q
 
-# 2. 验证代码行覆盖率 (93%)
-python -m coverage run --source=src/gated_mem -m pytest tests/ -q
-python -m coverage report -m
+# 2. 验证核心包零第三方依赖 (-S 隔离 site-packages)
+python -S -c "import sys; sys.path.insert(0, 'src'); import gated_mem, gated_mem.cli, gated_mem.server, gated_mem.adapters"
 
-# 3. 运行 Gate 2 六项硬指标一键机检 (15/15 PASS)
+# 3. 运行 Gate 2 / Gate 3 硬指标机检（需安装 coverage；Gate 3 满血检索需 [onnx]）
 python benchmarks/gate2_check.py
+python benchmarks/gate3_check.py
 
-# 4. 运行 15 组外部高压对抗压测集
-python benchmarks/run_phase2_stress.py
+# 4. 复现阶段五 E3 跨模块碰撞消歧（零依赖字面模式 / fastembed 语义模式）
+python benchmarks/eval_phase5_e3.py --provider builtin
+python benchmarks/eval_phase5_e3.py
 ```
 
-### 🚀 路径 C：启动阶段三开发 (MCP Server 与 CLI)
-1. 参阅 [docs/phase2_handoff.md](docs/phase2_handoff.md) 获取阶段三接口契约与开工清单；
-2. 查阅 [benchmarks/reports/phase2_gemini_audit.md](benchmarks/reports/phase2_gemini_audit.md) 注意事项（防范 write_event 副作用、补齐 BM25 与向量相似度融合）。
+### 🚀 路径 B：双轨制分支开发规范
+- **`master` 分支**：承接核心内核稳定性加固、文档同步与版本维护提交。
+- **`v1.1-external-eval` 分支**：严格基于 `v1.0.0` Tag 异步推进 E1（MemoryAgentBench CR）与 E2（Memora）外部学术基准实验，保持与已发布 Wheel 逐字节对齐。
